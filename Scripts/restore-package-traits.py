@@ -2,7 +2,8 @@
 """Put the committed SwiftPM package traits back into project.pbxproj.
 
 Codemagic's `xcode-project use-profiles` re-saves the project through the
-xcodeproj gem, which drops the `traits` attribute it does not know.
+xcodeproj gem, which drops the `traits` attribute it does not know. Without
+them AetherEngine builds with object audio and dual-layer Dolby Vision off.
 Run it after `use-profiles`; it fails the build if a trait cannot be restored.
 """
 import re

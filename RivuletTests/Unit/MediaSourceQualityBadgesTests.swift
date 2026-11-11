@@ -9,6 +9,7 @@
 import XCTest
 @testable import Rivulet
 
+@MainActor // Reference Player: MediaSource's badges read FormatIndexStore, so they are main-actor
 final class MediaSourceQualityBadgesTests: XCTestCase {
 
     func test_4kDolbyVision_eac3_5_1() {

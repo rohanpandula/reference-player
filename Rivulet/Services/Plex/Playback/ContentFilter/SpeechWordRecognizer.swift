@@ -56,8 +56,17 @@ final class SpeechModelStore: ObservableObject {
             .appendingPathComponent(folderName, isDirectory: true)
     }
 
+    /// Reference Player: BackgroundAssets ends the process ("The app couldn't be validated") when the
+    /// app group it is configured with is out of reach, and every player session asks this store
+    /// for its state. A build whose provisioning lacks the group loses the speech model, not playback.
+    nonisolated private static let assetPacksUsable: Bool = {
+        guard let group = Bundle.main.object(forInfoDictionaryKey: "BAAppGroupID") as? String else { return false }
+        return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: group) != nil
+    }()
+
     /// The model folder inside the asset pack, when the pack is on the device.
     nonisolated private static var packDirectory: URL? {
+        guard assetPacksUsable else { return nil }
         guard let file = try? AssetPackManager.shared.url(for: FilePath("\(folderName)/config.json")) else { return nil }
         let folder = file.deletingLastPathComponent()
         return AsrModels.modelsExist(at: folder, version: version) ? folder : nil
@@ -122,6 +131,7 @@ final class SpeechModelStore: ObservableObject {
     }
 
     nonisolated private static func downloadPack(progress: @escaping @Sendable (Double) -> Void) async throws {
+        guard assetPacksUsable else { throw CocoaError(.fileReadNoPermission) }
         let manager = AssetPackManager.shared
         let pack = try await manager.assetPack(withID: assetPackID)
         let updates = Task {

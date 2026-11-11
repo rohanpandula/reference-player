@@ -4,14 +4,12 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.bain.Rivulet</string>
+		<string>group.com.example.referenceplayer</string>
 	</array>
-	<!-- App Attest. Proves to our Workers that a request comes from the genuine
-	     app on genuine Apple hardware. "development" talks to Apple's dev
-	     attestation service; TestFlight and App Store builds MUST use
-	     "production" or every attestation is rejected on-device. -->
-	<key>com.apple.developer.devicecheck.appattest-environment</key>
-	<string>$(APPATTEST_ENVIRONMENT)</string>
+	<!-- Reference Player: no upstream App Attest identity, and no aps-environment (it
+	     rode the removed APPATTEST_ENVIRONMENT setting; only App Store Connect requires
+	     it beside CloudKit). The owned App Group and iCloud container need a
+	     provisioning team that supports them. -->
 	<!-- iCloud sync of preferences (NSUbiquitousKeyValueStore). Same store as iOS: one bundle id. -->
 	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
 	<string>$(TeamIdentifierPrefix)$(CFBundleIdentifier)</string>
@@ -22,10 +20,7 @@
 	</array>
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
-		<string>iCloud.com.gstudios.rivulet.sync</string>
+		<string>iCloud.com.example.referenceplayer.sync</string>
 	</array>
-	<!-- App Store Connect rejects a tvOS app with CloudKit but no aps-environment (ITMS-90575). -->
-	<key>aps-environment</key>
-	<string>$(APPATTEST_ENVIRONMENT)</string>
 </dict>
 </plist>

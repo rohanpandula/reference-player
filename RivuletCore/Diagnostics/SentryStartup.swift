@@ -30,6 +30,9 @@ public enum SentryStartup {
     @MainActor
     /// `configure` sets options that only exist on the caller's platform.
     public static func start(platform: Platform, configure: @escaping (Options) -> Void = { _ in }) {
+        // This fork ships an empty DSN. Enforce the opt-out centrally so
+        // both app targets avoid SDK startup, not just outbound event delivery.
+        guard !Secrets.sentryDSN.isEmpty else { return }
         SentrySDK.start { options in
             options.dsn = Secrets.sentryDSN
             options.debug = false

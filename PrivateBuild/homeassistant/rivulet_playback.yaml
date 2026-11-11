@@ -1,0 +1,65 @@
+# Home Assistant package for Reference Player's playback report.
+#
+# Reference Player posts JSON to a webhook (Settings > Playback > Home Assistant on the Apple TV
+# shows the address and the webhook id; reporting is off until you turn it on there). This
+# trigger-based template sensor turns each post into `sensor.rivulet_playback` with the
+# report's fields as attributes, so a dashboard can show the Apple TV's source quality
+# beside what your receiver or TV integration reports receiving. No token lives in the app;
+# `local_only` keeps the webhook to the local network.
+#
+# Install: copy to /config/packages/rivulet_playback.yaml, replace RIVULET_WEBHOOK_ID
+# with the id the Apple TV shows, run the configuration check, then reload template
+# entities (Developer tools > YAML) or restart. Remove the file to uninstall.
+template:
+  - trigger:
+      - trigger: webhook
+        webhook_id: "RIVULET_WEBHOOK_ID"
+        allowed_methods:
+          - POST
+        local_only: true
+    sensor:
+      - name: "Rivulet playback"
+        unique_id: rivulet_playback
+        icon: mdi:apple
+        state: "{{ trigger.json.get('state') or 'unknown' }}"
+        attributes:
+          player: "{{ trigger.json.get('player') }}"
+          app_version: "{{ trigger.json.get('app_version') }}"
+          device: "{{ trigger.json.get('device') }}"
+          device_model: "{{ trigger.json.get('device_model') }}"
+          os_version: "{{ trigger.json.get('os_version') }}"
+          engine: "{{ trigger.json.get('engine') }}"
+          title: "{{ trigger.json.get('title') }}"
+          series: "{{ trigger.json.get('series') }}"
+          episode: "{{ trigger.json.get('episode') }}"
+          year: "{{ trigger.json.get('year') }}"
+          video_mode: "{{ trigger.json.get('video_mode') }}"
+          audio_mode: "{{ trigger.json.get('audio_mode') }}"
+          video_codec: "{{ trigger.json.get('video_codec') }}"
+          resolution: "{{ trigger.json.get('resolution') }}"
+          frame_rate: "{{ trigger.json.get('frame_rate') }}"
+          hdr_format: "{{ trigger.json.get('hdr_format') }}"
+          dolby_vision_profile: "{{ trigger.json.get('dolby_vision_profile') }}"
+          dolby_vision_layer: "{{ trigger.json.get('dolby_vision_layer') }}"
+          dolby_vision_route: "{{ trigger.json.get('dolby_vision_route') }}"
+          dual_layer_route_taken: "{{ trigger.json.get('dual_layer_route_taken') }}"
+          video_route: "{{ trigger.json.get('video_route') }}"
+          audio_codec: "{{ trigger.json.get('audio_codec') }}"
+          audio_channels: "{{ trigger.json.get('audio_channels') }}"
+          audio_language: "{{ trigger.json.get('audio_language') }}"
+          audio_decoder: "{{ trigger.json.get('audio_decoder') }}"
+          audio_delivery: "{{ trigger.json.get('audio_delivery') }}"
+          height_speakers: "{{ trigger.json.get('height_speakers') }}"
+          height_layout_active: "{{ trigger.json.get('height_layout_active') }}"
+          objects_total: "{{ trigger.json.get('objects_total') }}"
+          objects_active: "{{ trigger.json.get('objects_active') }}"
+          objects_elevated: "{{ trigger.json.get('objects_elevated') }}"
+          height_channels: "{{ trigger.json.get('height_channels') }}"
+          heights_source: "{{ trigger.json.get('heights_source') }}"
+          heights_window_seconds: "{{ trigger.json.get('heights_window_seconds') }}"
+          heights_route: "{{ trigger.json.get('heights_route') }}"
+          heights_note: "{{ trigger.json.get('heights_note') }}"
+          bitrate_mbps: "{{ trigger.json.get('bitrate_mbps') }}"
+          observed_fps: "{{ trigger.json.get('observed_fps') }}"
+          dropped_frames: "{{ trigger.json.get('dropped_frames') }}"
+          reported_at: "{{ trigger.json.get('reported_at') }}"

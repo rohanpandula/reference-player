@@ -112,3 +112,9 @@ Screenshots/AppStore/*
 # MCP server config — machine-specific, holds absolute local paths.
 .mcp.json
 .vscode/
+
+# Reference Player build artifacts and local captures (PrivateBuild/); never commit credentials or logs.
+PrivateBuild/.build/
+PrivateBuild/captures/
+__pycache__/
+*.pyc

@@ -41,6 +41,7 @@ enum SettingsDescriptorStore {
         if id.hasPrefix("sq_") { return descriptors["streamingQualityOption"] }
         if id.hasPrefix("al_") { return descriptors["audioLanguage"] }
         if id.hasPrefix("sl_") { return descriptors["subtitleLanguage"] }
+        if id.hasPrefix("hs_") { return descriptors["heightSpeakers"] }
         if id.hasPrefix("sm_") { return descriptors["subtitleMode"] }
         if id.hasPrefix("ai_") { return descriptors["appIcon"] }
         if id.hasPrefix("hh_") { return descriptors["homeHero"] }
@@ -630,7 +631,7 @@ enum SettingsDescriptorStore {
             icon: "link",
             description: "Optional. A folder or address with per-title MCF or EDL filter files. From moviecontentfilter.com, download the EDL with your copy's times."
         ),
-    ]
+    ].merging(PrivateSettings.descriptors) { upstream, _ in upstream }
 
     // MARK: - Page Descriptors
 
@@ -693,6 +694,7 @@ enum SettingsDescriptorStore {
         case .addTvheadend: return ("tv", .systemBlue)
         case .addThreadfin: return ("server.rack", .systemBlue)
         case .addPlaylistURL: return ("list.bullet.rectangle", .systemGreen)
+        case .heightSpeakersPicker, .homeAssistant, .formatTags, .metadataKeys: return PrivateSettings.pageInfo(for: page)
         }
     }
 }

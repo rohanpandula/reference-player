@@ -163,7 +163,7 @@ final class DispatcharrURLBuilderTests: XCTestCase {
     /// it is safe to send to any IPTV server.
     func test_userAgent_identifiesRivuletAndLeaksNothing() {
         let agent = LiveTVClientIdentity.userAgent
-        XCTAssertTrue(agent.hasPrefix("Rivulet/"), "unexpected user agent: \(agent)")
+        XCTAssertTrue(agent.hasPrefix("\(PrivateBuildPolicy.userAgentProduct)/"), "unexpected user agent: \(agent)")
         XCTAssertEqual(LiveTVClientIdentity.streamHeaders["User-Agent"], agent)
     }
 

@@ -42,8 +42,13 @@ extension AudioTrack {
         case "eac3":                    name = "E-AC3"
         case "truehd":                  name = "TrueHD"
         case "dca", "dts":
-            if p.contains("ma")     {   name = "DTS-HD MA" }
-            else if p.contains("x") {   name = "DTS-X" }
+            // Reference Player: Plex and ffprobe both write DTS:X as an extension of DTS-HD MA
+            // ("ma + dts:x", "DTS-HD MA + DTS:X IMAX"), so it is asked first. A bare "x" matched
+            // DTS Express and never won against "ma".
+            if ["dts:x", "dts-x", "dtsx", "dts x"].contains(where: p.contains) || p == "x" {
+                                        name = "DTS-X" }
+            else if p.contains("ma") {  name = "DTS-HD MA" }
+            else if p.contains("hra") { name = "DTS-HD HRA" }
             else                    {   name = "DTS" }
         case "flac":                    name = "FLAC"
         case "alac":                    name = "ALAC"

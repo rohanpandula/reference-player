@@ -7,7 +7,7 @@ import Foundation
 /// file is moved inside the delegate callback, before the system deletes it.
 nonisolated final class IOSDownloadTransfer: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
     static let shared = IOSDownloadTransfer()
-    static let sessionIdentifier = "com.gstudios.rivulet.downloads"
+    static let sessionIdentifier = "com.example.referenceplayer.downloads"
     static let cellularKey = "downloadOverCellular"
     static let directory = URL.applicationSupportDirectory.appending(path: "Downloads", directoryHint: .isDirectory)
 

@@ -16,7 +16,7 @@ import Foundation
 /// Plex API constants
 enum PlexAPI: Sendable {
     static let baseUrl = "https://plex.tv"
-    static let productName = "Rivulet"
+    static let productName = PrivateBuildPolicy.productName  // Reference Player: the name servers are told.
 
     /// Host-injected, defaulting to the tvOS app's values. The iOS app
     /// overrides both at launch (RivuletiOSApp.init), before any request is

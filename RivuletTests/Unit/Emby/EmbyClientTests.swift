@@ -21,7 +21,7 @@ final class EmbyClientTests: XCTestCase {
 
     func test_authorization_isMediaBrowserForm_withEncodedDeviceAndToken() {
         let header = client().authorization
-        XCTAssertTrue(header.hasPrefix(#"MediaBrowser Client="Rivulet", Device="Apple%20TV", DeviceId=""#), header)
+        XCTAssertTrue(header.hasPrefix(#"MediaBrowser Client="\#(PlexAPI.productName)", Device="Apple%20TV", DeviceId=""#), header)
         XCTAssertTrue(header.contains(#"DeviceId="\#(PlexAPI.clientIdentifier)", Version=""#), header)
         XCTAssertTrue(header.hasSuffix(#", Token="tok""#), header)
         XCTAssertFalse(header.contains("'"), "Emby HTML-encodes apostrophes, so they do not round-trip")

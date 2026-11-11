@@ -23,7 +23,7 @@ enum LiveTVClientIdentity {
     /// so it is safe to send to any server and safe to log.
     nonisolated static let userAgent: String = {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
-        return "Rivulet/\(version)"
+        return "\(PrivateBuildPolicy.userAgentProduct)/\(version)"  // Reference Player: the fork's name as a token, not upstream's.
     }()
 
     /// Headers attached to every Live TV stream load. Kept as a single value so

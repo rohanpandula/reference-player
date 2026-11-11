@@ -10,7 +10,7 @@ import UIKit
 @MainActor
 final class IOSDownloadActivity {
     static let shared = IOSDownloadActivity()
-    private static let identifierPrefix = "com.gstudios.rivulet.downloads.activity"
+    private static let identifierPrefix = "com.example.referenceplayer.downloads.activity"
 
     private let center = IOSDownloadCenter.shared
     private var task: BGContinuedProcessingTask?

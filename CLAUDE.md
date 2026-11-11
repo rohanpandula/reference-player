@@ -1,3 +1,6 @@
+@PrivateBuild/CLAUDE-private.md
+Reference Player: if your tool does not follow the import above, read `PrivateBuild/CLAUDE-private.md` first; it takes precedence over this file wherever the two disagree.
+
 # Rivulet - Claude Context
 
 Rivulet is a tvOS and iOS media client for Plex, Jellyfin, Emby and IPTV. The primary surfaces (Home, Library, Search, Discover, Media Detail, the preview carousel, Person detail, Music, and the player chrome) are **UIKit**, as is Settings; SwiftUI remains for thin navigation shells and Live TV slots.

@@ -1,0 +1,37 @@
+# A markdown card for a dashboard, to sit beside your receiver and TV cards. An entities
+# card with attribute rows works too; this is the markdown alternative. Needs
+# sensor.rivulet_playback from rivulet_playback.yaml.
+#
+# Heights: on the native route the counts are live telemetry; on the FEL (software) route they
+# come from the engine's session log, as maxima over its 5 s then 30 s level windows.
+# "Live" means a playback state and a report younger than 45 seconds: the app reports
+# every ten seconds while playing, so an older report means the app stopped without
+# saying so (killed, Apple TV asleep, network gone).
+- type: markdown
+  title: Reference Player on the Apple TV
+  content: |-
+    {% set s = states('sensor.rivulet_playback') %}
+    {% set a = states.sensor.rivulet_playback.attributes if s not in ['unknown', 'unavailable'] else {} %}
+    {% set age = (now() - as_datetime(a.get('reported_at'))).total_seconds() if a.get('reported_at') else none %}
+    {% set live = s in ['playing', 'paused', 'buffering'] and age is not none and age < 45 %}
+    {% set stale = s in ['playing', 'paused', 'buffering'] and not live %}
+    {% set na = 'Nothing playing' if s == 'idle' else ('Last report ' ~ (age | round(0) | int) ~ ' s ago, app silent since' if stale else 'No report yet') %}
+    {% macro row(label, value) -%}
+    | {{ label }} | {% if live %}{{ value if value not in [none, '', 'None'] else 'Not reported' }}{% else %}{{ na }}{% endif %} |
+    {%- endmacro %}
+    | Reading | Reported value |
+    | :--- | :--- |
+    | Player | {{ (s | title) if s not in ['unknown', 'unavailable'] else 'No report yet' }}{{ ' (stale)' if stale else '' }} |
+    {{ row('Apple TV', (a.get('device') or '') ~ (', ' ~ a.get('os_version') if a.get('os_version') else '')) }}
+    {{ row('Title', (a.get('title') or '') ~ (' (' ~ a.get('series') ~ ' ' ~ a.get('episode') ~ ')' if a.get('episode') else '')) }}
+    {{ row('Video', ((a.get('video_codec') or '') | upper) ~ ' ' ~ (a.get('resolution') or '') ~ (' @ ' ~ (a.get('frame_rate') | round(3)) ~ ' fps' if a.get('frame_rate') else '')) }}
+    {{ row('HDR', (a.get('hdr_format') or '') ~ (', Profile ' ~ a.get('dolby_vision_profile') if a.get('dolby_vision_profile') else '') ~ (' ' ~ a.get('dolby_vision_layer') if a.get('dolby_vision_layer') else '')) }}
+    {{ row('Dolby Vision route', a.get('dolby_vision_route') or 'Not Dolby Vision') }}
+    {{ row('Audio', ((a.get('audio_codec') or '') | upper) ~ (' ' ~ a.get('audio_channels') ~ ' ch' if a.get('audio_channels') else '') ~ (' via ' ~ a.get('audio_decoder') if a.get('audio_decoder') else '')) }}
+    {{ row('Height Speakers setting', a.get('height_speakers')) }}
+    {{ row('Heights route', a.get('heights_route')) }}
+    {{ row('Heights live', (a.get('height_layout_active') ~ ': ' ~ (a.get('objects_active') if a.get('objects_active') is not none else '?') ~ ' of ' ~ (a.get('objects_total') if a.get('objects_total') is not none else '?') ~ ' objects active, ' ~ (a.get('objects_elevated') if a.get('objects_elevated') is not none else '?') ~ ' elevated' ~ (' (most at once over ' ~ (a.get('heights_window_seconds') | round(0) | int) ~ ' s)' if a.get('heights_window_seconds') else '')) if a.get('height_layout_active') else (a.get('heights_note') or 'Not rendering heights')) }}
+    {{ row('Bitrate', (a.get('bitrate_mbps') | round(1)) ~ ' Mb/s' if a.get('bitrate_mbps') else none) }}
+    {{ row('Delivery', (a.get('video_mode') or '') ~ ' / ' ~ (a.get('audio_delivery') or a.get('audio_mode') or '')) }}
+
+    The player's own account of the source and its routes. Your receiver and TV show what actually arrives.

@@ -232,6 +232,12 @@ final class MediaDetailChromeView: UIView {
         backgroundColor = .clear
         isUserInteractionEnabled = false  // host flips this on for .expandedDetail
 
+        // The DV FEL/MEL badge reads the format index, which can land after the first hero is
+        // drawn, and the tags switch also renames the TrueHD Atmos badge; rebuild the quality row
+        // when either changes.
+        NotificationCenter.default.addObserver(self, selector: #selector(formatIndexDidChange),
+                                               name: FormatIndexStore.didChange, object: nil)
+
         logoSlotView.addSubview(titleLogoImageView)
         logoSlotView.addSubview(titleFallbackLabel)
 
@@ -941,6 +947,11 @@ final class MediaDetailChromeView: UIView {
 
     /// Apple dims the whole metadata row, text and badges alike.
     private static let qualityRowAlpha: CGFloat = 0.75
+
+    @objc private func formatIndexDidChange() {
+        guard let item else { return }
+        rebuildQualityRow(item: item, detail: detail)
+    }
 
     private func rebuildQualityRow(item: MediaItem, detail: MediaItemDetail?) {
         qualityRow.arrangedSubviews.forEach { $0.removeFromSuperview() }

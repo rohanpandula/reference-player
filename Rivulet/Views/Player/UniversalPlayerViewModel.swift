@@ -551,6 +551,7 @@ final class UniversalPlayerViewModel: ObservableObject {
     /// `.provider` only: the play session's reporter. Recreated when the
     /// stream (and with it the play session) changes; nil once stopped.
     private var providerReporter: (any ProgressReporter)?
+    var homeAssistantSessionBegun = false  // Reference Player: see UniversalPlayerViewModel+HomeAssistant.swift.
     private var providerReporterStarted = false
     /// Provider reports run in call order: a progress must never reach the
     /// server ahead of the start it follows.
@@ -1750,6 +1751,7 @@ final class UniversalPlayerViewModel: ObservableObject {
         trackQualityStall(from: playbackState, to: state)
         playbackState = state
         isBuffering = state == .buffering
+        reportToHomeAssistant(state) { [weak self] in self?.isSwappingItem ?? false }
         switch state {
         case .playing: diagnostics.noteStarted()
         case .ended: diagnostics.noteEnd(.ended, position: currentTime)
@@ -1962,7 +1964,8 @@ final class UniversalPlayerViewModel: ObservableObject {
                 activity.title = metadata.title
                 activity.isEligibleForSearch = true
                 activity.userInfo = ["ratingKey": metadata.ratingKey ?? ""]
-                activity.targetContentIdentifier = "rivulet://play?ratingKey=\(metadata.ratingKey ?? "")"
+                // Use the shared builder so this fork's URLs cannot open the stock app.
+                activity.targetContentIdentifier = RivuletLink(.play, ratingKey: metadata.ratingKey ?? "").url?.absoluteString
                 self.userActivity = activity
                 activity.becomeCurrent()
             }
@@ -3832,6 +3835,7 @@ final class UniversalPlayerViewModel: ObservableObject {
 
     func stopPlayback() {
         stopCount += 1
+        endHomeAssistantSession()
         if case .failed = playbackState {
             diagnostics.noteEnd(.failed, position: currentTime)
         } else {
@@ -6732,6 +6736,7 @@ final class UniversalPlayerViewModel: ObservableObject {
     /// Send `stopped` once for the current play session, even if it never
     /// started: the provider ends its encoding on it.
     private func stopProviderReporter(at position: TimeInterval) async {
+        endHomeAssistantSession()
         guard let reporter = providerReporter else {
             await providerReportTail?.value
             return
@@ -6777,6 +6782,7 @@ final class UniversalPlayerViewModel: ObservableObject {
     // MARK: - Cleanup
 
     deinit {
+        Task { @MainActor in HomeAssistantReporter.shared.end() }  // Reference Player: no torn-down player left playing in Home Assistant.
         // Clean up AVPlayer time observer (must happen synchronously in deinit)
         if let timeObserver = _timeObserverForCleanup, let player = _playerForCleanup {
             player.removeTimeObserver(timeObserver)

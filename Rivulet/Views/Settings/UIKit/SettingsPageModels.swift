@@ -252,6 +252,7 @@ enum SettingsContent {
         case .contentFilter:          return contentFilter
         case .contentFilterStrength:  return contentFilterStrength
         case .contentFilterWords:     return contentFilterWords
+        case .heightSpeakersPicker, .homeAssistant, .formatTags, .metadataKeys: return PrivateSettings.rows(for: page)
         }
     }
 
@@ -556,6 +557,7 @@ enum SettingsContent {
                     if on { SpeechModelStore.shared.prepare() }
                     (vc as? SettingsPageViewController)?.reloadRows()
                 })),
+        ] + PrivateSettings.integrationRows + [
             .header("Resume"),
             toggle("instantResume", "Instant Resume", key: "continueWatchingInstantResume", default: true),
             // The prompt only has anything to interrupt while a Continue
@@ -608,6 +610,7 @@ enum SettingsContent {
                                          })),
             .header("Home Theater"),
             toggle("upscaleLowResolution", "Upscale SD and 720p", key: AetherPlayer.upscaleKey, default: false),
+        ] + PrivateSettings.homeTheaterRows + [
             .header("Filtering"),
             SettingsRowItem(id: "cat_contentFilter", title: "Content Filtering",
                             kind: .navigationValue(.contentFilter, value: {

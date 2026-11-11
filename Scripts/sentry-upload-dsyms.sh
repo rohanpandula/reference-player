@@ -16,6 +16,12 @@
 
 set -u
 
+# This fork never uploads symbols or source code to upstream's Sentry account, even
+# if the building Mac has sentry-cli or an old .sentryclirc. Monitoring with your
+# own account is a separate, reviewed change.
+echo "sentry: disabled in this fork (no symbols or sources uploaded)"
+exit 0
+
 # Only upload for non-debug builds. Debug uses plain DWARF (no dSYM) anyway.
 if [ "${CONFIGURATION:-}" = "Debug" ]; then
   echo "sentry: skipping dSYM upload for Debug configuration"

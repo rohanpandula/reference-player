@@ -36,6 +36,7 @@ struct MediaSource: Hashable, Sendable, Identifiable {
     }
 }
 
+@MainActor  // Reference Player: the badges read FormatIndexStore (FormatTagBadges.swift); every caller is UI.
 extension MediaSource {
     /// Display badges for the hero quality row, e.g. ["4K", "DV", "E-AC3 5.1"].
     /// Order is stable: resolution first, then HDR/range, then audio.
@@ -61,7 +62,7 @@ extension MediaSource {
     var detailBadges: [String] {
         var badges = [definitionBadge].compactMap { $0 } + rangeBadges
         if let audio = audioBadge {
-            if audio.hasSuffix("Atmos") { badges.append("Atmos") } else if audio.hasPrefix("DTS-X") { badges.append("DTS:X") }
+            if audio.hasSuffix("Atmos") { badges.append(atmosDetailBadge) } else if audio.hasPrefix("DTS-X") { badges.append("DTS:X") }
         }
         if subtitleTracks.contains(where: { ["eia_608", "eia_708"].contains($0.codec.lowercased()) }) { badges.append("CC") }
         if subtitleTracks.contains(where: \.isHearingImpaired) { badges.append("SDH") }
@@ -76,7 +77,8 @@ extension MediaSource {
     static let filledBadges: Set<String> = ["4K", "HD", "HDR", "HDR10+", "HLG"]
 
     /// Range badges; a Dolby Vision file that also carries HDR10+ gets both (#371).
-    var rangeBadges: [String] {
+    var rangeBadges: [String] { formatIndexRangeBadges(plain: plainRangeBadges) }  // Reference Player: FormatTagBadges.swift.
+    private var plainRangeBadges: [String] {
         guard let video = videoTracks.first else { return [] }
         switch video.videoRange {
         case .dolbyVision: return video.hasHDR10Plus ? ["DV", "HDR10+"] : ["DV"]

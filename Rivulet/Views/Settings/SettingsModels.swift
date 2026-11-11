@@ -56,6 +56,7 @@ enum SettingsPage: Hashable, CaseIterable {
     case homeQualityPicker, awayQualityPicker
     case audioLanguagePicker, subtitleLanguagePicker
     case contentFilter, contentFilterStrength, contentFilterWords
+    case heightSpeakersPicker, homeAssistant, formatTags, metadataKeys // Reference Player: PrivateSettingsContent.swift
 
     var title: String {
         switch self {
@@ -98,6 +99,7 @@ enum SettingsPage: Hashable, CaseIterable {
         case .contentFilter: return String(localized: "Content Filtering")
         case .contentFilterStrength: return String(localized: "Profanity")
         case .contentFilterWords: return String(localized: "Custom Words")
+        case .heightSpeakersPicker, .homeAssistant, .formatTags, .metadataKeys: return PrivateSettings.title(for: self)
         }
     }
 }

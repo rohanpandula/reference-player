@@ -25,7 +25,7 @@ final class JellyfinClientTests: XCTestCase {
 
     func test_authorization_isMediaBrowserScheme_withToken() {
         let header = client().authorization
-        XCTAssertTrue(header.hasPrefix(#"MediaBrowser Client="Rivulet", Device="#), header)
+        XCTAssertTrue(header.hasPrefix(#"MediaBrowser Client="\#(PlexAPI.productName)", Device="#), header)
         XCTAssertTrue(header.contains(#"DeviceId="\#(PlexAPI.clientIdentifier)""#), header)
         XCTAssertTrue(header.hasSuffix(#", Token="tok""#), header)
     }

@@ -1,0 +1,237 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@: could not check (HTTP %lld). Try again later." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: could not check (HTTP %2$lld). Try again later."
+          }
+        }
+      }
+    },
+    "%@: key accepted." : {
+
+    },
+    "%@: key refused (HTTP %lld)." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: key refused (HTTP %2$lld)."
+          }
+        }
+      }
+    },
+    "%@: no answer. Check the network." : {
+
+    },
+    "%@: no key entered." : {
+
+    },
+    "%lld files, built %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld files, built %2$@"
+          }
+        }
+      }
+    },
+    "%lld files, built %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld files, built %2$@."
+          }
+        }
+      }
+    },
+    "Asks each service once whether it accepts your key, and says what each answered: accepted, refused, or not checked because the service was busy or out of reach." : {
+
+    },
+    "Check Keys" : {
+
+    },
+    "Close and reopen the app to load what a new key turns on." : {
+
+    },
+    "Discover and Scores" : {
+
+    },
+    "Discover, recommendations and scores come from TMDB and MDBList with your own free keys. Without a key nothing is fetched from them. Your server's details show either way." : {
+
+    },
+    "Dolby Vision FEL" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dolby Vision FEL"
+          }
+        }
+      }
+    },
+    "Dual Layer (FEL)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwei Ebenen (FEL)"
+          }
+        }
+      }
+    },
+    "FEL, MEL and TrueHD Atmos Tags" : {
+
+    },
+    "Fetches the index again now. It also refreshes on its own at launch when the cached copy is older than six hours." : {
+
+    },
+    "Format Tags" : {
+
+    },
+    "Height Speakers" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Höhenlautsprecher"
+          }
+        }
+      }
+    },
+    "Home Assistant" : {
+
+    },
+    "Home Assistant Address" : {
+
+    },
+    "Home Assistant answered. Check that sensor.rivulet_playback now shows a test report; the webhook id must match its rivulet_playback package." : {
+
+    },
+    "Home Assistant did not answer at that address." : {
+
+    },
+    "Home Assistant's rivulet_playback package must use the same id. Clear it to make a new one." : {
+
+    },
+    "How many files the loaded index describes and when it was built." : {
+
+    },
+    "Index" : {
+
+    },
+    "Index Not Updated" : {
+
+    },
+    "Index URL" : {
+
+    },
+    "Index Updated" : {
+
+    },
+    "Integrations" : {
+
+    },
+    "Keeps the height channels of object-based soundtracks, lossless over HDMI. Off plays 7.1 without them. Some soundtracks need 7.1.4 or 9.1.6." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Behält die Höhenkanäle objektbasierter Tonspuren bei, verlustfrei über HDMI. Bei „Aus“ wird 7.1 ohne sie wiedergegeben. Manche Tonspuren benötigen 7.1.4 oder 9.1.6."
+          }
+        }
+      }
+    },
+    "Key Check" : {
+
+    },
+    "MDBList Key" : {
+
+    },
+    "Names DV FEL, DV MEL and TrueHD Atmos. Dolby Vision on a second video track plays as HDR and reads HDR beside DV FEL 2-track or DV MEL 2-track. Off shows plain badges." : {
+
+    },
+    "Names what a server cannot: whether a Dolby Vision Profile 7 file is FEL or MEL, read from an index built from your library files. Also names lossless Atmos as TrueHD Atmos." : {
+
+    },
+    "Not loaded" : {
+
+    },
+    "Plays the full Dolby Vision Profile 7 layer on a Dolby Vision TV, without AirPlay or Picture in Picture. Off plays it as 8.1." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gibt die vollständige Ebene von Dolby Vision Profil 7 auf einem Dolby-Vision-Fernseher wieder, ohne AirPlay oder Bild-in-Bild. Bei „Aus“ wird Profil 7 als 8.1 wiedergegeben."
+          }
+        }
+      }
+    },
+    "Posts a report when playback starts, changes or stops, and every ten seconds while it plays. Reports go to the address below, so give it Home Assistant's local address." : {
+
+    },
+    "Refresh Now" : {
+
+    },
+    "Report Not Sent" : {
+
+    },
+    "Report Playback" : {
+
+    },
+    "Report Sent" : {
+
+    },
+    "Send Test Report" : {
+
+    },
+    "Sends one test report now and says whether Home Assistant accepted it." : {
+
+    },
+    "TMDB Key" : {
+
+    },
+    "Tells Home Assistant what is playing and how: codec, resolution, Dolby Vision route, audio format and height rendering. Off sends nothing." : {
+
+    },
+    "The address of format-index.json, built from your library files with the index tools in PrivateBuild. With no address, nothing is fetched." : {
+
+    },
+    "The index could not be fetched." : {
+
+    },
+    "The webhook id Home Assistant listens on. Put the same id in its rivulet_playback package; clear it to make a new one." : {
+
+    },
+    "Webhook ID" : {
+
+    },
+    "Where Home Assistant answers on your network, with its port." : {
+
+    },
+    "Where Home Assistant answers on your network, with its port. With no address, nothing is sent." : {
+
+    },
+    "Where the Apple TV fetches format-index.json, built from your library." : {
+
+    },
+    "Your MDBList API key." : {
+
+    },
+    "Your MDBList key, from mdblist.com under Preferences. It adds Metacritic and Letterboxd scores to a title's details. The free plan allows 1,000 lookups a day." : {
+
+    },
+    "Your TMDB API Key or API Read Access Token." : {
+
+    },
+    "Your TMDB API Key or Read Access Token (themoviedb.org, Settings, API). It turns on Discover, recommendations and actor biographies. Reopen the app after." : {
+
+    }
+  },
+  "version" : "1.0"
+}

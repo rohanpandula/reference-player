@@ -58,6 +58,8 @@ final class MediaItemDetailPageViewController: UIViewController {
     private let dateRow = UIStackView()
     private let dateLabel = UILabel()
     private let badgeRow = UIStackView()
+    /// The detail the badge row was built from, kept so a format-index change can rebuild it.
+    private var detail: MediaItemDetail?
     private var playButton: FocusableActionButton?
     /// The Play pill's own label, held so a post-playback refresh can flip
     /// Play ↔ Resume without rebuilding (and re-focusing) the action row.
@@ -169,6 +171,13 @@ final class MediaItemDetailPageViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.refreshWatchState()
+            }
+            .store(in: &refreshObservers)
+        NotificationCenter.default.publisher(for: FormatIndexStore.didChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self, let detail = self.detail else { return }
+                self.rebuildBadgeRow(detail)
             }
             .store(in: &refreshObservers)
     }
@@ -540,11 +549,18 @@ final class MediaItemDetailPageViewController: UIViewController {
         setGenres(detail.genres.isEmpty ? fallbackGenres : detail.genres)
         infoColumns.configure(detail: detail)
         showExtras(detail)
+        self.detail = detail
+        rebuildBadgeRow(detail)
+        addVersionsButton(detail)
+    }
+
+    /// The badge row (`MediaSource.detailBadges`). Rebuilt when the format index changes, since the
+    /// DV FEL/MEL and TrueHD Atmos badges read it.
+    private func rebuildBadgeRow(_ detail: MediaItemDetail) {
         badgeRow.arrangedSubviews.forEach { $0.removeFromSuperview() }
         for text in detail.primarySource?.detailBadges ?? [] {
             badgeRow.addArrangedSubview(Self.badge(text, filled: MediaSource.filledBadges.contains(text)))
         }
-        addVersionsButton(detail)
     }
 
     /// The Extras row between the title and the info columns, only when the episode has some.

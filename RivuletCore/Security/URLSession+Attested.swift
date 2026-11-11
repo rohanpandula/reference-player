@@ -20,6 +20,14 @@ extension URLSession {
     /// On real hardware an unsigned request fails here instead of going out: both
     /// Workers enforce attestation, so it could only come back 401.
     func attestedData(for request: URLRequest) async throws -> (Data, URLResponse) {
+        // Reference Player: the user's own TMDB and MDBList keys answer the metadata routes they
+        // can (DirectMetadata), on a session of its own. That path never contacts upstream's Workers.
+        if let answer = try await DirectMetadata.answer(request) { return answer }
+        // A separately signed fork cannot authenticate as upstream.
+        // Stop before attestation enrollment OR any request leaves this process.
+        guard PrivateBuildPolicy.allowsUpstreamHostedServices else {
+            throw URLError(.userAuthenticationRequired)
+        }
         let client = AppAttestClient.shared
         let signed = await client.attest(request)
         if client.isSupported && !AppAttestClient.isSigned(signed) {

@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "bundle_id": "com.example.referenceplayer",
+  "team_id": "",
+  "app_group": "group.com.example.referenceplayer",
+  "url_scheme": "referenceplayer",
+  "display_name": "Reference Player"
+}

@@ -39,6 +39,10 @@ struct RivuletApp: App {
         // before any read. An explicit user choice still wins.
         UserDefaults.standard.register(defaults: ["showHomeHero": true])
         SkipLengthKeys.migrateLegacyKeys()
+        // Reference Player defaults only; use the existing FEL and Height Speakers UI.
+        // Register before settleFELDefault so fresh and existing installs agree.
+        PrivatePlaybackDefaults.register()
+        PrivateLaunch.startFormatIndex()
         // Every surface is dark artwork, so menus, popups and alerts stay dark in Light mode
         // too; Settings alone follows the system. On the window: SwiftUI's preferredColorScheme
         // never reached UIKit's presented popups.
@@ -47,6 +51,7 @@ struct RivuletApp: App {
             let window = note.object as? UIWindow
             MainActor.assumeIsolated { window?.overrideUserInterfaceStyle = .dark }
         }
+        AetherPlayer.settleFELDefault(existingInstall: PlexAuthManager.shared.hasCredentials || JellyfinSession.account != nil)
         // Start the path monitor now; its first reading arrives after a delay.
         _ = NetworkPathMonitor.shared
 

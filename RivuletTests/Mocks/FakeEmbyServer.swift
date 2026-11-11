@@ -90,7 +90,7 @@ nonisolated final class FakeEmbyServer: @unchecked Sendable {
         let label = "\(request.httpMethod ?? "GET") \(request.url!.path)"
         var found: [String] = []
         let header = request.value(forHTTPHeaderField: "Authorization") ?? ""
-        for part in [#"MediaBrowser Client="Rivulet", Device=""#, #"", DeviceId=""#, #"", Version=""#] where !header.contains(part) {
+        for part in [#"MediaBrowser Client="\#(PlexAPI.productName)", Device=""#, #"", DeviceId=""#, #"", Version=""#] where !header.contains(part) {
             found.append("\(label): Authorization lacks \(part)")
         }
         for legacy in ["X-Emby-Token", "X-Emby-Authorization", "X-MediaBrowser-Token"]

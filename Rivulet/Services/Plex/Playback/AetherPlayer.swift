@@ -10,6 +10,7 @@
 import AVFoundation
 import Combine
 import Foundation
+import os
 import Sentry
 import SwiftUI
 import UIKit
@@ -782,10 +783,13 @@ final class AetherPlayer: PlayerProtocol {
     var dolbyVisionPlayback: DolbyVisionPlayback? {
         DolbyVisionPlayback(sourceProfile: engine.sourceDVProfile,
                             convertedTo81: engine.dolbyVisionConversion == .profile7ToProfile81,
+                            onSoftwareRoute: isOnSoftwareRoute,
                             presentsDolbyVision: engine.videoFormat == .dolbyVision,
                             presentsHDR: engine.videoFormat != .sdr,
-                            panelSupportsDolbyVision: AetherEngine.displayCapabilities.supportsDolbyVision)
+                            panelSupportsDolbyVision: AetherEngine.displayCapabilities.supportsDolbyVision,
+                            dualLayerRouteTaken: dolbyVisionDualLayerRouteTaken)
     }
+    private(set) var dolbyVisionDualLayerRouteTaken: Bool?  // Reference Player: see the extension at the end of the file.
     /// FEL or MEL for the current Profile 7 load, probed after it starts; nil otherwise.
     private(set) var dolbyVisionEnhancementLayer: DolbyVisionLayerType?
     private var enhancementLayerURL: URL?
@@ -1162,11 +1166,14 @@ final class AetherPlayer: PlayerProtocol {
             // way whichever surface plays it (VOD recordings/rips included).
             teletextPage: Self.regionTeletextPage()
         )
+        let privateLoad = applyPrivateLoadOptions(to: &options)
         // The engine takes it only for SDR below 1080p and switches it off if it can't keep up.
         options.upscalesLowResolutionVideo = UserDefaults.standard.bool(forKey: Self.upscaleKey)
         options.audioDelaySeconds = AudioSync.seconds()
         // Read ahead as far as the engine's disk budget allows; live sizes its own window.
         if !isLive { options.forwardBufferSegments = .max }
+        let p7Route = Self.beginP7RouteCapture()
+        defer { if p7Route.ownsLogHandler { EngineLog.handler = nil } }
         // New content, so the previous item's aspect ratio describes nothing.
         // Reset HERE rather than when `currentItem` goes nil: the engine also
         // swaps its player for SAME-content reasons (audio track switch,
@@ -1177,6 +1184,7 @@ final class AetherPlayer: PlayerProtocol {
         // arrives.
         videoSize = .zero
         dolbyVisionEnhancementLayer = nil
+        resetPrivateLoadState()
         enhancementLayerURL = url
         // New file: the previous track's script and fonts describe nothing,
         // even when the next episode repeats the same header and track id.
@@ -1197,6 +1205,7 @@ final class AetherPlayer: PlayerProtocol {
             errorSubject.send(pe)
             throw pe
         }
+        finishP7RouteCapture(p7Route, privateLoad)
         if engine.sourceDVProfile == 7 { probeEnhancementLayer(url: url, headers: headers ?? [:]) }
         assFonts = engine.fontAttachments.map { LibassRenderer.Font(name: $0.filename, data: $0.data) }
         // The track may have been published during the load with no fonts;
@@ -1216,7 +1225,7 @@ final class AetherPlayer: PlayerProtocol {
                 }
             }.value
             guard let self, self.enhancementLayerURL == url else { return }
-            self.dolbyVisionEnhancementLayer = layer
+            if let layer { self.dolbyVisionEnhancementLayer = layer }  // Reference Player: a failed probe keeps the route line's answer.
         }
     }
 
@@ -1764,5 +1773,145 @@ struct AetherAdvancedStats {
             && serverBytesSentLifetime == nil && serverRequestCount == nil
             && demuxerBytesFetched == nil && audioBridgeLiveBytes == nil
             && rssMb == nil
+    }
+}
+
+// MARK: - Reference Player
+
+// Everything this fork adds that reads the engine. It stays in this file because
+// AetherPlayer.swift is the only file allowed to name an AetherEngine type and `engine` is private.
+// The class keeps the hook lines (in `dolbyVisionPlayback`, `loadFile` and `probeEnhancementLayer`)
+// and `dolbyVisionDualLayerRouteTaken`, which an extension cannot store: whether the engine's
+// route line said the Profile 7 dual-layer route was taken, nil until the line arrives. Engine
+// 7.57+ can put an unconverted P7 on the software host without composing it, so the Details label
+// needs this evidence, not the route alone. The route line also gives FEL or MEL at once when the
+// engine classified the source; the probe that reads the stream follows.
+extension AetherPlayer {
+    /// What the engine says it presents: SDR, HDR10, HDR10+, HLG or Dolby Vision.
+    var presentedVideoFormatName: String {
+        switch engine.videoFormat {
+        case .sdr: "SDR"
+        case .hdr10: "HDR10"
+        case .hdr10Plus: "HDR10+"
+        case .hlg: "HLG"
+        case .dolbyVision: "Dolby Vision"
+        }
+    }
+    var sourceDolbyVisionProfile: Int? { engine.sourceDVProfile }
+    /// The source picture's coded size, from the engine's probe; nil before load or without video.
+    var sourceVideoDimensions: CGSize? {
+        guard engine.sourceVideoWidth > 0, engine.sourceVideoHeight > 0 else { return nil }
+        return CGSize(width: Int(engine.sourceVideoWidth), height: Int(engine.sourceVideoHeight))
+    }
+    var sourceVideoFrameRate: Double? { engine.sourceVideoFrameRate }
+    /// The Height Speakers setting as a layout the engine knows, nil for Off or an unknown value.
+    static func heightLayoutName(forSetting raw: String) -> String? {
+        SpatialSpeakerLayout(rawValue: raw)?.rawValue
+    }
+    static var engineVersion: String { AetherEngine.version }
+    /// The object renderer's activity. The engine's telemetry reads it from its native session only
+    /// (`nativeVideoSession?.objectAudioActivity`), and the Profile 7 dual-layer route is the software
+    /// host, so there the bridge's own session log stands in (`SpatialBridgeLogReader`).
+    var objectAudioSnapshot: ObjectAudioSnapshot? {
+        if let activity = engine.diagnostics.liveTelemetry?.objectAudio {
+            return ObjectAudioSnapshot(layout: activity.layout.rawValue, objects: activity.objects,
+                                       activeObjects: activity.activeObjects, elevatedObjects: activity.elevatedObjects,
+                                       heightChannels: activity.heightChannels, source: .telemetry, windowSeconds: nil)
+        }
+        return SpatialBridgeLogReader.shared.snapshot
+    }
+    /// The engine's verdict on the current track's heights, from its session log: rendered into a
+    /// layout, or why it stayed on the plain decode.
+    var heightsRoute: String? { SpatialBridgeLogReader.shared.heightsRoute }
+    /// True when the bridge logged for this item but none of its lines gave a layout: this build
+    /// no longer reads the engine's log, so heights are unknown rather than off.
+    var heightsLogUnread: Bool { SpatialBridgeLogReader.shared.logUnread }
+    /// Installed once per process. `EngineLog.handler` belongs to the Profile 7 route capture in
+    /// `load` and to Live TV's join capture; the structured slot is free, and the engine delivers
+    /// every line to both. The closure runs on the engine's threads.
+    private static let bridgeLogReaderInstalled: Bool = {
+        EngineLog.structuredHandler = { @Sendable line, _, _ in SpatialBridgeLogReader.shared.ingest(line) }
+        return true
+    }()
+
+    /// Speaker layout ("7.1.4"…) object audio renders into; absent = off.
+    static let heightSpeakersKey = "heightSpeakers"
+
+    /// Profile 7 FEL composition; absent = off.
+    static let dolbyVisionFELKey = "dolbyVisionFEL"
+    private static let felDefaultSettledKey = "dolbyVisionFELDefaultSettled"
+
+    /// FEL used to default on. Once, pin it on for an install that already had a server,
+    /// so only new installs get the off default.
+    static func settleFELDefault(existingInstall: Bool, defaults: UserDefaults = .standard) {
+        guard !defaults.bool(forKey: felDefaultSettledKey) else { return }
+        defaults.set(true, forKey: felDefaultSettledKey)
+        if existingInstall, defaults.object(forKey: dolbyVisionFELKey) == nil {
+            defaults.set(true, forKey: dolbyVisionFELKey)
+        }
+    }
+
+    /// The settings `loadFile` reads for the private routes, kept for the route line's Sentry report.
+    struct PrivateLoadSettings {
+        let heightLayout: SpatialSpeakerLayout?
+        let panelDV: Bool
+        let felOn: Bool
+    }
+
+    /// Height Speakers and the Profile 7 FEL route, applied to the load's options.
+    func applyPrivateLoadOptions(to options: inout LoadOptions) -> PrivateLoadSettings {
+        // Settings → Playback → Height Speakers: TrueHD Atmos and DTS:X keep their heights as a
+        // rendered bed (lossless PCM, APAC on AirPlay) instead of 7.1 without them.
+        let heightLayout = SpatialSpeakerLayout(rawValue: UserDefaults.standard.string(forKey: Self.heightSpeakersKey) ?? "")
+        if let heightLayout { options.objectAudioRendering = .render(heightLayout) }
+        // Profile 7 FEL composes both layers (#345). The engine doesn't check the panel,
+        // so keep the native route (HDR10 base) where the TV can't show Dolby Vision.
+        // The FEL route renders heights too, so both settings apply to one title (#362).
+        let panelDV = AetherEngine.displayCapabilities.supportsDolbyVision
+        let felOn = UserDefaults.standard.bool(forKey: Self.dolbyVisionFELKey)
+        options.preferDualLayerDolbyVision = panelDV && felOn
+        return PrivateLoadSettings(heightLayout: heightLayout, panelDV: panelDV, felOn: felOn)
+    }
+
+    /// The engine's route line, caught while `loadFile` runs; `loadFile`'s `defer` releases the handler.
+    struct P7RouteCapture {
+        let p7RouteLine: OSAllocatedUnfairLock<String?>
+        let ownsLogHandler: Bool
+    }
+
+    static func beginP7RouteCapture() -> P7RouteCapture {
+        // #362: catch the engine's one Profile 7 route line for Sentry. Live TV's capture owns the
+        // handler while it runs, and VOD never loads then.
+        let p7RouteLine = OSAllocatedUnfairLock<String?>(initialState: nil)
+        let ownsLogHandler = EngineLog.handler == nil
+        if ownsLogHandler {
+            EngineLog.handler = { @Sendable line in
+                if line.contains("DV P7 dual-layer route:") { p7RouteLine.withLock { $0 = line } }
+            }
+        }
+        return P7RouteCapture(p7RouteLine: p7RouteLine, ownsLogHandler: ownsLogHandler)
+    }
+
+    /// New content: the previous item's route evidence and heights describe nothing.
+    func resetPrivateLoadState() {
+        dolbyVisionDualLayerRouteTaken = nil
+        _ = Self.bridgeLogReaderInstalled
+        SpatialBridgeLogReader.shared.reset()
+    }
+
+    /// After a successful load: FEL/MEL and the route from the captured line, and one Sentry report.
+    func finishP7RouteCapture(_ capture: P7RouteCapture, _ settings: PrivateLoadSettings) {
+        let p7RouteLine = capture.p7RouteLine
+        let (heightLayout, panelDV, felOn) = (settings.heightLayout, settings.panelDV, settings.felOn)
+        if let routeLine = p7RouteLine.withLock({ $0 }) {
+            dolbyVisionEnhancementLayer = DolbyVisionLayerType(routeLine: routeLine)
+            dolbyVisionDualLayerRouteTaken = DolbyVisionPlayback.dualLayerRouteTaken(routeLine: routeLine)
+            SentryBridge.log(.info, "DV P7 route", attributes: [
+                "engine_route": routeLine,
+                "panel_dv": panelDV,
+                "height_speakers": heightLayout?.rawValue ?? "off",
+                "fel_setting": felOn
+            ])
+        }
     }
 }
