@@ -2,6 +2,7 @@
 
 import hashlib
 import importlib.util
+import io
 import json
 import os
 import re
@@ -49,6 +50,11 @@ PRODUCT_BUNDLE_IDENTIFIER = net.builder.referenceplayer;
                 state["version"] = version
             self.lock["pins"].append({"identity": identity, "kind": "remoteSourceControl", "location": url, "state": state})
         self.write_json(verify_module.LOCK, self.lock)
+        self.write_json(verify_module.WORKSPACE_LOCK,
+                        {"version": 3, "pins": [pin for pin in self.lock["pins"] if pin["identity"] != "aetherengine"]})
+        self.write("ReferencePlayer.xcworkspace/contents.xcworkspacedata",
+                   '<Workspace><FileRef location="group:Rivulet.xcodeproj" />'
+                   '<FileRef location="group:PrivateBuild/.build/AetherEngine" /></Workspace>')
         self.write_json("PrivateBuild/UPSTREAM.json", {
             "schema_version": 1, "rivulet": {"revision": verify_module.BASELINE},
             "engine": {"version": verify_module.PINS["aetherengine"][1], "revision": verify_module.PINS["aetherengine"][2]},
@@ -96,11 +102,62 @@ exit 0
 
     def errors(self, pinned=None, **kwargs):
         # The fixture's files stand for the reviewed ones, unless a test pins something else.
+        kwargs.setdefault("patched_engine", False)  # These portable source fixtures contain no engine checkout.
         with patch.object(verify_module, "REVIEWED_SOURCES", self.pins() if pinned is None else pinned):
             return verify_module.verify(self.root, **kwargs)
 
     def test_reviewed_fixture_passes(self):
         self.assertEqual([], self.errors())
+
+    def test_default_verification_requires_the_prepared_engine(self):
+        with patch.object(verify_module, "REVIEWED_SOURCES", self.pins()):
+            errors = verify_module.verify(self.root)
+        self.assertTrue(any("Engine checkout missing" in error for error in errors), errors)
+
+    def test_cli_requires_engine_unless_source_only_is_explicit(self):
+        for flags, required in (([], True), (["--source-only"], False), (["--patched-engine"], True)):
+            output = io.StringIO()
+            with patch.object(sys, "argv", ["verify.py", "--root", str(self.root), *flags]), \
+                    patch.object(verify_module, "verify", return_value=[]) as verified, \
+                    patch.object(sys, "stdout", output):
+                self.assertEqual(0, verify_module.main())
+            verified.assert_called_once_with(self.root.resolve(), False, None, required)
+            self.assertEqual(not required, "NOT checked" in output.getvalue())
+
+    def test_workspace_resolution_cannot_rewrite_the_project_lock(self):
+        original = (self.root / verify_module.LOCK).read_bytes()
+        workspace = self.root / verify_module.WORKSPACE_LOCK
+        resolved = json.loads(workspace.read_text())
+        resolved["originHash"] = "workspace graph changed"
+        resolved["pins"].reverse()
+        self.write_json(verify_module.WORKSPACE_LOCK, resolved)
+        self.assertEqual([], self.errors())
+        self.assertEqual(original, (self.root / verify_module.LOCK).read_bytes())
+
+    def test_workspace_lock_symlink_and_dependency_drift_are_rejected(self):
+        workspace = self.root / verify_module.WORKSPACE_LOCK
+        saved = workspace.read_bytes()
+        workspace.unlink()
+        workspace.symlink_to(self.root / verify_module.LOCK)
+        self.assertTrue(any("independent regular file" in error for error in self.errors()))
+        workspace.unlink()
+        workspace.write_bytes(saved)
+        changed = json.loads(saved)
+        changed["pins"][0]["state"]["revision"] = "0" * 40
+        self.write_json(verify_module.WORKSPACE_LOCK, changed)
+        self.assertTrue(any("workspace lock must preserve" in error for error in self.errors()))
+
+    def test_workspace_lock_hardlink_is_also_rejected(self):
+        workspace = self.root / verify_module.WORKSPACE_LOCK
+        workspace.unlink()
+        os.link(self.root / verify_module.LOCK, workspace)
+        self.assertTrue(any("independent regular file" in error for error in self.errors()))
+
+    def test_workspace_lock_must_exclude_local_engine_and_reject_duplicate_pins(self):
+        for extra in (self.lock["pins"][0], self.lock["pins"][1]):
+            self.write_json(verify_module.WORKSPACE_LOCK,
+                            {"version": 3, "pins": [pin for pin in self.lock["pins"] if pin["identity"] != "aetherengine"] + [extra]})
+            self.assertTrue(any("workspace lock must preserve" in error for error in self.errors()))
 
     def test_signing_delegates_to_identity_validator(self):
         self.assertEqual([], self.errors(require_signing=True))
@@ -359,13 +416,10 @@ nonisolated enum DirectMetadata {
         original.rename(override)
         revisions[str(override)] = revisions.pop(str(original))
         workspace = self.root / "ReferencePlayer.xcworkspace"
-        workspace.mkdir()
+        workspace.mkdir(exist_ok=True)
         (workspace / "contents.xcworkspacedata").write_text(
             '<Workspace><FileRef location="group:Rivulet.xcodeproj" />'
             '<FileRef location="group:PrivateBuild/.build/AetherEngine" /></Workspace>')
-        lock = workspace / "xcshareddata/swiftpm/Package.resolved"
-        lock.parent.mkdir(parents=True)
-        lock.symlink_to(self.root / verify_module.LOCK)
         with patch.object(engine, "check") as checked, patch.object(verify_module.subprocess, "check_output", side_effect=fake_git):
             self.assertEqual([], self.errors(resolved_checkouts=directory, patched_engine=True))
             checked.assert_called_once_with(self.root)
@@ -612,6 +666,9 @@ if args[-1] == "build":
         self.assertEqual(0, result.returncode, result.stderr)
         calls = self.recorded()
         self.assertEqual(3, sum(call[0] == "verify" for call in calls))
+        verifications = [call for call in calls if call[0] == "verify"]
+        self.assertIn("--source-only", verifications[0])
+        self.assertTrue(all("--source-only" not in call and "--patched-engine" in call for call in verifications[1:]))
         commands = [call for call in calls if call[0] == "xcodebuild"]
         self.assertEqual(2, len(commands))
         for command in commands:

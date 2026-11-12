@@ -93,8 +93,9 @@ benchmark. These times do not establish end-to-end frame rate or HDMI behavior.
 
 A default change needs source/master comparisons that establish the actual horizontal alignment
 and filtering of representative FEL encodes, plus sustained on-device playback/seek and GPU-budget
-checks on the supported Apple TVs, including the in-place route. The paired Apple TV was disconnected
-for this experiment, and no title/master pair was available. This comparison is complete within
+checks on the supported Apple TVs, including the in-place route. No physical Apple TV was available
+for this experiment, and no title/master pair was available. The device inventory contained an Apple TV
+simulator; its disconnected state was previously mistaken for a paired physical device. This comparison is complete within
 those measured limits; it does not claim certified or universally bit-exact Dolby output.
 
 ## What is being compared

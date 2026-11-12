@@ -25,6 +25,7 @@ from typing import Optional
 
 BASELINE = "eabb7cf7833e6d1bb92d6fad116cb38a47305a0a"  # upstream v1.3.0-126, the last upstream release merged into this fork
 LOCK = Path("Rivulet.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved")
+WORKSPACE_LOCK = Path("ReferencePlayer.xcworkspace/xcshareddata/swiftpm/Package.resolved")
 # Reviewed source, pinned byte for byte (sha256). These two files decide what may reach upstream's
 # Workers and where the user's own TMDB and MDBList keys may be sent. Any edit to either, a comment
 # included, fails verification until the file has been read again and its digest replaced here. Patterns over Swift source were tried for this and kept missing an
@@ -357,7 +358,7 @@ def without_comments(text: str) -> str:
 
 
 def verify(root: Path, require_signing: bool = False,
-           resolved_checkouts: Optional[Path] = None, patched_engine: bool = False) -> list[str]:
+           resolved_checkouts: Optional[Path] = None, patched_engine: bool = True) -> list[str]:
     errors: list[str] = []
 
     def check(condition: bool, message: str) -> None:
@@ -428,6 +429,28 @@ def verify(root: Path, require_signing: bool = False,
             state["version"] = version
         check(pin.get("kind") == "remoteSourceControl" and pin.get("location") == url and pin.get("state") == state,
               f"Locked {identity} URL/version/revision changed; do not silently accept a decoder upgrade")
+
+    # Xcode removes a local package from the workspace lock. A shared symlink would
+    # let that legitimate resolution rewrite the project's independent remote pin.
+    workspace_lock = root / WORKSPACE_LOCK
+    shared_lock = workspace_lock.is_symlink() or (workspace_lock.is_file() and (root / LOCK).is_file()
+                                                and workspace_lock.samefile(root / LOCK))
+    check(workspace_lock.is_file() and not shared_lock,
+          "Reference Player workspace dependency lock must be an independent regular file, not the project lock")
+    workspace_pins = read_json(WORKSPACE_LOCK)
+    expected_pins = [pin for pin in pins if pin.get("identity") != "aetherengine"]
+    actual_pins = workspace_pins.get("pins")
+    check(workspace_pins.get("version") == 3 and isinstance(actual_pins, list)
+          and all(isinstance(pin, dict) and isinstance(pin.get("identity"), str) for pin in actual_pins)
+          and sorted(actual_pins, key=lambda pin: pin["identity"]) == sorted(expected_pins, key=lambda pin: pin["identity"]),
+          "Reference Player workspace lock must preserve every reviewed remote dependency except its local AetherEngine")
+    try:
+        workspace = root / "ReferencePlayer.xcworkspace"
+        refs = [ref.get("location") for ref in ET.parse(workspace / "contents.xcworkspacedata").iter("FileRef")]
+        check(sorted(refs) == ["group:PrivateBuild/.build/AetherEngine", "group:Rivulet.xcodeproj"],
+              "Reference Player workspace must override only the reviewed local engine")
+    except (OSError, ET.ParseError, TypeError) as exc:
+        errors.append(f"Reference Player workspace: {exc}")
 
     metadata = read_json("PrivateBuild/UPSTREAM.json")
     origin = metadata.get("rivulet", {})
@@ -532,13 +555,7 @@ def verify(root: Path, require_signing: bool = False,
         engine_override = root / engine.CHECKOUT
         try:
             engine.check(root)
-            workspace = root / "ReferencePlayer.xcworkspace"
-            refs = {ref.get("location") for ref in ET.parse(workspace / "contents.xcworkspacedata").iter("FileRef")}
-            check(refs == {"group:Rivulet.xcodeproj", "group:PrivateBuild/.build/AetherEngine"},
-                  "Reference Player workspace must override only the reviewed local engine")
-            check((workspace / "xcshareddata/swiftpm/Package.resolved").resolve() == (root / LOCK).resolve(),
-                  "Reference Player workspace must share the original dependency lock")
-        except (OSError, ValueError, KeyError, ET.ParseError, subprocess.CalledProcessError) as exc:
+        except (OSError, ValueError, KeyError, subprocess.CalledProcessError) as exc:
             errors.append(f"Patched engine: {exc}")
     if resolved_checkouts is not None:
         verify_resolved_checkouts(resolved_checkouts, errors, engine_override)
@@ -606,7 +623,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parent.parent)
     parser.add_argument("--require-signing", action="store_true", help="also require a configured bundle ID, App Group and team")
-    parser.add_argument("--patched-engine", action="store_true", help="verify the workspace engine override and its exact patch")
+    engine_mode = parser.add_mutually_exclusive_group()
+    engine_mode.add_argument("--patched-engine", action="store_true", default=True,
+                             help="verify the prepared engine (default; retained for existing callers)")
+    engine_mode.add_argument("--source-only", dest="patched_engine", action="store_false",
+                             help="limited source/configuration preflight; does not verify a prepared engine")
     parser.add_argument("--resolved-checkouts", type=Path, help="SwiftPM SourcePackages/checkouts directory after dependency resolution")
     args = parser.parse_args()
     errors = verify(args.root.resolve(), args.require_signing, args.resolved_checkouts, args.patched_engine)
@@ -614,7 +635,10 @@ def main() -> int:
         for error in errors:
             print(f"FAIL: {error}", file=sys.stderr)
         return 1
-    print("PASS: reviewed source/configuration contract is intact.")
+    if args.patched_engine:
+        print("PASS: reviewed source/configuration contract and prepared engine are intact.")
+    else:
+        print("PASS: source-only preflight. The prepared engine and its patch were NOT checked.")
     print("This does not establish Swift compilation, correct HDMI heights, FEL image fidelity, or playback performance.")
     return 0
 

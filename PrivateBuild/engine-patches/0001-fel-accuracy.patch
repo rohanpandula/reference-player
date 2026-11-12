@@ -1,27 +1,19 @@
-diff --git a/CHANGELOG.md b/CHANGELOG.md
-index a7fd5c8..bc076f8 100644
---- a/CHANGELOG.md
-+++ b/CHANGELOG.md
-@@ -10,7 +10,18 @@ the public-API contract.
- 
- ## [Unreleased]
- 
--_Nothing yet._
-+- **FEL reconstruction follows RPU mapping IDs.** Reuse frames select the named cached mapping
-+  instead of the latest one. A missing mapping falls back to slot zero, or bypasses composition when
-+  unavailable; seeks clear all slots. Missing RPUs borrow the last resolved frame's residual switch
-+  and display metadata, including after reuse frames.
-+
-+- **FEL composition preserves fixed-point reconstruction precision.** Polynomial/MMR prediction is
-+  clipped to unsigned 16-bit range; the signed 17-bit inverse-NLQ residual is added before rounding
-+  to the declared VDR depth. MMR retains the complete signed coefficient range (40 bits at denominator
-+  23), evaluates the specified Q20 terms with integer arithmetic, and preserves cancellation without
-+  overflowing the accumulation. Full-width coefficients use a separate GPU table; the shared block
-+  carries only their denominator. Resampling is unchanged. Real-title fidelity and device performance
-+  have not been revalidated for this change.
- 
- ## [7.61.0] - 2026-11-08
- 
+Reference Player modifications to AetherEngine
+Modified: 2026-11-12
+Copyright (C) 2026 Reference Player contributors
+Base: AetherEngine 7.61.0, d612bedb3e60f8bc403c646fe44c0a852ee8a995
+License: GNU Lesser General Public License, version 3, with the upstream
+Apple Store / DRM Exception. Upstream copyright and license notices are retained.
+
+Changes: RPU mapping-ID reuse, fixed-point FEL reconstruction and MMR coefficient
+precision, regression tests, and an opt-in luma resampling comparison.
+
+Corresponding engine source: the upstream commit above plus this patch.
+Upstream: https://github.com/superuser404notfound/AetherEngine
+Modifications and preparation/build scripts: https://github.com/rohanpandula/reference-player
+Use PrivateBuild/engine-patches and PrivateBuild/engine.py from the same app revision.
+See README.md beside this patch for preparation, modification and rebuild instructions.
+
 diff --git a/Sources/AetherEngine/Decoder/DualLayerVideoDecoder.swift b/Sources/AetherEngine/Decoder/DualLayerVideoDecoder.swift
 index c9b715f..4986c54 100644
 --- a/Sources/AetherEngine/Decoder/DualLayerVideoDecoder.swift
@@ -2840,98 +2832,3 @@ index f40a8c6..0f3062f 100644
          @Test("side data recorded for post-seek packets while flush() drains survives the flush and composes")
          func sideDataRecordedDuringTheDrainSurvivesFlush() async throws {
              let composer = ParamsRecordingComposer()
-diff --git a/docs/dolby-vision-fel.md b/docs/dolby-vision-fel.md
-index de9bf82..14e8538 100644
---- a/docs/dolby-vision-fel.md
-+++ b/docs/dolby-vision-fel.md
-@@ -67,8 +67,9 @@ leaves two ways to play Profile 7:
- What a composed frame handed to the display layer must be:
- 
- - **Pixels.** `kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange` (P010), BT.2020 primaries, PQ
--  transfer, colour attachments copied from the base layer. Reconstruction runs at 12-bit precision
--  (reshaped base plus inverse-NLQ residual); an ordered 8×8 Bayer dither, inverted on odd frames and
-+  transfer, colour attachments copied from the base layer. An unsigned 16-bit reshaped prediction and
-+  signed 17-bit inverse-NLQ residual are added, then rounded to the declared VDR depth (normally 12 bits).
-+  An ordered 8×8 Bayer dither, inverted on odd frames and
-   phase-offset between Cb and Cr, takes it to 10 bits. Luma is clamped to 64–940, chroma to 64–960.
- - **Metadata, on every frame.**
- 
-@@ -120,16 +121,20 @@ or when composition fails. A bypassed frame carries the Profile 8.1 RPU that kee
- mapping, so the display reshapes the picture the composer did not; a composed frame carries the form
- with the mapping removed.
- 
--**Kernels** (`DoviShaderSource.swift`). Luma: base code → piece selection → polynomial (evaluated in
--normalized float) or MMR when the luma curve uses MMR → plus the inverse-NLQ residual of the
--enhancement-layer luma, upsampled bilinearly from one gather of the 2x2 footprint with exact weights, the code rounded half up →
--12-bit clamp → dither → 10-bit. Chroma: base chroma plus the base luma at the chroma site ([1 2 1] around
--the even column in each of the cell's two rows, rows averaged; DoViBaker's MMR input) → MMR → plus the residual from the enhancement chroma, upsampled with the
--ETSI GS CCM 001 Annex B.3 default filter (vertical centred, horizontal co-sited; integer arithmetic) → dither.
-+**Kernels** (`DoviShaderSource.swift`). Luma: base code → piece selection → fixed-point polynomial
-+prediction (precomputed per base code) or integer Q20 MMR → unsigned 16-bit prediction → add the signed
-+17-bit inverse-NLQ residual → round and clamp to the declared VDR depth → dither to 10 bits. The EL luma
-+code is upsampled bilinearly from one gather with exact weights and rounded half up before inverse NLQ.
-+Chroma uses the base chroma and filtered base luma at its sample site ([1 2 1] around the even column in
-+each of two rows, then averaged) for its polynomial/MMR prediction. Its EL uses the unchanged ETSI
-+GS CCM 001 Annex B.3 default filter (vertical centred, horizontal co-sited), followed by the same
-+reconstruction and output stages.
- 
- **Parameter ABI.** `DoviShaderSource.sharedStructs` on the GPU side, `DoviMetalParams.serialize` on
- the Swift side. `DoviLayoutProbeTests` has the GPU read every sub-block back at the offset Swift wrote
--it to; `DoviShaderSyncTests` pins the serialized size and that every kernel is present.
-+it to; `DoviShaderSyncTests` pins the serialized size and that every kernel is present. MMR coefficients
-+are raw signed `Int64`/Metal `long` values in buffer 3; each component's shared MMR block contains only
-+its denominator, avoiding a duplicate coefficient array in the constant buffer.
- 
- ### 3.1 Audio
- 
-@@ -871,12 +876,25 @@ only come from the metadata.
- 
- ### 6.1 Correctness
- 
--The composer's arithmetic is held by tests that need no media: `DoviCpuModelTests` runs a CPU model of
--both kernels against the GPU at 12 bits, before the final rounding (`DoviDither.debugRawVDR`, test only),
--and `DoviGpuCurveSweepTests` and `DoviGpuEdgeCaseTests` sweep the curve and NLQ parameter space. On
--real titles `DoviFelRealFileTests` and `DoviRealFileExportTests` run when the fixtures are present and
--skip otherwise. Bit-exact output cannot be claimed: the EL is lossy in real
--streams and Dolby's prediction is not public.
-+The reconstruction follows the fixed-point stages in ETSI GS CCM 001 §5.4: polynomial and MMR
-+predictions are floored and clipped to 0…65535; inverse NLQ applies the sign and raw RPU ceiling before
-+its arithmetic shift into the signed 17-bit residual domain. Only their sum is rounded to the declared
-+VDR depth and clipped to that range. A ceiling smaller than one VDR code remains active when it is
-+representable at the intermediate precision. Early prediction rounding or residual truncation would
-+lose these fractions before they can combine.
-+
-+MMR integer parts −65536…65535 and fractional coefficients are retained in full (40 signed bits at
-+denominator 23). The shader forms the specified staged Q20 terms and splits each product into an integer
-+part and a remainder before accumulation, preserving cancellation even when a single signed 64-bit sum
-+would overflow. This is an arithmetic change, not a resampling change.
-+
-+`DoviCpuModelTests` uses an independent Int128 accumulation, with inline real RPU coefficient sets on
-+synthetic pixel planes. The curve, NLQ, clamp and cancellation regressions exercise the production GPU
-+kernels; `debugRawVDR` exposes their VDR-depth result before output dithering. Real-title comparisons in
-+`DoviFelRealFileTests` and `DoviRealFileExportTests` require external media and skip when it is absent.
-+No real-title image-fidelity or physical-device performance validation has been performed for this
-+precision change. Earlier timing and image-error measurements elsewhere in this document describe the
-+previous implementation and do not validate the new arithmetic.
- 
- ### 6.2 What is and is not applied
- 
-@@ -903,12 +921,15 @@ only (text, graphics). A DEBUG build can also read the chroma the old way (`debu
- runs. Against the DoViBaker oracle on a fine-detail set (gratings, zone plate, band-limited noise) a 4-fetch
- Catmull-Rom lowered the per-pixel error sd by about 0.7% on luma and left chroma unchanged, for four times
- the enhancement-layer reads. The luma phase is texel-centre aligned (`DoviEnhancementUpsamplerTests`).
--The inverse-NLQ table and the MMR coefficients are read from per-frame tables bound at buffers 2 and 3 of every compose kernel (`nlq_lut`, `mmr_table`).
-+The inverse-NLQ table holds signed 17-bit residuals in `Int32` entries at buffer 2. The MMR table holds
-+raw fixed-point coefficients in `Int64` entries at buffer 3. Both are bound for every compose kernel.
- 
- - **Missing or CRC-failed RPU:** the frame borrows the previous real RPU's parameters for up to
-   `maxBorrowedParamsRun` (3) frames in a row, then bypasses to the base layer. Reshaping and NLQ are constant
--  across a scene. A frame whose RPU sets `use_prev_vdr_rpu_flag` keeps the previous mapping for as long as the
--  stream asks, with no limit. Both are resolved when the packet is demuxed (`recordSideData`), in decode order,
-+  across a scene. A frame whose RPU sets `use_prev_vdr_rpu_flag` selects the cached `prev_vdr_rpu_id`
-+  (slots 0 through 15), with no borrow limit. An absent slot falls back to slot zero; if neither exists,
-+  or the requested ID is invalid, composition is bypassed. Seeks and teardown clear all slots. Missing
-+  RPUs borrow the last resolved frame, including its residual switch and display metadata. Both are resolved when the packet is demuxed (`recordSideData`), in decode order,
-   so "previous" is the previous frame of the stream and each frame reaches pairing with concrete parameters;
-   resolving at compose time would follow completion order instead.
- - **Output precision:** `DoviDither.fullPrecision` keeps the VDR bits below the 10-bit code in P010's unused low

@@ -1,6 +1,6 @@
 {
   "baseline": "eabb7cf7833e6d1bb92d6fad116cb38a47305a0a",
-  "totals": {"files": 44, "added": 621, "removed": 104},
+  "totals": {"files": 44, "added": 627, "removed": 114},
   "files": {
     ".gitignore": [6, 0],
     "AssetPackExtension/AssetPackExtension.entitlements": [1, 1],
@@ -27,7 +27,7 @@
     "RivuletCore/Models/Media/AudioTrack.swift": [7, 2],
     "RivuletCore/Models/Media/MediaSource.swift": [4, 2],
     "RivuletCore/Models/Plex/PlexModels.swift": [1, 1],
-    "RivuletCore/OpenSourceLicenses.swift": [263, 0],
+    "RivuletCore/OpenSourceLicenses.swift": [269, 10],
     "RivuletCore/Security/URLSession+Attested.swift": [8, 0],
     "RivuletCore/Sync/AccountVault.swift": [1, 1],
     "RivuletMac/Info.plist": [3, 3],

@@ -41,6 +41,36 @@ class EnginePatchTests(unittest.TestCase):
         self.assertEqual(engine.git(self.origin, 'rev-parse', 'HEAD'),
                          engine.git(self.root / engine.CHECKOUT, 'rev-parse', 'HEAD'))
 
+    def test_diff_settings_do_not_change_content_verification(self):
+        engine.prepare(self.root)
+        checkout = self.root / engine.CHECKOUT
+        for key, value in {'diff.context': '12', 'diff.mnemonicPrefix': 'true', 'diff.noprefix': 'true',
+                           'diff.suppressBlankEmpty': 'true', 'diff.indentHeuristic': 'false',
+                           'core.abbrev': '12'}.items():
+            engine.git(checkout, 'config', key, value)
+        engine.check(self.root)
+        (checkout / 'a.swift').write_text('unreviewed\n')
+        with self.assertRaisesRegex(ValueError, 'differs from the recorded patch'):
+            engine.check(self.root)
+
+    def test_patch_attribution_preamble_is_accepted(self):
+        patch = self.root / engine.PATCH
+        patch.write_text('Reference Player modifications to AetherEngine\nModified: 2026-11-12\n\n' + patch.read_text())
+        engine.prepare(self.root)
+        engine.check(self.root)
+
+    def test_check_keeps_index_worktree_and_object_store_unchanged(self):
+        engine.prepare(self.root)
+        checkout = self.root / engine.CHECKOUT
+        before_index = (checkout / '.git/index').read_bytes()
+        before_objects = {p.relative_to(checkout / '.git/objects'): p.read_bytes()
+                          for p in (checkout / '.git/objects').rglob('*') if p.is_file()}
+        engine.check(self.root)
+        self.assertEqual(before_index, (checkout / '.git/index').read_bytes())
+        self.assertEqual(before_objects, {p.relative_to(checkout / '.git/objects'): p.read_bytes()
+                                         for p in (checkout / '.git/objects').rglob('*') if p.is_file()})
+        self.assertEqual('new\n', (checkout / 'a.swift').read_text())
+
     def test_patch_can_add_regression_files(self):
         added = self.origin / 'regression.swift'
         added.write_text('regression\n')
@@ -72,6 +102,16 @@ class EnginePatchTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'untracked'):
             engine.prepare(self.root)
         self.assertEqual('keep me', extra.read_text())
+
+    def test_staged_extra_files_are_not_hidden_by_the_expected_index(self):
+        engine.prepare(self.root)
+        checkout = self.root / engine.CHECKOUT
+        extra = checkout / 'extra.swift'
+        extra.write_text('keep my staged work\n')
+        engine.git(checkout, 'add', 'extra.swift')
+        with self.assertRaisesRegex(ValueError, 'tracked paths changed'):
+            engine.check(self.root)
+        self.assertEqual('keep my staged work\n', extra.read_text())
 
     def test_wrong_revision_and_symlink_refused(self):
         engine.prepare(self.root)

@@ -7,7 +7,7 @@
 //
 //  Third-party open-source license texts shown in Settings → About → Licenses & Legal.
 //
-//  AetherEngine (an optional video player) is dynamically linked via Swift Package Manager
+//  AetherEngine (an optional video player) is linked via Swift Package Manager
 //  and used under the GNU Lesser General Public License v3, with an App Store / DRM exception.
 //  FFmpeg (demux/decode/remux) is dynamically linked via the FFmpegBuild package and used
 //  under the LGPL (v2.1 or later); that build bundles dav1d (BSD 2-Clause, AV1 decode).
@@ -15,10 +15,8 @@
 //  under the MIT license. Rivulet itself is distributed under the PolyForm Noncommercial
 //  License 1.0.0.
 //
-//  LGPL compliance: because the LGPL components are dynamically linked and the corresponding
-//  source (plus the scripts and configure flags used to build the FFmpeg frameworks) is made
-//  available from the public repositories cited below, recipients can obtain, modify, and
-//  relink modified versions of these libraries.
+//  The notices below identify upstream sources, Reference Player's engine modifications,
+//  and build scripts. Use the matching app source revision to reproduce the linked libraries.
 //
 
 import Foundation
@@ -38,10 +36,8 @@ enum OpenSourceLicenses {
     /// (FFmpeg n8.1.3, dav1d 1.5.4).
     static let ffmpegSourceURL = "https://github.com/superuser404notfound/FFmpegBuild"
 
-    /// Where the corresponding AetherEngine source for the version linked by this app can be
-    /// obtained, as required to satisfy the LGPL v3. Rivulet links the upstream release
-    /// unmodified; this URL and the tag cited in the entry below must track the SPM pin.
-    static let aetherSourceURL = "https://github.com/superuser404notfound/AetherEngine"
+    /// Reference Player carries a patch against the pinned upstream engine; both are corresponding source.
+    static let aetherSourceURL = "https://github.com/rohanpandula/reference-player"
 
     /// Shown at the top of the Licenses & Legal screen.
     static let appLicense = """
@@ -60,7 +56,7 @@ enum OpenSourceLicenses {
         [
             Entry(
                 name: "AetherEngine",
-                summary: "Video playback engine — the default player for on-demand titles. Dynamically linked and used under the GNU Lesser General Public License, version 3, with an Apple Store / DRM Exception. Copyright © 2026 Vincent Herbst. The complete corresponding source for the exact version linked by this app (tag 7.61.0, commit d612bed) is available at \(aetherSourceURL).",
+                summary: "Video playback engine — the default player for on-demand titles. Used under the GNU Lesser General Public License, version 3, with the Apple Store / DRM Exception reproduced below. Copyright © 2026 Vincent Herbst. Reference Player modifications © 2026 Reference Player contributors, dated 2026-11-12: FEL mapping reuse, reconstruction arithmetic and regression tests. The patched workspace uses upstream tag 7.61.0, commit d612bedb3e60f8bc403c646fe44c0a852ee8a995 (https://github.com/superuser404notfound/AetherEngine), plus PrivateBuild/engine-patches/0001-fel-accuracy.patch from this app's source revision at \(aetherSourceURL). That repository includes preparation and rebuild scripts in PrivateBuild. The original project can also build the unchanged upstream engine.",
                 licenseText: aetherLGPLv3
             ),
             Entry(
