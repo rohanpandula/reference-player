@@ -35,6 +35,11 @@ allows. Working rules:
 - Keep the reviewed Rivulet/engine/decoder combination in `PrivateBuild/UPSTREAM.json` until a
   candidate has been explicitly reviewed. AetherEngine 7.57 changed audio semantics without renaming
   `TrueHDObjectAudio`; a successful build is not enough.
+- The engine is upstream plus the patch in `PrivateBuild/engine-patches/`, prepared by `engine.py`.
+  Build `ReferencePlayer.xcworkspace`; the project alone intentionally keeps upstream unchanged.
+  This overrides upstream CLAUDE.md's "do not propose editing engine sources" rule for this fork.
+  Keep engine changes as a focused patch against the reviewed commit; follow the patch README to
+  update it or drop fixes adopted upstream. Never copy codec code into the app.
 - Preserve `Package.resolved`; do not solve dependency problems by deleting it, silently upgrading
   packages, or using unpinned `main`.
 - `PrivateBuild/verify.py` is a source/configuration check, NOT a Dolby fidelity, security, Xcode
@@ -57,7 +62,7 @@ allows. Working rules:
 
 The upstream test command under "Build & Run" in `CLAUDE.md` gives no usable result in this fork:
 without ad hoc signing the App Group is inaccessible, and about 50 player tests and every Keychain
-write fail. Run this before calling a change done:
+write fail. Prepare the engine once with `python3 PrivateBuild/engine.py`. Run this before calling a change done:
 
 ```bash
 python3 PrivateBuild/check.py --all     # every check, one at a time, with a result table

@@ -15,7 +15,7 @@ command -v python3 >/dev/null || { echo "Python 3.9+ is required for the source 
 # empty array differs from newer Bash releases.
 verify_args=(--root "$repo_root")
 if [[ "$mode" == device ]]; then verify_args+=(--require-signing); fi
-python3 "$script_dir/verify.py" "${verify_args[@]}"
+python3 "$script_dir/verify.py" "${verify_args[@]}" --source-only
 if [[ "$(uname -s)" != Darwin ]]; then
     echo "STOP: Apple tvOS builds require macOS and Xcode. Static checks ran; no Swift build was attempted." >&2
     exit 2
@@ -61,7 +61,10 @@ finish() {
 }
 trap finish EXIT
 
-common=(-project Rivulet.xcodeproj -scheme "Reference Player" -configuration Release
+python3 "$script_dir/engine.py"
+verify_args+=(--patched-engine)
+
+common=(-workspace ReferencePlayer.xcworkspace -scheme "Reference Player" -configuration Release
         -clonedSourcePackagesDirPath "$packages_dir" -onlyUsePackageVersionsFromResolvedFile)
 # Xcode may download the already-pinned packages/binaries here. It is not allowed
 # to choose a newer version to make a resolution failure disappear.

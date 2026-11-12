@@ -190,3 +190,11 @@ the test catches it. Add the page's rows and descriptions to `PrivateSettingsRow
   synthetic releases. The same day an adversarial review broke them in a clone; the
   fixes (nothing changes before the merge is certain, the must-equal list only asserts, markers fail
   `verify.py`) followed. No real upstream release has been merged with them yet.
+
+## Private engine patch
+
+The app still records upstream's exact engine pin. The Reference Player workspace overrides it with
+that revision plus `PrivateBuild/engine-patches/0001-fel-accuracy.patch`; see the
+[engine patch procedure](engine-patches/README.md). A Rivulet sync does not silently rebase this patch.
+After reviewing an engine update, reapply the patch against its new pin and run the engine tests and
+`check.py --all`. Keep the old checkout until the new one is verified.

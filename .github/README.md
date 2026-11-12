@@ -80,13 +80,22 @@ tree and also refuse upstream's hosted services, but have none of these settings
 - **Tooling to follow upstream releases**: `PrivateBuild/sync.py` merges an upstream release tag and
   does the mechanical part, and `PrivateBuild/check.py` runs every check.
 
+The engine also carries a [small pinned patch](../PrivateBuild/engine-patches/README.md) for FEL RPU
+mapping reuse and reconstruction precision. It resolves the requested mapping ID, preserves the
+current residual switch when concealing a missing RPU, combines prediction and residual before
+rounding, and supports the full MMR coefficient range. The numerical changes follow the published
+fixed-point process. [Release comparisons](../PrivateBuild/FEL-PERFORMANCE.md) measure a 9.0–9.5%
+reduction in 4K MMR median GPU time from exact grouped accumulation, while the accuracy patch still
+takes about 2.1× upstream GPU time on Mac. Image fidelity and performance on the target Apple TV
+still need measurement before merging the patch.
+
 ## Status
 
-- It builds, and its unit tests pass on the tvOS simulator: 3,534 of 3,534 tvOS unit tests and 166
-  Python tests for the fork's tooling, measured on 2026-11-11 with Xcode 27.1, the version on the
+- It builds, and its unit tests pass on the tvOS simulator: 3,534 of 3,534 tvOS unit tests and 216
+  Python tests for the fork's tooling, measured on 2026-11-12 with Xcode 27.1, the version on the
   machine that ran them (upstream pins Xcode 27.2 in `codemagic.yaml`). The checks also built the
-  tvOS app in Release for a real Apple TV and compiled the iOS and Mac apps in their default
-  configuration.
+  tvOS app in Release against the device SDK and compiled the iOS and Mac apps in their default
+  configuration. These are local results, not GitHub Actions results; Actions are disabled in this fork.
 - Playback features have not yet been checked by this fork's author on a physical Apple TV.
 - No binaries are provided. You build it yourself, signed with your own Apple developer account.
 
@@ -101,8 +110,9 @@ is not promised to sign them.
 # Secrets.swift with an empty Sentry DSN (this fork ships no Sentry destination; verify.py insists)
 sed 's/"YOUR_SENTRY_DSN_HERE"/""/' RivuletCore/Config/Secrets.swift.template > RivuletCore/Config/Secrets.swift
 python3 PrivateBuild/configure.py --bundle-id com.yourname.referenceplayer --team-id YOURTEAMID
+python3 PrivateBuild/engine.py
 python3 PrivateBuild/check.py --quick
-open Rivulet.xcodeproj    # scheme: Reference Player
+open ReferencePlayer.xcworkspace    # scheme: Reference Player
 ```
 
 `configure.py` writes your bundle prefix, App Group (`group.<bundle-id>` unless you pass
@@ -126,7 +136,8 @@ Rivulet and this fork are licensed under the [PolyForm Noncommercial License 1.0
 
 Required Notice: Copyright (C) 2025-2026 Bain Gurley
 
-This fork is free of charge and not for sale.
+This fork is free of charge and not for sale. Its AetherEngine modifications retain the engine's LGPL-3.0
+license and Apple Store / DRM exception; [source and rebuild instructions](../PrivateBuild/engine-patches/README.md#license-changes-and-corresponding-source) identify the pinned baseline and patch.
 
 Playback runs on [AetherEngine](https://github.com/superuser404notfound/AetherEngine) (LGPL-3.0
 with an Apple Store / DRM exception), with [FFmpegBuild](https://github.com/superuser404notfound/FFmpegBuild)

@@ -2,15 +2,19 @@
 
 import hashlib
 import importlib.util
+import io
 import json
 import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 SPEC = importlib.util.spec_from_file_location("private_verify", Path(__file__).resolve().parents[1] / "verify.py")
 verify_module = importlib.util.module_from_spec(SPEC)
@@ -46,6 +50,11 @@ PRODUCT_BUNDLE_IDENTIFIER = net.builder.referenceplayer;
                 state["version"] = version
             self.lock["pins"].append({"identity": identity, "kind": "remoteSourceControl", "location": url, "state": state})
         self.write_json(verify_module.LOCK, self.lock)
+        self.write_json(verify_module.WORKSPACE_LOCK,
+                        {"version": 3, "pins": [pin for pin in self.lock["pins"] if pin["identity"] != "aetherengine"]})
+        self.write("ReferencePlayer.xcworkspace/contents.xcworkspacedata",
+                   '<Workspace><FileRef location="group:Rivulet.xcodeproj" />'
+                   '<FileRef location="group:PrivateBuild/.build/AetherEngine" /></Workspace>')
         self.write_json("PrivateBuild/UPSTREAM.json", {
             "schema_version": 1, "rivulet": {"revision": verify_module.BASELINE},
             "engine": {"version": verify_module.PINS["aetherengine"][1], "revision": verify_module.PINS["aetherengine"][2]},
@@ -93,11 +102,62 @@ exit 0
 
     def errors(self, pinned=None, **kwargs):
         # The fixture's files stand for the reviewed ones, unless a test pins something else.
+        kwargs.setdefault("patched_engine", False)  # These portable source fixtures contain no engine checkout.
         with patch.object(verify_module, "REVIEWED_SOURCES", self.pins() if pinned is None else pinned):
             return verify_module.verify(self.root, **kwargs)
 
     def test_reviewed_fixture_passes(self):
         self.assertEqual([], self.errors())
+
+    def test_default_verification_requires_the_prepared_engine(self):
+        with patch.object(verify_module, "REVIEWED_SOURCES", self.pins()):
+            errors = verify_module.verify(self.root)
+        self.assertTrue(any("Engine checkout missing" in error for error in errors), errors)
+
+    def test_cli_requires_engine_unless_source_only_is_explicit(self):
+        for flags, required in (([], True), (["--source-only"], False), (["--patched-engine"], True)):
+            output = io.StringIO()
+            with patch.object(sys, "argv", ["verify.py", "--root", str(self.root), *flags]), \
+                    patch.object(verify_module, "verify", return_value=[]) as verified, \
+                    patch.object(sys, "stdout", output):
+                self.assertEqual(0, verify_module.main())
+            verified.assert_called_once_with(self.root.resolve(), False, None, required)
+            self.assertEqual(not required, "NOT checked" in output.getvalue())
+
+    def test_workspace_resolution_cannot_rewrite_the_project_lock(self):
+        original = (self.root / verify_module.LOCK).read_bytes()
+        workspace = self.root / verify_module.WORKSPACE_LOCK
+        resolved = json.loads(workspace.read_text())
+        resolved["originHash"] = "workspace graph changed"
+        resolved["pins"].reverse()
+        self.write_json(verify_module.WORKSPACE_LOCK, resolved)
+        self.assertEqual([], self.errors())
+        self.assertEqual(original, (self.root / verify_module.LOCK).read_bytes())
+
+    def test_workspace_lock_symlink_and_dependency_drift_are_rejected(self):
+        workspace = self.root / verify_module.WORKSPACE_LOCK
+        saved = workspace.read_bytes()
+        workspace.unlink()
+        workspace.symlink_to(self.root / verify_module.LOCK)
+        self.assertTrue(any("independent regular file" in error for error in self.errors()))
+        workspace.unlink()
+        workspace.write_bytes(saved)
+        changed = json.loads(saved)
+        changed["pins"][0]["state"]["revision"] = "0" * 40
+        self.write_json(verify_module.WORKSPACE_LOCK, changed)
+        self.assertTrue(any("workspace lock must preserve" in error for error in self.errors()))
+
+    def test_workspace_lock_hardlink_is_also_rejected(self):
+        workspace = self.root / verify_module.WORKSPACE_LOCK
+        workspace.unlink()
+        os.link(self.root / verify_module.LOCK, workspace)
+        self.assertTrue(any("independent regular file" in error for error in self.errors()))
+
+    def test_workspace_lock_must_exclude_local_engine_and_reject_duplicate_pins(self):
+        for extra in (self.lock["pins"][0], self.lock["pins"][1]):
+            self.write_json(verify_module.WORKSPACE_LOCK,
+                            {"version": 3, "pins": [pin for pin in self.lock["pins"] if pin["identity"] != "aetherengine"] + [extra]})
+            self.assertTrue(any("workspace lock must preserve" in error for error in self.errors()))
 
     def test_signing_delegates_to_identity_validator(self):
         self.assertEqual([], self.errors(require_signing=True))
@@ -347,6 +407,28 @@ nonisolated enum DirectMetadata {
         with patch.object(verify_module.subprocess, "check_output", side_effect=fake_git):
             self.assertEqual([], self.errors(resolved_checkouts=directory))
 
+    def test_patched_verification_reads_the_workspace_engine_not_the_remote_checkout(self):
+        import engine
+        directory, _, revisions, fake_git = self.prepare_checkouts()
+        original = directory / "AetherEngine"
+        override = self.root / engine.CHECKOUT
+        override.parent.mkdir(parents=True)
+        original.rename(override)
+        revisions[str(override)] = revisions.pop(str(original))
+        workspace = self.root / "ReferencePlayer.xcworkspace"
+        workspace.mkdir(exist_ok=True)
+        (workspace / "contents.xcworkspacedata").write_text(
+            '<Workspace><FileRef location="group:Rivulet.xcodeproj" />'
+            '<FileRef location="group:PrivateBuild/.build/AetherEngine" /></Workspace>')
+        with patch.object(engine, "check") as checked, patch.object(verify_module.subprocess, "check_output", side_effect=fake_git):
+            self.assertEqual([], self.errors(resolved_checkouts=directory, patched_engine=True))
+            checked.assert_called_once_with(self.root)
+        with patch.object(engine, "check", side_effect=ValueError("unexpected edits")):
+            self.assertIn("Patched engine: unexpected edits", self.errors(patched_engine=True))
+        (workspace / "contents.xcworkspacedata").write_text('<Workspace/>')
+        with patch.object(engine, "check"):
+            self.assertTrue(any("workspace must override" in e for e in self.errors(patched_engine=True)))
+
     def test_actual_checkout_revision_drift(self):
         directory, _, revisions, fake_git = self.prepare_checkouts()
         revisions[str(directory / "LibTrueHD")] = "0" * 40
@@ -540,6 +622,11 @@ class BuildScriptTests(unittest.TestCase):
 with open(os.environ["MOCK_CALLS"], "a") as stream:
     stream.write(json.dumps(["verify", *sys.argv[1:]]) + "\\n")
 ''')
+        (self.private / "engine.py").write_text('''import json, os
+with open(os.environ["MOCK_CALLS"], "a") as stream:
+    stream.write(json.dumps(["engine"]) + "\\n")
+raise SystemExit(19 if os.environ.get("MOCK_ENGINE_FAIL") else 0)
+''')
         self.executable("uname", "#!/bin/sh\necho Darwin\n")
         self.executable("xcodebuild", '''#!/usr/bin/env python3
 import json, os, sys
@@ -579,14 +666,25 @@ if args[-1] == "build":
         self.assertEqual(0, result.returncode, result.stderr)
         calls = self.recorded()
         self.assertEqual(3, sum(call[0] == "verify" for call in calls))
+        verifications = [call for call in calls if call[0] == "verify"]
+        self.assertIn("--source-only", verifications[0])
+        self.assertTrue(all("--source-only" not in call and "--patched-engine" in call for call in verifications[1:]))
         commands = [call for call in calls if call[0] == "xcodebuild"]
         self.assertEqual(2, len(commands))
         for command in commands:
             self.assertIn("-onlyUsePackageVersionsFromResolvedFile", command)
             self.assertIn("Release", command)
+            self.assertIn("ReferencePlayer.xcworkspace", command)
+            self.assertNotIn("-project", command)
             self.assertNotIn("-allowProvisioningUpdates", command)
         self.assertIn("ARCHS=arm64", commands[-1])
         self.assertIn("CODE_SIGNING_ALLOWED=NO", commands[-1])
+
+    def test_engine_failure_prevents_resolution_and_build(self):
+        self.env["MOCK_ENGINE_FAIL"] = "1"
+        result = self.run_build()
+        self.assertEqual(19, result.returncode, result.stderr)
+        self.assertFalse(any(call[0] == "xcodebuild" for call in self.recorded()))
 
     def test_lock_mutation_causes_failure_and_is_not_restored(self):
         self.env["MOCK_XCODE_MODE"] = "mutate-lock"

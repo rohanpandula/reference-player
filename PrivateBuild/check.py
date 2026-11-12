@@ -27,7 +27,7 @@ from typing import Callable, NamedTuple, Optional
 ROOT = Path(__file__).resolve().parent.parent
 SIMULATOR = "platform=tvOS Simulator,name=Apple TV 4K (3rd generation)"
 AD_HOC = ["CODE_SIGN_STYLE=Manual", "CODE_SIGN_IDENTITY=-", "DEVELOPMENT_TEAM=", "PROVISIONING_PROFILE_SPECIFIER="]
-PROJECT = ["-project", "Rivulet.xcodeproj", "-onlyUsePackageVersionsFromResolvedFile"]
+PROJECT = ["-workspace", "ReferencePlayer.xcworkspace", "-onlyUsePackageVersionsFromResolvedFile"]
 
 
 def xcodebuild_commands(out: Path) -> dict[str, list[str]]:
@@ -69,7 +69,7 @@ def resolved_checkouts(root: Path) -> Optional[Path]:
         except (OSError, plistlib.InvalidFileException):
             continue
         checkouts = info.parent / "SourcePackages/checkouts"
-        if Path(workspace) == root / "Rivulet.xcodeproj" and checkouts.is_dir():
+        if Path(workspace) == root / "ReferencePlayer.xcworkspace" and checkouts.is_dir():
             return checkouts
     return None
 
@@ -143,7 +143,11 @@ def run_checks(root: Path, out: Path, quick: bool, everything: bool, runner: Run
 
     results.append(unmerged_result(unmerged(root)))
     print(f"... unmerged paths\n    {results[-1].status}: {results[-1].detail}", flush=True)
-    step("verify.py", [py, str(root / "PrivateBuild/verify.py")], "verify.log", simple("verify.py"))
+    step("engine patch", [py, str(root / "PrivateBuild/engine.py"), *(["--check"] if quick else [])],
+         "engine.log", simple("engine patch"))
+    if results[-1].status == "failed":
+        return results   # Never compile an absent or unreviewed engine override.
+    step("verify.py", [py, str(root / "PrivateBuild/verify.py"), "--patched-engine"], "verify.log", simple("verify.py"))
 
     def resolved(note: str) -> None:
         """After the step that resolves packages, so a pin bump is checked against its new checkout."""
@@ -152,7 +156,7 @@ def run_checks(root: Path, out: Path, quick: bool, everything: bool, runner: Run
             results.append(Result("verify.py --resolved-checkouts", "not checked",
                                   "no SwiftPM checkout in DerivedData for this project yet (build once)"))
             return
-        step("verify.py --resolved-checkouts", [py, str(root / "PrivateBuild/verify.py"), "--resolved-checkouts", str(found)],
+        step("verify.py --resolved-checkouts", [py, str(root / "PrivateBuild/verify.py"), "--patched-engine", "--resolved-checkouts", str(found)],
              "verify-checkouts.log", lambda code, text: Result("verify.py --resolved-checkouts",
                                                               "passed" if code == 0 else "failed", f"{verdict(code, text)} ({found}{note})"))
 
