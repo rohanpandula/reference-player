@@ -81,14 +81,15 @@ tree and also refuse upstream's hosted services, but have none of these settings
   does the mechanical part, and `PrivateBuild/check.py` runs every check.
 
 The engine also carries a [small pinned patch](../PrivateBuild/engine-patches/README.md) for FEL RPU
-mapping reuse. It resolves the mapping ID requested by the stream and preserves the current residual
-switch when concealing a missing RPU. This is a correctness fix for those cases, not a measured
-improvement across all titles.
+mapping reuse and reconstruction precision. It resolves the requested mapping ID, preserves the
+current residual switch when concealing a missing RPU, combines prediction and residual before
+rounding, and supports the full MMR coefficient range. The numerical changes follow the published
+fixed-point process. Image fidelity and GPU performance on an Apple TV still need measurement.
 
 ## Status
 
-- It builds, and its unit tests pass on the tvOS simulator: 3,534 of 3,534 tvOS unit tests and 166
-  Python tests for the fork's tooling, measured on 2026-11-11 with Xcode 27.1, the version on the
+- It builds, and its unit tests pass on the tvOS simulator: 3,534 of 3,534 tvOS unit tests and 176
+  Python tests for the fork's tooling, measured on 2026-11-12 with Xcode 27.1, the version on the
   machine that ran them (upstream pins Xcode 27.2 in `codemagic.yaml`). The checks also built the
   tvOS app in Release for a real Apple TV and compiled the iOS and Mac apps in their default
   configuration.

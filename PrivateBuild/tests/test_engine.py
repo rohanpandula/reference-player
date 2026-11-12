@@ -41,6 +41,18 @@ class EnginePatchTests(unittest.TestCase):
         self.assertEqual(engine.git(self.origin, 'rev-parse', 'HEAD'),
                          engine.git(self.root / engine.CHECKOUT, 'rev-parse', 'HEAD'))
 
+    def test_patch_can_add_regression_files(self):
+        added = self.origin / 'regression.swift'
+        added.write_text('regression\n')
+        engine.git(self.origin, 'add', '-N', 'regression.swift')
+        patch = self.root / engine.PATCH
+        patch.write_text(patch.read_text() + engine.git(self.origin, 'diff', '--binary', 'HEAD', '--', 'regression.swift'))
+        engine.git(self.origin, 'reset', '--', 'regression.swift')
+        added.unlink()
+        engine.prepare(self.root)
+        engine.check(self.root)
+        self.assertEqual('regression\n', (self.root / engine.CHECKOUT / 'regression.swift').read_text())
+
     def test_empty_patch_uses_upstream_unchanged(self):
         (self.root / engine.PATCH).write_text('')
         engine.prepare(self.root)

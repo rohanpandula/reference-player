@@ -194,7 +194,7 @@ the test catches it. Add the page's rows and descriptions to `PrivateSettingsRow
 ## Private engine patch
 
 The app still records upstream's exact engine pin. The Reference Player workspace overrides it with
-that revision plus `PrivateBuild/engine-patches/0001-fel-rpu-mapping.patch`; see the
+that revision plus `PrivateBuild/engine-patches/0001-fel-accuracy.patch`; see the
 [engine patch procedure](engine-patches/README.md). A Rivulet sync does not silently rebase this patch.
 After reviewing an engine update, reapply the patch against its new pin and run the engine tests and
 `check.py --all`. Keep the old checkout until the new one is verified.

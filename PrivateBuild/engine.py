@@ -11,7 +11,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parent.parent
 CHECKOUT = Path('PrivateBuild/.build/AetherEngine')
-PATCH = Path('PrivateBuild/engine-patches/0001-fel-rpu-mapping.patch')
+PATCH = Path('PrivateBuild/engine-patches/0001-fel-accuracy.patch')
 
 
 def git(path: Path, *args: str) -> str:
@@ -50,8 +50,8 @@ def prepare(root: Path) -> None:
             raise ValueError('Upstream tag no longer matches the reviewed revision')
         git(staging, 'checkout', '--detach', pin['revision'])
         if (root / PATCH).read_text():
-            git(staging, 'apply', '--check', str(root / PATCH))
-            git(staging, 'apply', str(root / PATCH))
+            git(staging, 'apply', '--check', '--index', str(root / PATCH))
+            git(staging, 'apply', '--index', str(root / PATCH))
         staging.rename(path)
     finally:
         if staging.exists():
