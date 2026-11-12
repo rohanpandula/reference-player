@@ -37,8 +37,11 @@ again. A failed clone or patch application never installs a partially prepared e
 - Preserve unsigned 16-bit prediction and signed 17-bit residual until they are added, then round
   once to the declared VDR depth. Keep fractional residual ceilings and apply the sign before shifting.
 - Accept the full signed MMR coefficient range (-65536 through 65535 integer parts). Upload raw
-  Int64 coefficients and evaluate the specified Q20 terms on the GPU. Splitting product quotients
-  and remainders avoids overflow in large sums without losing cancellation precision.
+  Int64 coefficients and evaluate the specified Q20 terms on the GPU. Splitting bounded partial
+  sums into quotients and remainders avoids overflow without losing cancellation precision.
+- Accumulate up to 16 MMR products before splitting their quotients and remainders. Every legal
+  product is in [-2^59, 2^59), so each partial sum fits Int64 even when the full 22-term sum does
+  not. This reduces the splits from as many as 22 to two, preserving negative floors and cancellation.
 
 The numerical baseline is [ETSI GS CCM 001, sections 5.3 and 5.4](https://www.etsi.org/deliver/etsi_gs/CCM/001_099/001/01.01.01_60/gs_ccm001v010101p.pdf).
 Regression tests cover fractional reconstruction, positive/negative residuals, sub-code ceilings,
@@ -46,15 +49,20 @@ wide MMR cancellation, accumulator overflow, and real RPU coefficient sets again
 Int128 model. The 16-bit prediction is stored exactly in the existing Float luma lookup table;
 MMR coefficients use a separate Int64 table. Removing the duplicate coefficients from the parameter
 block keeps the combined parameter/table allocation unchanged. Layout is checked on the GPU.
+The grouped accumulation keeps every specified intermediate truncation. GPU tests compare
+1,134 isolated monomials with the independent Int128 model at BL depths 8–16, amplify a lost Q20
+unit into a full prediction code, and cover negative remainders, cancellation across the group
+boundary, and mixed chroma mappings. Basis construction and all callers remain unchanged.
 
 Resampling defaults, output formats, dithering policy, routing and audio are unchanged.
 The patch also carries an opt-in GPU comparison test for the existing bilinear and Annex B
 luma paths. Reference Player owns its independent CPU model, generated inputs, runner and
 [measured resampling comparison](../RESAMPLING.md); it adds no playback setting or dependency. The internal
 reconstruction precision change can affect a final output code. Real-title fidelity and physical
-Apple TV GPU performance have not been measured. The [Release baseline comparison](../FEL-PERFORMANCE.md)
-finds about 2.3× GPU time for 4K MMR composition on this Mac; physical Apple TV validation remains
-a merge gate. The Mac result does not establish device headroom.
+Apple TV GPU performance have not been measured. The [Release comparisons](../FEL-PERFORMANCE.md)
+find a 9.0–9.5% reduction in 4K MMR median GPU time from grouped accumulation on this Mac.
+The optimized accuracy patch still takes about 2.1× upstream GPU time. Physical Apple TV
+validation remains a merge gate; the Mac result does not establish device headroom.
 
 The supplied `dovi_cleanroom` corpus was inspected as reference material. Its ID-indexed payload
 handling suggested this investigation. No decompiled code or binary is included. The behavior is

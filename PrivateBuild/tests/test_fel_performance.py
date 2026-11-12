@@ -12,6 +12,22 @@ import fel_performance as perf
 
 
 class FelPerformanceTests(unittest.TestCase):
+    def test_baseline_definition_preserves_default_and_hashes_supplied_patch(self):
+        data, metadata = perf.baseline_config(None)
+        self.assertIsNone(data)
+        self.assertIsNone(metadata['baselinePatchSHA256'])
+        self.assertEqual(metadata['baselineDescription'], 'Unpatched pinned upstream')
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary)/'before.patch'
+            path.write_bytes(b'exact saved patch\n')
+            data, metadata = perf.baseline_config(path)
+            self.assertEqual(data, b'exact saved patch\n')
+            self.assertEqual(metadata['baselinePatchSHA256'], perf.sha(data))
+            self.assertIn('supplied baseline patch: before.patch', metadata['baselineDescription'])
+            path.write_bytes(b'\n')
+            with self.assertRaisesRegex(ValueError, 'empty'):
+                perf.baseline_config(path)
+
     def report(self):
         results = []
         for width, height, profile, route in sorted(perf.CASES):
@@ -121,6 +137,28 @@ class FelPerformanceTests(unittest.TestCase):
             for case in result['comparisons']:
                 for delta in case['roundMedianChangePercent']['gpuMs']: self.assertAlmostEqual(delta, 10)
                 for delta in case['roundMedianChangePercent']['completionMs']: self.assertAlmostEqual(delta, 20)
+
+    def test_per_frame_calibration_detects_a_changed_first_frame(self):
+        report = self.report()
+        for result in report['results']: result['outputSHA256ByFrame'] = ['first', result['outputSHA256']]
+        perf.validate_report(report)
+        report['results'][0]['outputSHA256ByFrame'][0] = 'changed first frame'
+        with self.assertRaisesRegex(ValueError, 'per-frame output calibration'):
+            perf.validate_report(report)
+
+    def test_outputs_match_records_both_frames_without_rejecting_engine_differences(self):
+        for mode, expected in (('same', True), ('different-first-frame', False), ('legacy', None)):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as temporary:
+                directory = Path(temporary)
+                for round_, variant in perf.run_order():
+                    report = self.report()
+                    if mode != 'legacy':
+                        for result in report['results']:
+                            first = variant if mode == 'different-first-frame' else 'same first frame'
+                            result['outputSHA256ByFrame'] = [first, result['outputSHA256']]
+                    (directory/f'run-{round_}-{variant}.json').write_text(json.dumps(report))
+                with patch.object(perf, 'verify', return_value={}): result = perf.analyze(directory)
+                self.assertTrue(all(case['outputsMatch'] is expected for case in result['comparisons']))
 
 
 if __name__ == '__main__': unittest.main()

@@ -3,6 +3,8 @@
 
 Run --prepare-only, --build-only, then --run-only separately to keep builds away
 from measurements. --analyze-only rereads the recorded samples. Default runs all.
+--baseline-patch applies a saved patch to the pinned baseline during preparation;
+otherwise the baseline is unpatched upstream. Its exact bytes/hash are retained.
 The Swift harness uses unchanged production async paths and their existing GPU
 mean. No engine source instrumentation, DEBUG defines or shader changes are added.
 """
@@ -86,9 +88,19 @@ def install_benchmark(checkout):
                 fixtureSHA256=sha(fixture.encode()), sources=TEST_SOURCES)
 
 
-def prepare(directory):
+def baseline_config(patch):
+    if patch is None:
+        return None, dict(baselinePatchSHA256=None, baselineDescription='Unpatched pinned upstream')
+    data = patch.read_bytes()
+    if not data.strip(): raise ValueError('The supplied baseline patch is empty')
+    return data, dict(baselinePatchSHA256=sha(data),
+                      baselineDescription=f'Pinned upstream with supplied baseline patch: {patch.name}')
+
+
+def prepare(directory, baseline_patch=None):
     if directory.exists():
         raise ValueError('Use a new directory for preparation; existing snapshots are never overwritten')
+    baseline_data, baseline_metadata = baseline_config(baseline_patch)
     subprocess.run([sys.executable, str(ROOT/'PrivateBuild/engine.py'), '--check'], check=True)
     pin = json.loads((ROOT/'PrivateBuild/UPSTREAM.json').read_text())['engine']
     original = ROOT/'PrivateBuild/.build/AetherEngine'
@@ -97,13 +109,17 @@ def prepare(directory):
                     patchSHA256=sha(PATCH.read_bytes()), harnessSHA256=sha(HARNESS.read_bytes()),
                     python=sys.version, swift=subprocess.check_output(['swift', '--version'], text=True).strip(),
                     rounds=ROUNDS, instrumentation='none; identical Release benchmark with test-only fixture extraction/source selection',
-                    testTargetSelection={}, variants={})
+                    testTargetSelection={}, variants={}, **baseline_metadata)
+    if baseline_data is not None:
+        (directory/'baseline.patch').write_bytes(baseline_data)
     for variant in VARIANTS:
         checkout = directory/variant
         subprocess.run(['git', 'clone', '--no-hardlinks', '--no-checkout', str(original), str(checkout)], check=True)
         subprocess.run(['git', '-C', str(checkout), 'checkout', '--detach', pin['revision']], check=True)
         if variant == 'patched':
             subprocess.run(['git', '-C', str(checkout), 'apply', '--index', str(PATCH)], check=True)
+        elif baseline_data is not None:
+            subprocess.run(['git', '-C', str(checkout), 'apply', '--index', str(directory/'baseline.patch')], check=True)
         source = (checkout/COMPOSER).read_text()
         # The cumulative mean is only usable before its first completed window.
         for required in ('private static let gpuTimeWindow = 120',
@@ -126,6 +142,13 @@ def prepare(directory):
 
 def verify(directory):
     metadata = json.loads((directory/'provenance.json').read_text())
+    baseline_hash = metadata.get('baselinePatchSHA256')
+    saved_baseline = directory/'baseline.patch'
+    if baseline_hash is not None:
+        if not saved_baseline.is_file() or sha(saved_baseline.read_bytes()) != baseline_hash:
+            raise ValueError('Saved baseline patch differs from its recorded hash')
+    elif saved_baseline.exists():
+        raise ValueError('Unpatched baseline unexpectedly contains a baseline patch')
     if metadata['patchSHA256'] != sha(PATCH.read_bytes()):
         raise ValueError('Current engine patch differs from the snapshot; prepare and measure new snapshots')
     if metadata['harnessSHA256'] != sha(HARNESS.read_bytes()):
@@ -212,6 +235,10 @@ def validate_report(report):
         peer = next(r for r in results if (r['width'], r['height'], r['profile']) == (result['width'], result['height'], result['profile']) and r['route'] != result['route'])
         if peer['outputSHA256'] != result['outputSHA256'] or peer['inputSHA256'] != result['inputSHA256']:
             raise ValueError('Pool/in-place fixture calibration differs within one engine')
+        hashes, peer_hashes = result.get('outputSHA256ByFrame'), peer.get('outputSHA256ByFrame')
+        if hashes is not None or peer_hashes is not None:
+            if not isinstance(hashes, list) or len(hashes) != 2 or result['outputSHA256'] != hashes[1] or peer_hashes != hashes:
+                raise ValueError('Pool/in-place per-frame output calibration is missing or differs')
 
 
 def analyze(directory):
@@ -227,6 +254,8 @@ def analyze(directory):
                    for (round_, variant), report in reports.items()}
         if len({tuple(e['inputSHA256']) for e in entries.values()}) != 1:
             raise ValueError('Baseline and patched input frames differ')
+        frame_hashes = [e.get('outputSHA256ByFrame') for e in entries.values()]
+        outputs_match = None if any(h is None for h in frame_hashes) else len({tuple(h) for h in frame_hashes}) == 1
         stats = {variant: {field: [dict(median=statistics.median(s[field] for s in entries[round_, variant]['samples']),
                                        p95=percentile([s[field] for s in entries[round_, variant]['samples']], .95))
                                   for round_ in range(1, ROUNDS+1)] for field in ('gpuMs', 'completionMs')}
@@ -234,12 +263,12 @@ def analyze(directory):
         deltas = {field: [100*(stats['patched'][field][i]['median']/stats['baseline'][field][i]['median']-1)
                           for i in range(ROUNDS)] for field in ('gpuMs', 'completionMs')}
         comparisons.append(dict(width=case[0], height=case[1], profile=case[2], route=case[3], runs=stats,
-                                roundMedianChangePercent=deltas))
+                                roundMedianChangePercent=deltas, outputsMatch=outputs_match))
     result = dict(schemaVersion=1, provenance=metadata, comparisons=comparisons,
                   comparisonMethod='matched crossover rounds of separate process runs; changes compare per-run medians, not paired command buffers',
                   reports=[dict(round=round_, variant=variant, report=reports[round_, variant]) for round_, variant in run_order()],
-                  calibration='Pool/in-place output hashes compare only final sequence 69 (frame 1) within each engine, not every output frame and not different engines with intentionally different arithmetic.',
-                  limitation='Mac single-frame composition comparison, not Apple TV playback or deadline validation. The RPU is parsed once per profile/dimensions and parameters are reused; RPU parsing and mapping-slot state handling are excluded. Per-compose LUT generation/upload, encoding and callback delivery are included in completion latency. Decode, rendering, contention and source restoration are excluded; the CPU delta covers composition, not the whole playback pipeline.')
+                  calibration='Current reports hash normal Bayer P010 outputs for both input frames after final sequences 68 and 69, outside timing; pool/in-place hashes must agree within each engine. outputsMatch compares both frames across all runs and engines without requiring equality for intentionally different arithmetic. It is null for legacy reports that only hash final sequence 69/frame 1. This is not a comparison of every timed frame or raw 12-bit VDR.',
+                  limitation='Mac single-frame composition comparison, not Apple TV playback or deadline validation. The RPU is parsed once per profile/dimensions and parameters are reused; RPU parsing and mapping-slot state handling are excluded. Per-compose LUT generation/upload, encoding and callback delivery are included in completion latency. Decode, rendering, contention and source restoration are excluded; completion latency covers composition, not the whole playback pipeline.')
     (directory/'analysis.json').write_text(json.dumps(result, indent=2)+'\n')
     print(f'Wrote {directory / "analysis.json"}')
     return result
@@ -248,17 +277,20 @@ def analyze(directory):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--directory', type=Path, required=True)
+    parser.add_argument('--baseline-patch', type=Path, help='apply this saved patch to the baseline during preparation')
     mode = parser.add_mutually_exclusive_group()
     for name in ('prepare', 'build', 'run', 'analyze'):
         mode.add_argument(f'--{name}-only', action='store_true')
     args = parser.parse_args(); directory = args.directory.resolve()
+    if args.baseline_patch is not None and (args.build_only or args.run_only or args.analyze_only):
+        parser.error('--baseline-patch is a preparation option; later stages use the saved baseline definition')
     try:
-        if args.prepare_only: prepare(directory)
+        if args.prepare_only: prepare(directory, args.baseline_patch)
         elif args.build_only: build(directory)
         elif args.run_only: measure(directory); analyze(directory)
         elif args.analyze_only: analyze(directory)
         else:
-            prepare(directory); build(directory); measure(directory); analyze(directory)
+            prepare(directory, args.baseline_patch); build(directory); measure(directory); analyze(directory)
     except (OSError, ValueError, KeyError, subprocess.CalledProcessError) as exc:
         parser.exit(1, f'FAIL: {exc}\n')
 

@@ -30,6 +30,7 @@ struct ReferencePlayerFelPerformanceTests {
         let cbMmr: Bool, crMmr: Bool
         let inputSHA256: [String]
         let outputSHA256: String
+        let outputSHA256ByFrame: [String]
         let calls: Int, inPlaceComposedFrames: Int, inPlaceLostFrames: Int
         let hasOutputPool: Bool
         let samples: [Sample]
@@ -134,7 +135,7 @@ struct ReferencePlayerFelPerformanceTests {
                     }
                     var samples = [Sample]()
                     var previousGpuTotal = 0.0
-                    var lastOutput: CVPixelBuffer?
+                    var lastOutputs = [CVPixelBuffer?](repeating: nil, count: frames.count)
                     var calls = 0
                     for sequence in 0..<(Self.warmups + Self.samples) {
                         try autoreleasepool {
@@ -175,19 +176,25 @@ struct ReferencePlayerFelPerformanceTests {
                                                   gpuMs: gpuMs, completionMs: Double(completion.end - start) / 1_000_000,
                                                   thermalState: ProcessInfo.processInfo.thermalState.rawValue))
                         }
-                        if sequence == Self.warmups + Self.samples - 1 {
-                            lastOutput = route == "pool_async" ? completion.output : frames[frame].bl
+                        if sequence >= Self.warmups + Self.samples - frames.count {
+                            // Hold pool outputs; these final in-place inputs are never restored again.
+                            lastOutputs[frame] = route == "pool_async" ? completion.output : frames[frame].bl
                         }
                         }
                     }
                     try #require(calls == 70 && samples.count == Self.samples && composer.inPlaceLostFrames == 0)
                     try #require(composer.inPlaceComposedFrames == (route == "in_place_async" ? calls : 0))
                     try #require(composer.hasOutputPool == (route == "pool_async"))
-                    let output = try #require(lastOutput)
+                    let outputHashes = try lastOutputs.map { output in
+                        let buffer = try #require(output)
+                        return Self.hash(Self.planeData(buffer))
+                    }
                     results.append(Result(width: width, height: height, profile: profile, route: route,
                                           flags: params.flags.rawValue, lumaNlqScale: params.nlqY.nlqScale,
                                           cbMmr: params.polyCb.usesMmr, crMmr: params.polyCr.usesMmr,
-                                          inputSHA256: inputHashes, outputSHA256: Self.hash(Self.planeData(output)), calls: calls,
+                                          inputSHA256: inputHashes,
+                                          outputSHA256: outputHashes[(Self.warmups + Self.samples - 1) % frames.count],
+                                          outputSHA256ByFrame: outputHashes, calls: calls,
                                           inPlaceComposedFrames: composer.inPlaceComposedFrames, inPlaceLostFrames: composer.inPlaceLostFrames,
                                           hasOutputPool: composer.hasOutputPool, samples: samples))
                 }

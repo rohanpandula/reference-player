@@ -6,7 +6,8 @@ License: GNU Lesser General Public License, version 3, with the upstream
 Apple Store / DRM Exception. Upstream copyright and license notices are retained.
 
 Changes: RPU mapping-ID reuse, fixed-point FEL reconstruction and MMR coefficient
-precision, regression tests, and an opt-in luma resampling comparison.
+precision and bounded exact accumulation, regression tests, and an opt-in
+luma resampling comparison.
 
 Corresponding engine source: the upstream commit above plus this patch.
 Upstream: https://github.com/superuser404notfound/AetherEngine
@@ -602,7 +603,7 @@ index e44ddd1..49c8ae3 100644
              precondition(offset - start == DoviMmrParams.stride,
                           "DoviMmrParams serialization is not stride bytes")
 diff --git a/Sources/AetherEngine/Video/Metal/DoviShaderSource.swift b/Sources/AetherEngine/Video/Metal/DoviShaderSource.swift
-index b308953..072f07f 100644
+index b308953..91f3d7f 100644
 --- a/Sources/AetherEngine/Video/Metal/DoviShaderSource.swift
 +++ b/Sources/AetherEngine/Video/Metal/DoviShaderSource.swift
 @@ -40,7 +40,7 @@ typedef int  dovi_i32;
@@ -659,7 +660,7 @@ index b308953..072f07f 100644
      dovi_u32 bl_max;
      dovi_u32 vdr_max;
      dovi_u32 vdr_scale;
-@@ -219,124 +209,66 @@ static inline int dovi_select_piece(constant struct DoviPolynomialParams &curve,
+@@ -219,124 +209,69 @@ static inline int dovi_select_piece(constant struct DoviPolynomialParams &curve,
      return clamp(piece, 0, max(last_piece, 0));
  }
  
@@ -767,14 +768,17 @@ index b308953..072f07f 100644
 -    return s;
 +    device const long* c = coefficients + piece * DOVI_MMR_TABLE_PIECE_STRIDE;
 +    uint shift = min(denom, 23u) + 4u;
-+    ulong mask = (1UL << shift) - 1UL;
++    uint mask = (1u << shift) - 1u;
 +    long whole = 0;
-+    ulong fraction = 0;
-+    // Split products before summing: legal cancelling coefficients can overflow one signed 64-bit sum.
-+    for (uint k = 0u; k <= 7u * min(order, 3u); ++k) {
-+        long product = c[k] * t[k];
-+        whole += product >> shift;
-+        fraction += ulong(product) & mask;
++    uint fraction = 0;
++    uint count = 1u + 7u * min(order, 3u);
++    // Legal products are in [-2^59, 2^59): any 16 fit signed 64-bit, but all 22 need not.
++    // Split each partial into quotient/remainder so cancellation and the final floor stay exact.
++    for (uint first = 0u; first < count; first += 16u) {
++        long partial = 0;
++        for (uint k = first; k < min(first + 16u, count); ++k) partial += c[k] * t[k];
++        whole += partial >> shift;
++        fraction += uint(partial) & mask; // At most two remainders below 2^27.
 +    }
 +    return int(clamp(whole + long(fraction >> shift), 0L, 65535L));
  }
@@ -832,7 +836,7 @@ index b308953..072f07f 100644
  }
  
  /* ============================================================================
-@@ -344,9 +276,8 @@ static inline int dovi_denormalize(float pred_norm, uint bl_max, uint vdr_scale,
+@@ -344,9 +279,8 @@ static inline int dovi_denormalize(float pred_norm, uint bl_max, uint vdr_scale,
     ========================================================================= */
  
  // The inverse linear-deadzone quantiser depends on the 10-bit EL code alone, so the composer evaluates it
@@ -844,7 +848,7 @@ index b308953..072f07f 100644
  static inline int dovi_inv_nlq(device const int* nlq_lut, uint component, int el_code) {
      return nlq_lut[component * 1024u + uint(clamp(el_code, 0, 1023))];
  }
-@@ -389,14 +320,14 @@ static inline int dovi_quantize(
+@@ -389,14 +323,14 @@ static inline int dovi_quantize(
  // (`dovi_annexb_chroma`). The RPU does not carry the encoder's own filter (el_spatial_resampling_filter_flag
  // only says one was used), and the standard treats resampling as non-normative, but Annex B gives a default
  // and it is the one reading every EL plane agrees on: vertical first, centred, then horizontal, co-sited.
@@ -861,7 +865,7 @@ index b308953..072f07f 100644
  //
  // The bilinear read: el_spatial_resampling_filter_flag advertises that the encoder used its own
  // separable filter, whose taps the RPU does not carry, so no bit-exact inverse
-@@ -573,7 +504,7 @@ static inline void dovi_compose_luma_plane(
+@@ -573,7 +507,7 @@ static inline void dovi_compose_luma_plane(
      constant struct DoviMetalParams&       params,
      constant float*                        luma_lut,
      device const int*                      nlq_lut,
@@ -870,7 +874,7 @@ index b308953..072f07f 100644
      uint2                                  gid)
  {
      if (gid.x >= params.bl_width || gid.y >= params.bl_height) {
-@@ -582,19 +513,15 @@ static inline void dovi_compose_luma_plane(
+@@ -582,19 +516,15 @@ static inline void dovi_compose_luma_plane(
  
      int bl_y = int(bl_y_tex.read(gid).r >> 6);
  
@@ -894,7 +898,7 @@ index b308953..072f07f 100644
  
      if ((params.flags & DOVI_FLAG_DISABLE_RESIDUAL) == 0u &&
          params.nlq_y.nlq_method == DOVI_NLQ_METHOD_LINEAR &&
-@@ -615,7 +542,7 @@ static inline void dovi_compose_luma_plane(
+@@ -615,7 +545,7 @@ static inline void dovi_compose_luma_plane(
          vdr_y += dovi_inv_nlq(nlq_lut, 0u, el_code);
      }
  
@@ -903,7 +907,7 @@ index b308953..072f07f 100644
  
      int out_y = dovi_quantize(vdr_y, params.vdr_scale, params.dither_mode,
                                dovi_dither(gid, params.frame_index, uint2(0u, 0u)), 64, 940);
-@@ -638,7 +565,7 @@ kernel void dovi_compose_luma(
+@@ -638,7 +568,7 @@ kernel void dovi_compose_luma(
      constant struct DoviMetalParams&       params        [[buffer(0)]],
      constant float*                        luma_lut      [[buffer(1)]],
      device const int*                      nlq_lut       [[buffer(2)]],
@@ -912,7 +916,7 @@ index b308953..072f07f 100644
      uint2                                  gid           [[thread_position_in_grid]])
  {
      dovi_compose_luma_plane(bl_y_tex, bl_uv_tex, el_y_tex, out_y_tex, params, luma_lut, nlq_lut, mmr_table, gid);
-@@ -686,7 +613,7 @@ static inline DoviChromaSite dovi_chroma_site(
+@@ -686,7 +616,7 @@ static inline DoviChromaSite dovi_chroma_site(
      texture2d<ushort, access::read>       el_uv_tex,
      constant struct DoviMetalParams        &params,
      device const int*                      nlq_lut,
@@ -921,7 +925,7 @@ index b308953..072f07f 100644
  {
      uint uv_width = (params.bl_width + 1u) / 2u;
      uint uv_height = (params.bl_height + 1u) / 2u;
-@@ -714,19 +641,12 @@ static inline DoviChromaSite dovi_chroma_site(
+@@ -714,19 +644,12 @@ static inline DoviChromaSite dovi_chroma_site(
      int bl_cb = int(bl_uv.r >> 6);
      int bl_cr = int(bl_uv.g >> 6);
  
@@ -945,7 +949,7 @@ index b308953..072f07f 100644
  
      if ((params.flags & DOVI_FLAG_DISABLE_RESIDUAL) == 0u) {
          bool cb_active = (params.nlq_cb.nlq_method == DOVI_NLQ_METHOD_LINEAR && params.nlq_cb.nlq_scale != 0);
-@@ -763,8 +683,8 @@ static inline DoviChromaSite dovi_chroma_site(
+@@ -763,8 +686,8 @@ static inline DoviChromaSite dovi_chroma_site(
      }
  
      DoviChromaSite out;
@@ -956,7 +960,7 @@ index b308953..072f07f 100644
      return out;
  }
  
-@@ -804,7 +724,7 @@ static inline void dovi_compose_chroma_plane(
+@@ -804,7 +727,7 @@ static inline void dovi_compose_chroma_plane(
      UVOut                                  out_uv_tex,
      constant struct DoviMetalParams&       params,
      device const int*                      nlq_lut,
@@ -965,7 +969,7 @@ index b308953..072f07f 100644
      uint2                                  gid)
  {
      uint uv_width = (params.bl_width + 1u) / 2u;
-@@ -825,7 +745,7 @@ kernel void dovi_compose_chroma(
+@@ -825,7 +748,7 @@ kernel void dovi_compose_chroma(
      texture2d<ushort, access::write>       out_uv_tex    [[texture(3)]],
      constant struct DoviMetalParams&       params        [[buffer(0)]],
      device const int*                      nlq_lut       [[buffer(2)]],
@@ -974,7 +978,7 @@ index b308953..072f07f 100644
      uint2                                  gid           [[thread_position_in_grid]])
  {
      dovi_compose_chroma_plane(bl_y_tex, bl_uv_tex, el_uv_tex, out_uv_tex, params, nlq_lut, mmr_table, gid);
-@@ -841,7 +761,7 @@ static inline DoviChromaSite dovi_output_site(
+@@ -841,7 +764,7 @@ static inline DoviChromaSite dovi_output_site(
      texture2d<ushort, access::read>        el_uv_tex,
      constant struct DoviMetalParams        &params,
      device const int*                      nlq_lut,
@@ -983,7 +987,7 @@ index b308953..072f07f 100644
  {
      DoviChromaSite s = dovi_chroma_site(site, bl_y_tex, bl_uv_tex, el_uv_tex, params, nlq_lut, mmr_table);
      int lo = int(64u * params.vdr_scale);
-@@ -861,7 +781,7 @@ kernel void dovi_compose_chroma_422(
+@@ -861,7 +784,7 @@ kernel void dovi_compose_chroma_422(
      texture2d<ushort, access::write>       out_uv_tex    [[texture(3)]],
      constant struct DoviMetalParams&       params        [[buffer(0)]],
      device const int*                      nlq_lut       [[buffer(2)]],
@@ -992,7 +996,7 @@ index b308953..072f07f 100644
      uint2                                  gid           [[thread_position_in_grid]])
  {
      uint uv_width = (params.bl_width + 1u) / 2u;
-@@ -901,7 +821,7 @@ kernel void dovi_compose_chroma_444(
+@@ -901,7 +824,7 @@ kernel void dovi_compose_chroma_444(
      texture2d<ushort, access::write>       out_uv_tex    [[texture(3)]],
      constant struct DoviMetalParams&       params        [[buffer(0)]],
      device const int*                      nlq_lut       [[buffer(2)]],
@@ -1001,7 +1005,7 @@ index b308953..072f07f 100644
      uint2                                  gid           [[thread_position_in_grid]],
      uint2                                  tid           [[thread_position_in_threadgroup]],
      uint2                                  tgid          [[threadgroup_position_in_grid]],
-@@ -985,94 +905,78 @@ kernel void dovi_layout_probe(
+@@ -985,94 +908,78 @@ kernel void dovi_layout_probe(
      out[12] = params.poly_y.order[7];
      out[13] = uint(params.poly_y.coef[7][2]);
      out[14] = params.poly_y.coef_shift[7];
@@ -1164,7 +1168,7 @@ index b308953..072f07f 100644
  }
  """
  
-@@ -1106,7 +1010,7 @@ kernel void dovi_compose_luma_in_place(
+@@ -1106,7 +1013,7 @@ kernel void dovi_compose_luma_in_place(
      constant struct DoviMetalParams&       params        [[buffer(0)]],
      constant float*                        luma_lut      [[buffer(1)]],
      device const int*                      nlq_lut       [[buffer(2)]],
@@ -1173,7 +1177,7 @@ index b308953..072f07f 100644
      uint2                                  gid           [[thread_position_in_grid]])
  {
      dovi_compose_luma_plane(y_tex, bl_uv_tex, el_y_tex, y_tex, params, luma_lut, nlq_lut, mmr_table, gid);
-@@ -1119,7 +1023,7 @@ kernel void dovi_compose_chroma_in_place(
+@@ -1119,7 +1026,7 @@ kernel void dovi_compose_chroma_in_place(
      texture2d<ushort, access::read>        el_uv_tex     [[texture(2)]],
      constant struct DoviMetalParams&       params        [[buffer(0)]],
      device const int*                      nlq_lut       [[buffer(2)]],
@@ -2512,17 +2516,202 @@ index 0000000..d7d78c6
 +#endif
 diff --git a/Tests/AetherEngineTests/DoviReconstructionPrecisionTests.swift b/Tests/AetherEngineTests/DoviReconstructionPrecisionTests.swift
 new file mode 100644
-index 0000000..165ef3b
+index 0000000..0b6bfed
 --- /dev/null
 +++ b/Tests/AetherEngineTests/DoviReconstructionPrecisionTests.swift
-@@ -0,0 +1,95 @@
+@@ -0,0 +1,280 @@
 +#if DualLayerDolbyVision
 +import Testing
 +import Dovi
++import Foundation
++import Metal
 +@testable import AetherEngine
 +
 +@Suite(.offCooperativePoolOneLane)
 +struct DoviReconstructionPrecisionTests {
++    /// Read the production curve's full 16-bit prediction: output rounding must not hide a lost Q20 bit.
++    private struct PredictionProbe {
++        let device: MTLDevice
++        let queue: MTLCommandQueue
++        let pipeline: MTLComputePipelineState
++
++        init() throws {
++            device = try #require(MTLCreateSystemDefaultDevice())
++            queue = try #require(device.makeCommandQueue())
++            let library = try device.makeLibrary(source: DoviShaderSource.poolSource + """
++            kernel void precision_prediction_probe(constant DoviMetalParams &p [[buffer(0)]],
++                device const long *coefficients [[buffer(1)]], device const uint4 *inputs [[buffer(2)]],
++                device int *output [[buffer(3)]], uint i [[thread_position_in_grid]]) {
++                uint4 x = inputs[i];
++                output[i] = dovi_eval_curve(p.poly_y, coefficients + i * 22u, p.mmr_y.coef_shift,
++                    p.poly_y, p.poly_cb, p.poly_cr, int(x.x), int(x.x), int(x.y), int(x.z), p.bl_max);
++            }
++            """, options: nil)
++            pipeline = try device.makeComputePipelineState(function: #require(library.makeFunction(name: "precision_prediction_probe")))
++        }
++
++        func run(_ p: DoviMetalParams, inputs: [SIMD4<UInt32>], coefficients: [Int64]) throws -> [Int32] {
++            let data = p.serialize()
++            let parameters = try #require(data.withUnsafeBytes { device.makeBuffer(bytes: $0.baseAddress!, length: $0.count, options: .storageModeShared) })
++            let terms = try #require(coefficients.withUnsafeBytes { device.makeBuffer(bytes: $0.baseAddress!, length: $0.count, options: .storageModeShared) })
++            let source = try #require(inputs.withUnsafeBytes { device.makeBuffer(bytes: $0.baseAddress!, length: $0.count, options: .storageModeShared) })
++            let result = try #require(device.makeBuffer(length: inputs.count * MemoryLayout<Int32>.stride, options: .storageModeShared))
++            let command = try #require(queue.makeCommandBuffer())
++            let encoder = try #require(command.makeComputeCommandEncoder())
++            encoder.setComputePipelineState(pipeline)
++            for (index, buffer) in [parameters, terms, source, result].enumerated() { encoder.setBuffer(buffer, offset: 0, index: index) }
++            encoder.dispatchThreads(MTLSize(width: inputs.count, height: 1, depth: 1),
++                                    threadsPerThreadgroup: MTLSize(width: min(inputs.count, pipeline.threadExecutionWidth), height: 1, depth: 1))
++            encoder.endEncoding(); command.commit(); command.waitUntilCompleted()
++            try #require(command.status == .completed)
++            return Array(UnsafeBufferPointer(start: result.contents().assumingMemoryBound(to: Int32.self), count: inputs.count))
++        }
++    }
++
++    private static func mmrParams(bits: Int = 10, order: UInt32 = 3) -> DoviMetalParams {
++        var p = DoviGpuEdgeCaseTests.params(flags: [.disableResidual, .lumaMmr])
++        _ = p.setBitDepths(bl: bits, vdr: max(bits, 12))
++        var curve = p.polyY
++        curve.pivots[1] = p.blMax
++        curve.method[0] = DoviMapping.mmr.rawValue
++        curve.order[0] = order
++        p.polyY = curve; p.polyCb = curve; p.polyCr = curve
++        p.mmrY.coefShift = 23
++        return p
++    }
++
++    private static func prediction(_ p: DoviMetalParams, input: SIMD4<UInt32>) -> Int {
++        let model = DoviCpuModelTests.Model(p)
++        let divisor = Double(p.blMax) + 1
++        return model.denormalize(model.predict(p.polyY, p.mmrY, blValue: Int(input.x),
++            y: Double(input.x) / divisor, u: Double(input.y) / divisor, v: Double(input.z) / divisor))
++    }
++
++    @Test("every MMR monomial preserves Q20 carry and truncation bits across supported BL depths")
++    func monomialPrecision() throws {
++        let probe = try PredictionProbe()
++        for bits in 8...16 {
++            let base = Self.mmrParams(bits: bits)
++            let hi = base.blMax, half = (hi + 1) / 2
++            let vectors: [SIMD4<UInt32>] = [
++                .init(0, hi, 1, 0), .init(1, hi - 1, hi, 0), .init(hi, hi, hi, 0),
++                .init(half - 1, half + 1, hi - 3, 0), .init(hi - 7, half + 3, half - 5, 0),
++                .init(hi / 3, hi / 5, hi / 7, 0)
++            ]
++            var inputs = [SIMD4<UInt32>](), coefficients = [Int64]()
++            for term in 0..<21 {
++                for input in vectors {
++                    var p = base
++                    p.mmrY.coef[0][term] = 16 << 23
++                    // A gain of 16 makes a single Q20 unit one prediction code. Recenter using
++                    // the independent Int128 model so saturation cannot hide a product error.
++                    p.mmrY.constant[0] = Int64(32768 - Self.prediction(p, input: input)) << 7
++                    #expect(Self.prediction(p, input: input) == 32768)
++                    inputs.append(input)
++                    coefficients += [p.mmrY.constant[0]] + p.mmrY.coef[0]
++                }
++            }
++            let actual = try probe.run(base, inputs: inputs, coefficients: coefficients)
++            for (index, value) in actual.enumerated() {
++                #expect(value == 32768, "BL \(bits), term \(index / vectors.count), input \(inputs[index])")
++            }
++        }
++    }
++
++    @Test("all 22 MMR terms retain negative remainders and wide cancellation")
++    func allTermCancellation() throws {
++        let probe = try PredictionProbe()
++        let base = Self.mmrParams()
++        let vectors: [SIMD4<UInt32>] = [.init(1023, 1023, 1023, 0), .init(511, 513, 997, 0), .init(37, 901, 623, 0)]
++        var inputs = [SIMD4<UInt32>](), coefficients = [Int64](), expected = [Int32]()
++        for wide in [false, true] {
++            for input in vectors {
++                var p = base
++                p.mmrY.coef[0] = (0..<21).map { k in
++                    wide ? (k.isMultiple(of: 2) ? -1 : 1) * ((Int64(1) << 34) + Int64(17 * k + 1)) : -1
++                }
++                // The -1 case gives 22 remainders whose sum exceeds signed 32-bit at the max input.
++                // Keep a nonzero constant remainder as well as the cancelling integer part.
++                p.mmrY.constant[0] = (Int64(32768 - Self.prediction(p, input: input)) << 7) + 127
++                inputs.append(input)
++                coefficients += [p.mmrY.constant[0]] + p.mmrY.coef[0]
++                expected.append(Int32(Self.prediction(p, input: input)))
++            }
++        }
++        #expect(try probe.run(base, inputs: inputs, coefficients: coefficients) == expected)
++    }
++
++    @Test("large partial sums cancel across the 16-product boundary before prediction clipping")
++    func crossPartialCancellation() throws {
++        let probe = try PredictionProbe()
++        let input = SIMD4<UInt32>(512, 512, 512, 0)
++        // At half-scale the first 16 basis terms sum to 2280/512, the remaining
++        // six to 153/512. Opposite coefficients in ratio 51/760 nearly cancel.
++        for denominator in [0, 1, 7, 15, 23] {
++            var base = Self.mmrParams()
++            base.mmrY.coefShift = UInt32(denominator)
++            let maximum = (Int64(1) << (16 + denominator)) - 1
++            let smaller = maximum * 51 / 760
++            var coefficients = [Int64](), expected = [Int32]()
++            for sign in [Int64(-1), 1] {
++                var p = base
++                p.mmrY.constant[0] = sign * smaller
++                p.mmrY.coef[0] = (0..<21).map { $0 < 15 ? sign * smaller : -sign * maximum }
++                p.mmrY.coef[0][20] += sign  // Exercise partial remainders at the larger denominators.
++                let prediction = Int64(Self.prediction(p, input: input))
++                p.mmrY.constant[0] += (((32768 - prediction) << denominator) + (1 << 15)) >> 16
++                let centered = Self.prediction(p, input: input)
++                try #require(centered > 0 && centered < 65535, "Cancellation must remain observable, not saturate")
++                coefficients += [p.mmrY.constant[0]] + p.mmrY.coef[0]
++                expected.append(Int32(centered))
++            }
++            #expect(try probe.run(base, inputs: [input, input], coefficients: coefficients) == expected,
++                    "Coefficient denominator \(denominator)")
++        }
++    }
++
++    @Test("chroma MMR preserves independent orders, curve clamps and non-MMR branches")
++    func chromaBranches() throws {
++        let composer = try #require(DoviFelComposer())
++        let frames = try #require(DoviFelInPlaceComposeTests.makeBaseAndEnhancement(width: 32, height: 16, seed: 47))
++        let boundaryCodes = [0, 90, 91, 92, 202, 203, 204, 512, 876, 877, 878, 912, 913, 914, 1023]
++        DoviGpuCurveSweepTests.fillPlane(frames.bl, plane: 1, components: 2) { x, y, c in
++            boundaryCodes[(x + 3 * y + 7 * c) % boundaryCodes.count]
++        }
++        typealias C = DoviCpuModelTests
++        let bl = C.plane(frames.bl, 0, components: 1), uv = C.plane(frames.bl, 1, components: 2)
++        let el = C.plane(frames.el, 1, components: 2)
++        for (cbKind, crKind) in [(-1, 1), (1, -1), (0, 2), (2, 0), (1, 3), (3, 1), (2, 3), (3, 2), (1, 1), (2, 2), (3, 3)] {
++            var p = DoviGpuEdgeCaseTests.params(flags: [.disableResidual])
++            p.ditherMode = .debugRawVDR
++            p.polyY.pivots[0] = 17; p.polyY.pivots[1] = 991
++            func curve(_ kind: Int, low: UInt32, high: UInt32) -> DoviPolynomialParams {
++                if kind < 0 { return .identity }
++                var c = DoviGpuCurveSweepTests.identityCurve()
++                c.pivots[0] = low; c.pivots[1] = high
++                if kind == 0 { c.coef[0] = [1 << 21, 1 << 22, 0] }
++                else { c.method[0] = DoviMapping.mmr.rawValue; c.order[0] = UInt32(kind) }
++                return c
++            }
++            p.polyCb = curve(cbKind, low: 91, high: 913)
++            p.polyCr = curve(crKind, low: 203, high: 877)
++            var mmr = DoviMmrParams(); mmr.coefShift = 23; mmr.constant[0] = 1 << 22
++            mmr.coef[0] = (0..<21).map { Int64([3, -2, 4, -1, 2, -3, 1][$0 % 7]) << 18 }
++            p.mmrCb = mmr
++            mmr.coefShift = 22; mmr.constant[0] >>= 1
++            mmr.coef[0] = mmr.coef[0].map { $0 >> 1 }
++            p.mmrCr = mmr
++            let output = try #require(composer.compose(baseBuffer: frames.bl, enhancementBuffer: frames.el, params: p))
++            let actual = C.plane(output, 1, components: 2), model = C.Model(p)
++            for y in 0..<uv.height { for x in 0..<uv.width {
++                let expected = model.chroma(bl: bl, blUV: uv, elUV: el, x: x, y: y)
++                let offset = (y * uv.width + x) * 2
++                #expect(Int(actual.raw[offset] >> 4) == expected.0, "Cb \(cbKind)/Cr \(crKind) at \(x), \(y)")
++                #expect(Int(actual.raw[offset + 1] >> 4) == expected.1, "Cb \(cbKind)/Cr \(crKind) at \(x), \(y)")
++            } }
++        }
++    }
++
 +    @Test("prediction and signed residual retain fractional VDR codes until the final rounding",
 +          arguments: [(514, 2050), (510, 2047), (513, 2049), (511, 2048), (512, 2048)])
 +    func roundsAfterAddition(el: Int, expected: Int) throws {

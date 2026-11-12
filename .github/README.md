@@ -84,13 +84,14 @@ The engine also carries a [small pinned patch](../PrivateBuild/engine-patches/RE
 mapping reuse and reconstruction precision. It resolves the requested mapping ID, preserves the
 current residual switch when concealing a missing RPU, combines prediction and residual before
 rounding, and supports the full MMR coefficient range. The numerical changes follow the published
-fixed-point process. A [patched-versus-upstream Release comparison](../PrivateBuild/FEL-PERFORMANCE.md)
-measures a substantial MMR composition cost on Mac; image fidelity and GPU performance on the target
-Apple TV still need measurement before merging the patch.
+fixed-point process. [Release comparisons](../PrivateBuild/FEL-PERFORMANCE.md) measure a 9.0–9.5%
+reduction in 4K MMR median GPU time from exact grouped accumulation, while the accuracy patch still
+takes about 2.1× upstream GPU time on Mac. Image fidelity and performance on the target Apple TV
+still need measurement before merging the patch.
 
 ## Status
 
-- It builds, and its unit tests pass on the tvOS simulator: 3,534 of 3,534 tvOS unit tests and 213
+- It builds, and its unit tests pass on the tvOS simulator: 3,534 of 3,534 tvOS unit tests and 216
   Python tests for the fork's tooling, measured on 2026-11-12 with Xcode 27.1, the version on the
   machine that ran them (upstream pins Xcode 27.2 in `codemagic.yaml`). The checks also built the
   tvOS app in Release against the device SDK and compiled the iOS and Mac apps in their default
