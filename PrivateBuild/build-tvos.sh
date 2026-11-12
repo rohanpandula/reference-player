@@ -61,7 +61,10 @@ finish() {
 }
 trap finish EXIT
 
-common=(-project Rivulet.xcodeproj -scheme "Reference Player" -configuration Release
+python3 "$script_dir/engine.py"
+verify_args+=(--patched-engine)
+
+common=(-workspace ReferencePlayer.xcworkspace -scheme "Reference Player" -configuration Release
         -clonedSourcePackagesDirPath "$packages_dir" -onlyUsePackageVersionsFromResolvedFile)
 # Xcode may download the already-pinned packages/binaries here. It is not allowed
 # to choose a newer version to make a resolution failure disappear.

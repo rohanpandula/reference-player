@@ -7,10 +7,13 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 SPEC = importlib.util.spec_from_file_location("private_verify", Path(__file__).resolve().parents[1] / "verify.py")
 verify_module = importlib.util.module_from_spec(SPEC)
@@ -347,6 +350,31 @@ nonisolated enum DirectMetadata {
         with patch.object(verify_module.subprocess, "check_output", side_effect=fake_git):
             self.assertEqual([], self.errors(resolved_checkouts=directory))
 
+    def test_patched_verification_reads_the_workspace_engine_not_the_remote_checkout(self):
+        import engine
+        directory, _, revisions, fake_git = self.prepare_checkouts()
+        original = directory / "AetherEngine"
+        override = self.root / engine.CHECKOUT
+        override.parent.mkdir(parents=True)
+        original.rename(override)
+        revisions[str(override)] = revisions.pop(str(original))
+        workspace = self.root / "ReferencePlayer.xcworkspace"
+        workspace.mkdir()
+        (workspace / "contents.xcworkspacedata").write_text(
+            '<Workspace><FileRef location="group:Rivulet.xcodeproj" />'
+            '<FileRef location="group:PrivateBuild/.build/AetherEngine" /></Workspace>')
+        lock = workspace / "xcshareddata/swiftpm/Package.resolved"
+        lock.parent.mkdir(parents=True)
+        lock.symlink_to(self.root / verify_module.LOCK)
+        with patch.object(engine, "check") as checked, patch.object(verify_module.subprocess, "check_output", side_effect=fake_git):
+            self.assertEqual([], self.errors(resolved_checkouts=directory, patched_engine=True))
+            checked.assert_called_once_with(self.root)
+        with patch.object(engine, "check", side_effect=ValueError("unexpected edits")):
+            self.assertIn("Patched engine: unexpected edits", self.errors(patched_engine=True))
+        (workspace / "contents.xcworkspacedata").write_text('<Workspace/>')
+        with patch.object(engine, "check"):
+            self.assertTrue(any("workspace must override" in e for e in self.errors(patched_engine=True)))
+
     def test_actual_checkout_revision_drift(self):
         directory, _, revisions, fake_git = self.prepare_checkouts()
         revisions[str(directory / "LibTrueHD")] = "0" * 40
@@ -540,6 +568,11 @@ class BuildScriptTests(unittest.TestCase):
 with open(os.environ["MOCK_CALLS"], "a") as stream:
     stream.write(json.dumps(["verify", *sys.argv[1:]]) + "\\n")
 ''')
+        (self.private / "engine.py").write_text('''import json, os
+with open(os.environ["MOCK_CALLS"], "a") as stream:
+    stream.write(json.dumps(["engine"]) + "\\n")
+raise SystemExit(19 if os.environ.get("MOCK_ENGINE_FAIL") else 0)
+''')
         self.executable("uname", "#!/bin/sh\necho Darwin\n")
         self.executable("xcodebuild", '''#!/usr/bin/env python3
 import json, os, sys
@@ -584,9 +617,17 @@ if args[-1] == "build":
         for command in commands:
             self.assertIn("-onlyUsePackageVersionsFromResolvedFile", command)
             self.assertIn("Release", command)
+            self.assertIn("ReferencePlayer.xcworkspace", command)
+            self.assertNotIn("-project", command)
             self.assertNotIn("-allowProvisioningUpdates", command)
         self.assertIn("ARCHS=arm64", commands[-1])
         self.assertIn("CODE_SIGNING_ALLOWED=NO", commands[-1])
+
+    def test_engine_failure_prevents_resolution_and_build(self):
+        self.env["MOCK_ENGINE_FAIL"] = "1"
+        result = self.run_build()
+        self.assertEqual(19, result.returncode, result.stderr)
+        self.assertFalse(any(call[0] == "xcodebuild" for call in self.recorded()))
 
     def test_lock_mutation_causes_failure_and_is_not_restored(self):
         self.env["MOCK_XCODE_MODE"] = "mutate-lock"

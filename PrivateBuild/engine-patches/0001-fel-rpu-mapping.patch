@@ -1,0 +1,439 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index a7fd5c8..923d2a8 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -10,7 +10,10 @@ the public-API contract.
+ 
+ ## [Unreleased]
+ 
+-_Nothing yet._
++- **FEL reconstruction follows RPU mapping IDs.** Reuse frames select the named cached mapping
++  instead of the latest one. A missing mapping falls back to slot zero, or bypasses composition when
++  unavailable; seeks clear all slots. Missing RPUs borrow the last resolved frame's residual switch
++  and display metadata, including after reuse frames.
+ 
+ ## [7.61.0] - 2026-11-08
+ 
+diff --git a/Sources/AetherEngine/Decoder/DualLayerVideoDecoder.swift b/Sources/AetherEngine/Decoder/DualLayerVideoDecoder.swift
+index c9b715f..4986c54 100644
+--- a/Sources/AetherEngine/Decoder/DualLayerVideoDecoder.swift
++++ b/Sources/AetherEngine/Decoder/DualLayerVideoDecoder.swift
+@@ -495,8 +495,9 @@ final class DualLayerVideoDecoder: VideoDecodingPipeline, @unchecked Sendable {
+     private var sweepFireUptime: TimeInterval = .infinity
+     /// How many settled base-layer keys are remembered (dolby-vision-fel.md §5.5).
+     static let settledKeyMemory = 64
+-    /// Last parameters that came from a real RPU, and how many frames in a row have borrowed them. Both
+-    /// move in decode order, in `recordSideData`.
++    /// Mapping slots and the last resolved frame used for missing-RPU concealment. Updated in decode
++    /// order, in `recordSideData`; the slots hold only mappings, not per-frame display metadata.
++    private var mappingsByID: [UInt64: DoviMetalParams] = [:]
+     private var lastGoodParams: DoviMetalParams?
+     private var lastGoodDMNAL: [UInt8]?
+     private var lastGoodBaseLayerNAL: [UInt8]?
+@@ -915,7 +916,8 @@ final class DualLayerVideoDecoder: VideoDecodingPipeline, @unchecked Sendable {
+             // compose time runs in completion order, which is not stream order.
+             DoviDmPassthroughProbe.shared.noteSource(key: ptsKey, rpu: layers.rpuData)
+             recordSideData(key: ptsKey, params: layers.rpuParams, dmNAL: layers.convertedRpu, baseLayerNAL: layers.baseLayerRpu,
+-                           usesPrevious: layers.usesPreviousMapping, disableResidual: layers.disableResidual)
++                           usesPrevious: layers.previousMappingID != nil, disableResidual: layers.disableResidual,
++                           previousMappingID: layers.previousMappingID ?? 0)
+         }
+ 
+         // The enhancement decoder opens for a classified FEL stream only
+@@ -1850,42 +1852,43 @@ final class DualLayerVideoDecoder: VideoDecodingPipeline, @unchecked Sendable {
+     }
+ 
+     /// Resolves what one packet's RPU means for its frame and records it for pairing. Runs in decode order,
+-    /// from `decode(packet:)`, so "the previous mapping" is the previous frame in the stream and not whichever
++    /// from `decode(packet:)`, so references see mappings defined by earlier packets, not whichever
+     /// frame happened to finish composing last. The caller holds `lock`.
+     ///
+-    /// - A real RPU is the frame's parameters, and the new "previous mapping".
+-    /// - `use_prev_vdr_rpu_flag` keeps the previous mapping by definition, for as long as the stream keeps
+-    ///   asking.
++    /// - A real RPU stores its mapping under `vdr_rpu_id`.
++    /// - `use_prev_vdr_rpu_flag` selects `prev_vdr_rpu_id` from that cache, without a borrow limit.
+     /// - A missing or corrupt RPU may borrow the previous mapping for up to `maxBorrowedParamsRun` frames in
+     ///   a row; reshaping and NLQ parameters are constant across a scene. Past that the frame carries none
+     ///   and goes out as its base layer.
+-    private func recordSideData(key: Int64, params: DoviMetalParams?, dmNAL: [UInt8]?, baseLayerNAL: [UInt8]? = nil, usesPrevious: Bool, disableResidual: Bool = false) {
++    private func recordSideData(key: Int64, params: DoviMetalParams?, dmNAL: [UInt8]?, baseLayerNAL: [UInt8]? = nil, usesPrevious: Bool, disableResidual: Bool = false, previousMappingID: UInt64 = 0) {
+         var resolvedParams = params
+         var resolvedNAL = dmNAL
+         var resolvedBaseLayerNAL = baseLayerNAL
+         if let params {
+-            lastGoodParams = params
+-            lastGoodDMNAL = dmNAL
+-            lastGoodBaseLayerNAL = baseLayerNAL
+-            borrowedParamsRun = 0
+-        } else if let last = lastGoodParams {
+-            if usesPrevious {
+-                // Only `prev_vdr_rpu_id` 0 is followed (the previous RPU in decode order), as on every
+-                // surveyed stream. The curves and NLQ come from that RPU; the residual switch is this
+-                // frame's own header flag, not the previous frame's.
+-                var borrowed = last
+-                if disableResidual { borrowed.flags.insert(.disableResidual) } else { borrowed.flags.remove(.disableResidual) }
+-                resolvedParams = borrowed
+-                resolvedNAL = dmNAL ?? lastGoodDMNAL
+-                resolvedBaseLayerNAL = baseLayerNAL ?? lastGoodBaseLayerNAL
+-            } else if borrowedParamsRun < Self.maxBorrowedParamsRun {
+-                borrowedParamsRun += 1
+-                summaryBorrowedParams += 1
+-                resolvedParams = last
++            if params.rpuID <= 15 { mappingsByID[params.rpuID] = params }
++        } else if usesPrevious {
++            // An RPU ID names a slot, not a distance back in decode order. An absent slot uses
++            // slot zero; with neither available, bypass instead of applying an unrelated curve.
++            if previousMappingID <= 15, var mapping = mappingsByID[previousMappingID] ?? mappingsByID[0] {
++                if disableResidual { mapping.flags.insert(.disableResidual) } else { mapping.flags.remove(.disableResidual) }
++                resolvedParams = mapping
+                 resolvedNAL = dmNAL ?? lastGoodDMNAL
+                 resolvedBaseLayerNAL = baseLayerNAL ?? lastGoodBaseLayerNAL
+-                EngineLog.emit("[DualLayerVideoDecoder] RPU missing for key=\(key); reusing the previous frame's parameters (\(borrowedParamsRun)/\(Self.maxBorrowedParamsRun))", category: .swPlayback, level: .verbose)
+             }
++        } else if let last = lastGoodParams, borrowedParamsRun < Self.maxBorrowedParamsRun {
++            borrowedParamsRun += 1
++            summaryBorrowedParams += 1
++            resolvedParams = last
++            resolvedNAL = dmNAL ?? lastGoodDMNAL
++            resolvedBaseLayerNAL = baseLayerNAL ?? lastGoodBaseLayerNAL
++            EngineLog.emit("[DualLayerVideoDecoder] RPU missing for key=\(key); reusing the previous frame's parameters (\(borrowedParamsRun)/\(Self.maxBorrowedParamsRun))", category: .swPlayback, level: .verbose)
++        }
++        if params != nil || usesPrevious {
++            // Concealment follows the last resolved frame, including its current residual switch and DM.
++            lastGoodParams = resolvedParams
++            lastGoodDMNAL = resolvedNAL
++            lastGoodBaseLayerNAL = resolvedBaseLayerNAL
++            borrowedParamsRun = 0
+         }
+         guard resolvedParams != nil || resolvedNAL != nil else { return }
+         sideDataRing.insert(key: key, params: resolvedParams, dmNAL: resolvedNAL, baseLayerNAL: resolvedBaseLayerNAL)
+@@ -2262,6 +2265,7 @@ final class DualLayerVideoDecoder: VideoDecodingPipeline, @unchecked Sendable {
+         // Same reason, and the same section: RPUs the demux thread records for post-seek packets
+         // during the drain must survive it, so the side data resets here, before any of them can
+         // exist, and not after the drain.
++        mappingsByID.removeAll()
+         lastGoodParams = nil
+         lastGoodDMNAL = nil
+         lastGoodBaseLayerNAL = nil
+@@ -2491,6 +2495,7 @@ final class DualLayerVideoDecoder: VideoDecodingPipeline, @unchecked Sendable {
+         sweepGeneration &+= 1
+         blArrivalSeq = 0
+         settledBlKeys.removeAll()
++        mappingsByID.removeAll()
+         lastGoodParams = nil
+         lastGoodDMNAL = nil
+         lastGoodBaseLayerNAL = nil
+@@ -2878,12 +2883,12 @@ final class DualLayerVideoDecoder: VideoDecodingPipeline, @unchecked Sendable {
+     var absentEnhancementKeyCountForTesting: Int { lock.lock(); defer { lock.unlock() }; return elAbsentKeys.count }
+ 
+     /// One call is one packet, in decode order: a nil `params` is a packet with a missing RPU (or, with
+-    /// `usesPrevious`, one that says to keep the previous mapping), resolved exactly as in production.
+-    func seedRPUForTesting(pts: CMTime, params: DoviMetalParams?, displayMetadataNAL: [UInt8]?, baseLayerNAL: [UInt8]? = nil, usesPrevious: Bool = false, disableResidual: Bool = false) {
++    /// `usesPrevious`, one that selects `previousMappingID`), resolved exactly as in production.
++    func seedRPUForTesting(pts: CMTime, params: DoviMetalParams?, displayMetadataNAL: [UInt8]?, baseLayerNAL: [UInt8]? = nil, usesPrevious: Bool = false, disableResidual: Bool = false, previousMappingID: UInt64 = 0) {
+         lock.lock()
+         defer { lock.unlock() }
+         let key = Self.canonicalKey(pts: pts)
+-        recordSideData(key: key, params: params, dmNAL: displayMetadataNAL, baseLayerNAL: baseLayerNAL, usesPrevious: usesPrevious, disableResidual: disableResidual)
++        recordSideData(key: key, params: params, dmNAL: displayMetadataNAL, baseLayerNAL: baseLayerNAL, usesPrevious: usesPrevious, disableResidual: disableResidual, previousMappingID: previousMappingID)
+     }
+ }
+ #endif
+diff --git a/Sources/AetherEngine/Video/DoviRpuConverter.swift b/Sources/AetherEngine/Video/DoviRpuConverter.swift
+index 2a50714..8542941 100644
+--- a/Sources/AetherEngine/Video/DoviRpuConverter.swift
++++ b/Sources/AetherEngine/Video/DoviRpuConverter.swift
+@@ -40,14 +40,14 @@ public enum DoviRpuConverter {
+         let isFEL: Bool
+         let isMEL: Bool
+         let success: Bool
+-        /// `use_prev_vdr_rpu_flag`: the RPU carries no mapping and means "keep the previous one".
+-        let usesPreviousMapping: Bool
++        /// Mapping slot requested by `use_prev_vdr_rpu_flag`, before the 8.1 rewrite.
++        let previousMappingID: UInt64?
+         /// This RPU's own `disable_residual_flag`. The header is read even when no mapping follows, so
+         /// a `use_prev_vdr_rpu_flag` frame can still say whether its residual applies.
+         let disableResidual: Bool
+ 
+         #if DualLayerDolbyVision
+-        init(elPacket: UnsafeMutablePointer<AVPacket>?, rpuData: [UInt8]?, convertedRpu: [UInt8]? = nil, baseLayerRpu: [UInt8]? = nil, rpuParams: DoviMetalParams? = nil, isFEL: Bool, isMEL: Bool = false, success: Bool, usesPreviousMapping: Bool = false, disableResidual: Bool = false) {
++        init(elPacket: UnsafeMutablePointer<AVPacket>?, rpuData: [UInt8]?, convertedRpu: [UInt8]? = nil, baseLayerRpu: [UInt8]? = nil, rpuParams: DoviMetalParams? = nil, isFEL: Bool, isMEL: Bool = false, success: Bool, previousMappingID: UInt64? = nil, disableResidual: Bool = false) {
+             self.rpuParams = rpuParams
+             self.elPacket = elPacket
+             self.rpuData = rpuData
+@@ -56,18 +56,18 @@ public enum DoviRpuConverter {
+             self.isFEL = isFEL
+             self.isMEL = isMEL
+             self.success = success
+-            self.usesPreviousMapping = usesPreviousMapping
++            self.previousMappingID = previousMappingID
+             self.disableResidual = disableResidual
+         }
+         #else
+-        init(elPacket: UnsafeMutablePointer<AVPacket>?, rpuData: [UInt8]?, convertedRpu: [UInt8]? = nil, isFEL: Bool, isMEL: Bool = false, success: Bool, usesPreviousMapping: Bool = false, disableResidual: Bool = false) {
++        init(elPacket: UnsafeMutablePointer<AVPacket>?, rpuData: [UInt8]?, convertedRpu: [UInt8]? = nil, isFEL: Bool, isMEL: Bool = false, success: Bool, previousMappingID: UInt64? = nil, disableResidual: Bool = false) {
+             self.elPacket = elPacket
+             self.rpuData = rpuData
+             self.convertedRpu = convertedRpu
+             self.isFEL = isFEL
+             self.isMEL = isMEL
+             self.success = success
+-            self.usesPreviousMapping = usesPreviousMapping
++            self.previousMappingID = previousMappingID
+             self.disableResidual = disableResidual
+         }
+         #endif
+@@ -238,7 +238,7 @@ public enum DoviRpuConverter {
+         var isMEL = false
+         var hadEL = false
+         var degraded = false
+-        var usesPrevious = false
++        var previousMappingID: UInt64?
+         var disableResidual = false
+ 
+         A53SEIParser.forEachNAL(data, size, framing) { nal, len in
+@@ -261,10 +261,11 @@ public enum DoviRpuConverter {
+                 #if DualLayerDolbyVision
+                 let thisParams: DoviMetalParams? = extractParams ? DoviFelComposer.parseRpuParameters(rpu: rpu) : nil
+                 #endif
+-                var thisPrevious = false, thisDisableResidual = false, thisFEL = false, thisMEL = false
++                var thisPreviousID: UInt64?
++                var thisDisableResidual = false, thisFEL = false, thisMEL = false
+                 // Only the dual-layer outputs read the header; the P8.1 rewrite drops what it yields.
+                 if keepRpuBytes, let hdr = dovi_rpu_get_header(rpu) {
+-                    if hdr.pointee.use_prev_vdr_rpu_flag { thisPrevious = true }
++                    if hdr.pointee.use_prev_vdr_rpu_flag { thisPreviousID = hdr.pointee.prev_vdr_rpu_id }
+                     thisDisableResidual = hdr.pointee.disable_residual_flag
+                     if let elTypePtr = hdr.pointee.el_type {
+                         switch String(cString: elTypePtr) {
+@@ -316,7 +317,7 @@ public enum DoviRpuConverter {
+                 rpuParams = thisParams
+                 baseLayerRpuBytes = thisBaseLayer
+                 #endif
+-                usesPrevious = thisPrevious
++                previousMappingID = thisPreviousID
+                 disableResidual = thisDisableResidual
+                 isFEL = thisFEL
+                 isMEL = thisMEL
+@@ -389,7 +390,7 @@ public enum DoviRpuConverter {
+             isFEL: isFEL && !isMEL,
+             isMEL: isMEL,
+             success: !degraded && !allocationFailed,
+-            usesPreviousMapping: usesPrevious,
++            previousMappingID: previousMappingID,
+             disableResidual: disableResidual
+         )
+         #else
+@@ -400,7 +401,7 @@ public enum DoviRpuConverter {
+             isFEL: isFEL && !isMEL,
+             isMEL: isMEL,
+             success: !degraded && !allocationFailed,
+-            usesPreviousMapping: usesPrevious,
++            previousMappingID: previousMappingID,
+             disableResidual: disableResidual
+         )
+         #endif
+diff --git a/Sources/AetherEngine/Video/Metal/DoviFelComposer.swift b/Sources/AetherEngine/Video/Metal/DoviFelComposer.swift
+index 03e998e..38be6e4 100644
+--- a/Sources/AetherEngine/Video/Metal/DoviFelComposer.swift
++++ b/Sources/AetherEngine/Video/Metal/DoviFelComposer.swift
+@@ -1682,7 +1682,12 @@ final class DoviFelComposer: @unchecked Sendable {
+         }
+         defer { dovi_rpu_free_header(header) }
+ 
++        guard mapping.pointee.vdr_rpu_id <= 15 else {
++            logOnce("[DoviFelComposer] RPU mapping ID out of range; refusing to compose")
++            return nil
++        }
+         var params = DoviMetalParams()
++        params.rpuID = mapping.pointee.vdr_rpu_id
+ 
+         // coefficient_data_type selects fixed point (0) or 32-bit float (1). Every
+         // coefficient below is decoded as (int << denom) + frac, which is only the
+diff --git a/Sources/AetherEngine/Video/Metal/DoviMetalParams.swift b/Sources/AetherEngine/Video/Metal/DoviMetalParams.swift
+index e44ddd1..b255d21 100644
+--- a/Sources/AetherEngine/Video/Metal/DoviMetalParams.swift
++++ b/Sources/AetherEngine/Video/Metal/DoviMetalParams.swift
+@@ -147,11 +147,14 @@ struct DoviNlqParams: Sendable {
+ /// Parameter block uploaded to the composition kernels; mirrors
+ /// `struct DoviMetalParams` in `DoviShaderSource`.
+ ///
+-/// ``serialize()`` writes the fields in declaration order and asserts each
++/// ``serialize()`` writes the GPU fields in declaration order and asserts each
+ /// sub-block's size, and `dovi_layout_probe` reads sentinels back out of the
+ /// uploaded bytes on the GPU, so a field added on one side of the ABI cannot go
+ /// unnoticed on the other.
+ struct DoviMetalParams: Sendable {
++    /// CPU-only mapping cache key; not part of the serialized Metal ABI.
++    var rpuID: UInt64 = 0
++
+     var blWidth: UInt32 = 3840
+     var blHeight: UInt32 = 2160
+     var elWidth: UInt32 = 1920
+diff --git a/Tests/AetherEngineTests/DoviRpuConverterTests.swift b/Tests/AetherEngineTests/DoviRpuConverterTests.swift
+index 96c0b29..562c053 100644
+--- a/Tests/AetherEngineTests/DoviRpuConverterTests.swift
++++ b/Tests/AetherEngineTests/DoviRpuConverterTests.swift
+@@ -56,6 +56,28 @@ struct DoviRpuConverterTests {
+         av_packet_free(&p)
+     }
+ 
++    #if DualLayerDolbyVision
++    @Test("dual-layer extraction preserves mapping IDs before the Profile 8.1 rewrite", arguments: [UInt64(0), 7, 15])
++    func mappingIDsSurviveConversion(id: UInt64) throws {
++        typealias G = DoviRpuGuardTests
++        let mapping = G.craft(pieces: [[.polynomial], [.polynomial], [.polynomial]], residual: .fel,
++                              vdrRpuId: { $0.ue(id) })
++        let previous = G.craftUsePrev(cmv40Block: (10, 8), prevRpuId: { $0.ue(id) })
++        let bl = hevcNAL(type: 1, payload: [0xAA, 0xBB])
++        let first = avccPacket([bl, mapping])
++        let second = avccPacket([bl, previous])
++        defer { free(first); free(second) }
++        let full = DoviRpuConverter.separateDualLayers(first)
++        let reuse = DoviRpuConverter.separateDualLayers(second)
++        #expect(full.success)
++        #expect(full.rpuParams?.rpuID == id)
++        #expect(full.previousMappingID == nil)
++        #expect(reuse.success)
++        #expect(reuse.rpuParams == nil)
++        #expect(reuse.previousMappingID == id)
++    }
++    #endif
++
+     // MARK: - #135 point 3: conversion-failure posture
+ 
+     @Test("Unconvertible RPU degrades to clean HDR10: RPU and EL dropped, base layer kept")
+diff --git a/Tests/AetherEngineTests/DualLayerVideoDecoderTests.swift b/Tests/AetherEngineTests/DualLayerVideoDecoderTests.swift
+index f40a8c6..0f3062f 100644
+--- a/Tests/AetherEngineTests/DualLayerVideoDecoderTests.swift
++++ b/Tests/AetherEngineTests/DualLayerVideoDecoderTests.swift
+@@ -463,6 +463,77 @@ extension HeavyDualLayerSuites {
+             #expect(blMax == [100, 200, 200, 200, 300])
+         }
+ 
++        @Test("use_prev selects its mapping slot, replacement is per slot, and missing RPUs follow the resolved frame")
++        func previousMappingSelectsID() async throws {
++            let composer = ParamsRecordingComposer()
++            let deliveries = Deliveries()
++            let decoder = DualLayerVideoDecoder(composer: composer)
++            defer { decoder.close() }
++            decoder.onFrame = { buffer, pts, hdr10 in deliveries.record(buffer, pts, hdr10) }
++            decoder.primeForTesting(enhancementLayer: true)
++            func mapping(_ id: UInt64, _ tag: UInt32) -> DoviMetalParams {
++                var p = Self.params(); p.rpuID = id; p.blMax = tag; return p
++            }
++            decoder.seedRPUForTesting(pts: Self.pts(0), params: mapping(0, 100), displayMetadataNAL: nil)
++            decoder.seedRPUForTesting(pts: Self.pts(1), params: mapping(15, 200), displayMetadataNAL: nil)
++            decoder.seedRPUForTesting(pts: Self.pts(2), params: nil, displayMetadataNAL: nil, usesPrevious: true, previousMappingID: 0)
++            decoder.seedRPUForTesting(pts: Self.pts(3), params: nil, displayMetadataNAL: nil)
++            decoder.seedRPUForTesting(pts: Self.pts(4), params: mapping(15, 300), displayMetadataNAL: nil)
++            decoder.seedRPUForTesting(pts: Self.pts(5), params: nil, displayMetadataNAL: nil, usesPrevious: true, previousMappingID: 15)
++            decoder.seedRPUForTesting(pts: Self.pts(6), params: nil, displayMetadataNAL: nil, usesPrevious: true, previousMappingID: 7)
++            var bases: [Int: CVPixelBuffer] = [:]
++            for frame in [0, 4, 2, 6, 3, 5, 1] {
++                let bl = try #require(Self.baseLayer())
++                bases[frame] = bl
++                decoder.handleEnhancementLayerFrame(elBuffer: try #require(Self.enhancementLayer()), pts: Self.pts(Int64(frame)))
++                decoder.handleBaseLayerFrame(baseBuffer: bl, pts: Self.pts(Int64(frame)), hdr10Data: nil)
++            }
++            try await waitFor { deliveries.count == 7 }
++            #expect((0..<7).map { composer.blMax(of: bases[$0]!) } == [100, 200, 100, 100, 300, 300, 100])
++        }
++
++        @Test("unavailable or invalid mapping IDs never borrow an unrelated slot", arguments: [UInt64(0), 7, 16, UInt64.max])
++        func previousMappingUnavailable(id: UInt64) async throws {
++            let composer = ParamsRecordingComposer()
++            let deliveries = Deliveries()
++            let decoder = DualLayerVideoDecoder(composer: composer)
++            defer { decoder.close() }
++            decoder.onFrame = { buffer, pts, hdr10 in deliveries.record(buffer, pts, hdr10) }
++            decoder.primeForTesting(enhancementLayer: true)
++            var p = Self.params(); p.rpuID = 15
++            decoder.seedRPUForTesting(pts: Self.pts(0), params: p, displayMetadataNAL: nil)
++            decoder.seedRPUForTesting(pts: Self.pts(1), params: nil, displayMetadataNAL: nil, usesPrevious: true, previousMappingID: id)
++            let bl = try #require(Self.baseLayer())
++            decoder.handleEnhancementLayerFrame(elBuffer: try #require(Self.enhancementLayer()), pts: Self.pts(1))
++            decoder.handleBaseLayerFrame(baseBuffer: bl, pts: Self.pts(1), hdr10Data: nil)
++            try await waitFor { deliveries.count == 1 }
++            #expect(composer.blMax(of: bl) == nil)
++            #expect(decoder.composedFrameCount == 0)
++        }
++
++        @Test("seek clears every cached mapping slot")
++        func seekClearsMappingIDs() async throws {
++            let composer = ParamsRecordingComposer()
++            let deliveries = Deliveries()
++            let decoder = DualLayerVideoDecoder(composer: composer)
++            defer { decoder.close() }
++            decoder.onFrame = { buffer, pts, hdr10 in deliveries.record(buffer, pts, hdr10) }
++            decoder.primeForTesting(enhancementLayer: true)
++            for id in [UInt64(0), 15] {
++                var p = Self.params(); p.rpuID = id
++                decoder.seedRPUForTesting(pts: Self.pts(Int64(id)), params: p, displayMetadataNAL: nil)
++            }
++            decoder.flush()
++            for (frame, id) in [UInt64(0), 15].enumerated() {
++                let pts = Self.pts(Int64(frame + 20))
++                decoder.seedRPUForTesting(pts: pts, params: nil, displayMetadataNAL: nil, usesPrevious: true, previousMappingID: id)
++                decoder.handleEnhancementLayerFrame(elBuffer: try #require(Self.enhancementLayer()), pts: pts)
++                decoder.handleBaseLayerFrame(baseBuffer: try #require(Self.baseLayer()), pts: pts, hdr10Data: nil)
++            }
++            try await waitFor { deliveries.count == 2 }
++            #expect(decoder.composedFrameCount == 0)
++        }
++
+         @Test("a use_prev frame keeps the previous mapping but takes its own disable_residual_flag")
+         func usePreviousTakesOwnResidualFlag() async throws {
+             let composer = ParamsRecordingComposer()
+@@ -494,6 +565,33 @@ extension HeavyDualLayerSuites {
+         }
+ 
+         #if DEBUG
++        @Test("a missing RPU borrows the last resolved residual switch, including use_prev frames")
++        func missingRpuAfterPreviousMapping() async throws {
++            let composer = ParamsRecordingComposer()
++            let deliveries = Deliveries()
++            let decoder = DualLayerVideoDecoder(composer: composer)
++            defer { decoder.close() }
++            decoder.onFrame = { buffer, pts, hdr10 in deliveries.record(buffer, pts, hdr10) }
++            decoder.primeForTesting(enhancementLayer: true)
++
++            var initial = Self.params()
++            initial.flags.insert(.disableResidual)
++            decoder.seedRPUForTesting(pts: Self.pts(0), params: initial, displayMetadataNAL: Self.rpuNAL(tag: 0))
++            for frame in 1...3 {
++                decoder.seedRPUForTesting(pts: Self.pts(Int64(frame)), params: nil, displayMetadataNAL: nil)
++            }
++            decoder.seedRPUForTesting(pts: Self.pts(4), params: nil, displayMetadataNAL: Self.rpuNAL(tag: 1),
++                                      usesPrevious: true, disableResidual: false)
++            decoder.seedRPUForTesting(pts: Self.pts(5), params: nil, displayMetadataNAL: nil)
++            let base = try #require(Self.baseLayer())
++            let el = try #require(Self.enhancementLayer())
++            decoder.handleEnhancementLayerFrame(elBuffer: el, pts: Self.pts(5))
++            decoder.handleBaseLayerFrame(baseBuffer: base, pts: Self.pts(5), hdr10Data: nil)
++            try await waitFor { deliveries.count == 1 }
++            #expect(composer.flags(of: base)?.contains(.disableResidual) == false)
++            #expect(deliveries.snapshot.first?.rpuPayload == Data(Self.rpuNAL(tag: 1).dropFirst(2)))
++        }
++
+         @Test("side data recorded for post-seek packets while flush() drains survives the flush and composes")
+         func sideDataRecordedDuringTheDrainSurvivesFlush() async throws {
+             let composer = ParamsRecordingComposer()
+diff --git a/docs/dolby-vision-fel.md b/docs/dolby-vision-fel.md
+index de9bf82..f93fd2c 100644
+--- a/docs/dolby-vision-fel.md
++++ b/docs/dolby-vision-fel.md
+@@ -907,8 +907,10 @@ The inverse-NLQ table and the MMR coefficients are read from per-frame tables bo
+ 
+ - **Missing or CRC-failed RPU:** the frame borrows the previous real RPU's parameters for up to
+   `maxBorrowedParamsRun` (3) frames in a row, then bypasses to the base layer. Reshaping and NLQ are constant
+-  across a scene. A frame whose RPU sets `use_prev_vdr_rpu_flag` keeps the previous mapping for as long as the
+-  stream asks, with no limit. Both are resolved when the packet is demuxed (`recordSideData`), in decode order,
++  across a scene. A frame whose RPU sets `use_prev_vdr_rpu_flag` selects the cached `prev_vdr_rpu_id`
++  (slots 0 through 15), with no borrow limit. An absent slot falls back to slot zero; if neither exists,
++  or the requested ID is invalid, composition is bypassed. Seeks and teardown clear all slots. Missing
++  RPUs borrow the last resolved frame, including its residual switch and display metadata. Both are resolved when the packet is demuxed (`recordSideData`), in decode order,
+   so "previous" is the previous frame of the stream and each frame reaches pairing with concrete parameters;
+   resolving at compose time would follow completion order instead.
+ - **Output precision:** `DoviDither.fullPrecision` keeps the VDR bits below the 10-bit code in P010's unused low

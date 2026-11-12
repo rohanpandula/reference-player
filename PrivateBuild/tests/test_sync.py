@@ -249,7 +249,7 @@ class SyncRunTests(TempRepos):
             "PrivateBuild/footprint.py": (HERE / "footprint.py").read_text(),
             "PrivateBuild/UPSTREAM.json": (HERE / "UPSTREAM.json").read_text(),
             sync.NOTES: f"# Notes\n\nThis tree is upstream Rivulet `v1.0.0-1` (`{self.old}`), merged 2026-01-01, plus the overlay.\n",
-            "CLAUDE.md": self.BLOCK + "# Upstream\n\nText.\n", ".gitignore": "PrivateBuild/.build/\n",
+            "CLAUDE.md": self.BLOCK + "# Upstream\n\nText.\n", ".gitignore": "PrivateBuild/.build/\n__pycache__/\n",
             "app.swift": "a\nprivate\nb\nc\n", "Other/Private.xcstrings": '{"strings" : {}}\n'}, "overlay")
         self.release = self.commit(self.up, {"CLAUDE.md": "# Upstream\n\nText two.\n", "README.md": "readme two\n",
                                              "app.swift": "a\nb\nc\nd\n",
@@ -467,10 +467,16 @@ class CheckTableTests(unittest.TestCase):
     def test_full_run_passes_and_names_each_step(self):
         results, seen = self.run_stubbed(everything=True)
         self.assertEqual(0, check.exit_code(results))
-        self.assertEqual(["passed"] * 10, [result.status for result in results], check.table(results))
+        self.assertEqual(["passed"] * 11, [result.status for result in results], check.table(results))
         self.assertEqual("unmerged paths", results[0].name, "the first step")
         self.assertIn("10 of 10 passed", dict((r.name, r.detail) for r in results)["tvOS tests"])
         self.assertEqual(4, sum(command[0] == "xcodebuild" for command in seen))
+
+    def test_refused_engine_patch_stops_before_building(self):
+        results, seen = self.run_stubbed(fail=("engine.py",))
+        self.assertEqual("failed", results[-1].status)
+        self.assertEqual("engine patch", results[-1].name)
+        self.assertFalse(any(command[0] == "xcodebuild" for command in seen))
 
     def test_quick_and_defaults_run_no_xcodebuild_where_they_should_not(self):
         results, seen = self.run_stubbed(quick=True)
@@ -532,6 +538,8 @@ class CheckTableTests(unittest.TestCase):
     def test_the_commands_are_the_documented_ones(self):
         commands = check.xcodebuild_commands(Path("out"))
         tests = commands["tvOS tests"]
+        self.assertIn("ReferencePlayer.xcworkspace", tests)
+        self.assertNotIn("-project", tests)
         for argument in ("-parallel-testing-enabled", "-test-timeouts-enabled", "-default-test-execution-time-allowance",
                          "CODE_SIGN_IDENTITY=-", "-onlyUsePackageVersionsFromResolvedFile", "Reference Player"):
             self.assertIn(argument, tests)

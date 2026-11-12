@@ -80,6 +80,11 @@ tree and also refuse upstream's hosted services, but have none of these settings
 - **Tooling to follow upstream releases**: `PrivateBuild/sync.py` merges an upstream release tag and
   does the mechanical part, and `PrivateBuild/check.py` runs every check.
 
+The engine also carries a [small pinned patch](../PrivateBuild/engine-patches/README.md) for FEL RPU
+mapping reuse. It resolves the mapping ID requested by the stream and preserves the current residual
+switch when concealing a missing RPU. This is a correctness fix for those cases, not a measured
+improvement across all titles.
+
 ## Status
 
 - It builds, and its unit tests pass on the tvOS simulator: 3,534 of 3,534 tvOS unit tests and 166
@@ -101,8 +106,9 @@ is not promised to sign them.
 # Secrets.swift with an empty Sentry DSN (this fork ships no Sentry destination; verify.py insists)
 sed 's/"YOUR_SENTRY_DSN_HERE"/""/' RivuletCore/Config/Secrets.swift.template > RivuletCore/Config/Secrets.swift
 python3 PrivateBuild/configure.py --bundle-id com.yourname.referenceplayer --team-id YOURTEAMID
+python3 PrivateBuild/engine.py
 python3 PrivateBuild/check.py --quick
-open Rivulet.xcodeproj    # scheme: Reference Player
+open ReferencePlayer.xcworkspace    # scheme: Reference Player
 ```
 
 `configure.py` writes your bundle prefix, App Group (`group.<bundle-id>` unless you pass
