@@ -2288,6 +2288,236 @@ index e74019d..4d1d758 100644
  
          // First element of every array and every NLQ scalar, per component, each with its own sentinel.
          let names = ["y", "cb", "cr"]
+diff --git a/Tests/AetherEngineTests/DoviLumaResamplingComparisonTests.swift b/Tests/AetherEngineTests/DoviLumaResamplingComparisonTests.swift
+new file mode 100644
+index 0000000..d7d78c6
+--- /dev/null
++++ b/Tests/AetherEngineTests/DoviLumaResamplingComparisonTests.swift
+@@ -0,0 +1,224 @@
++#if DualLayerDolbyVision && DEBUG
++import Foundation
++import CoreVideo
++import CryptoKit
++import Metal
++import Testing
++import Dovi
++@testable import AetherEngine
++
++/// Opt-in offline A/B measurement. Inputs and analysis are owned by Reference Player's
++/// PrivateBuild resampling runner; this test changes no production policy.
++@Suite(.offCooperativePoolOneLane)
++struct DoviLumaResamplingComparisonTests {
++    static let directory = ProcessInfo.processInfo.environment["AETHER_LUMA_COMPARISON_DIR"].map { URL(fileURLWithPath: $0) }
++
++    struct Manifest: Decodable {
++        let warmupPairs: Int
++        let samplePairs: Int
++        let entries: [Entry]
++    }
++
++    struct Entry: Codable {
++        let name: String
++        let width: Int, height: Int, elWidth: Int, elHeight: Int, frames: Int
++        let profile: String
++        let measure: Bool
++        let blSHA256: String, elSHA256: String
++    }
++
++    struct Sample: Encodable {
++        let pair: Int, frame: Int, position: Int
++        let variant: String
++        let gpuMs: Double, wallMs: Double
++        let thermalState: Int
++    }
++
++    struct Result: Encodable {
++        let entry: Entry
++        let chromaIdentical: Bool
++        let flags: UInt32
++        let lumaNlqScale: Int32
++        let lumaNlqShift: UInt32
++        let cbMmr: Bool, crMmr: Bool
++        let annexBEligible: Bool
++        let samples: [Sample]
++    }
++
++    struct Report: Encodable {
++        let schemaVersion: Int
++        let manifestSHA256: String
++        let timestamp: String
++        let device: String
++        let operatingSystem: String
++        let configuration: String
++        let traits: [String]
++        let thermalStateBefore: Int, thermalStateAfter: Int
++        let lowPowerMode: Bool?
++        let warmupPairs: Int, samplePairs: Int
++        let route: String
++        let timingOutput: String
++        let results: [Result]
++    }
++
++    static func parameters(profile: String) throws -> DoviMetalParams {
++        if profile == "identity" {
++            return DoviGpuEdgeCaseTests.params()
++        }
++        try #require(profile == "fel_fixture", "Unknown comparison profile: \(profile)")
++        return try DoviComposedFrameRpuTests.felNAL.withUnsafeBufferPointer { bytes in
++            let rpu = try #require(DoviRpuGuard.parse(bytes.baseAddress!, bytes.count))
++            defer { dovi_rpu_free(rpu) }
++            return try #require(DoviFelComposer.parseRpuParameters(rpu: rpu))
++        }
++    }
++
++    static func frameWords(width: Int, height: Int) -> Int {
++        width * height + 2 * ((width + 1) / 2) * ((height + 1) / 2)
++    }
++
++    static func sha256(_ data: Data) -> String {
++        SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
++    }
++
++    @Test("compare bilinear and Annex B luma on prepared frames with paired GPU timing",
++          .enabled(if: DoviLumaResamplingComparisonTests.directory != nil && MTLCreateSystemDefaultDevice() != nil, "set AETHER_LUMA_COMPARISON_DIR"))
++    func compare() throws {
++        let dir = try #require(Self.directory)
++        let manifestData = try Data(contentsOf: dir.appendingPathComponent("manifest.json"))
++        let manifest = try JSONDecoder().decode(Manifest.self, from: manifestData)
++        try #require((1...100).contains(manifest.warmupPairs), "warmupPairs must be 1...100")
++        try #require((4...1000).contains(manifest.samplePairs) && manifest.samplePairs.isMultiple(of: 2),
++                     "samplePairs must be even and in 4...1000")
++        try #require(!manifest.entries.isEmpty && manifest.entries.count <= 100, "Need 1...100 entries")
++        try #require(Set(manifest.entries.map(\.name)).count == manifest.entries.count, "Entry names must be unique")
++        let device = try #require(MTLCreateSystemDefaultDevice())
++        let initialThermalState = ProcessInfo.processInfo.thermalState.rawValue
++        let composer = try #require(DoviFelComposer())
++        composer.chromaFormat = .yuv420
++        try #require(DoviFelComposer.residualEnabled, "Residual must be enabled for the comparison")
++        let variants: [(String, DoviComposerFlags)] = [("bilinear", []), ("annexb", [.debugAnnexBElLuma])]
++        var results = [Result]()
++
++        for entry in manifest.entries {
++            try #require(entry.name.range(of: "^[A-Za-z0-9_-]+$", options: .regularExpression) != nil,
++                         "Entry name must be a plain directory name")
++            try #require([entry.width, entry.height, entry.elWidth, entry.elHeight].allSatisfy { (2...8192).contains($0) }
++                         && (1...32).contains(entry.frames), "Invalid geometry/frame count for \(entry.name)")
++            let base = dir.appendingPathComponent(entry.name)
++            let blCount = Self.frameWords(width: entry.width, height: entry.height)
++            let elCount = Self.frameWords(width: entry.elWidth, height: entry.elHeight)
++            let blData = try Data(contentsOf: base.appendingPathComponent("bl.yuv"))
++            let elData = try Data(contentsOf: base.appendingPathComponent("el.yuv"))
++            try #require(Self.sha256(blData) == entry.blSHA256 && Self.sha256(elData) == entry.elSHA256,
++                         "Input SHA-256 does not match the manifest for \(entry.name)")
++            try #require(blData.count == blCount * entry.frames * 2 && elData.count == elCount * entry.frames * 2,
++                         "Incorrect planar 10-bit input byte count for \(entry.name)")
++            let blWords = blData.withUnsafeBytes { Array($0.bindMemory(to: UInt16.self)) }
++            let elWords = elData.withUnsafeBytes { Array($0.bindMemory(to: UInt16.self)) }
++            try #require(blWords.allSatisfy { $0 <= 1023 } && elWords.allSatisfy { $0 <= 1023 },
++                         "Input words must contain 10-bit codes for \(entry.name)")
++            let params = try Self.parameters(profile: entry.profile)
++            try #require(!params.flags.contains(.disableResidual) && params.nlqY.nlqMethod == .linear && params.nlqY.nlqScale != 0,
++                         "Profile must apply the luma EL residual")
++            try #require(!params.flags.contains(.lumaMmr), "Luma MMR is outside this resampling comparison")
++            try #require(params.blMax == 1023 && params.vdrMax == 4095, "Capture requires 10-bit input and 12-bit VDR")
++            var frames = [(CVPixelBuffer, CVPixelBuffer)]()
++            for frame in 0..<entry.frames {
++                let bl = try #require(blWords.withUnsafeBufferPointer {
++                    DoviGpuCaptureTests.makeP010($0, offset: frame * blCount, width: entry.width, height: entry.height)
++                })
++                let el = try #require(elWords.withUnsafeBufferPointer {
++                    DoviGpuCaptureTests.makeP010($0, offset: frame * elCount, width: entry.elWidth, height: entry.elHeight)
++                })
++                frames.append((bl, el))
++            }
++
++            var sameChroma = true
++            for (frame, buffers) in frames.enumerated() {
++                var referenceChroma: [UInt16]?
++                for (variant, flags) in variants {
++                    try autoreleasepool {
++                        var raw = params; raw.flags.formUnion(flags); raw.ditherMode = .debugRawVDR
++                        let output = try #require(composer.compose(baseBuffer: buffers.0, enhancementBuffer: buffers.1, params: raw))
++                        let words = DoviGpuCaptureTests.planeWords(output, shift: 4)
++                        let count = entry.width * entry.height
++                        let luma = Array(words.prefix(count))
++                        try luma.withUnsafeBytes { try Data($0).write(to: base.appendingPathComponent("gpu_\(variant)_\(frame).u16")) }
++                        let chroma = Array(words.dropFirst(count))
++                        if let referenceChroma { sameChroma = sameChroma && chroma == referenceChroma }
++                        else { referenceChroma = chroma }
++                        var ten = raw; ten.ditherMode = .none
++                        let output10 = try #require(composer.compose(baseBuffer: buffers.0, enhancementBuffer: buffers.1, params: ten))
++                        let luma10 = Array(DoviGpuCaptureTests.planeWords(output10, shift: 6).prefix(count))
++                        try luma10.withUnsafeBytes { try Data($0).write(to: base.appendingPathComponent("gpu10_\(variant)_\(frame).u16")) }
++                    }
++                }
++            }
++            #expect(sameChroma, "Luma-only variant changed chroma for \(entry.name)")
++
++            var samples = [Sample]()
++            if entry.measure {
++                for pair in -manifest.warmupPairs..<manifest.samplePairs {
++                    let sequence = pair + manifest.warmupPairs
++                    let frame = sequence % frames.count
++                    // Rotating each completed frame cycle also balances order for even frame counts.
++                    let reverse = (frame + sequence / frames.count).isMultiple(of: 2)
++                    let order = reverse ? [1, 0] : [0, 1]
++                    for (position, index) in order.enumerated() {
++                        let sample: Sample = try autoreleasepool {
++                            let (variant, flags) = variants[index]
++                            var timed = params; timed.flags.formUnion(flags); timed.ditherMode = .bayer8x8
++                            let start = DispatchTime.now().uptimeNanoseconds
++                            let output = composer.compose(baseBuffer: frames[frame].0, enhancementBuffer: frames[frame].1,
++                                                          params: timed, frameIndex: UInt32(sequence))
++                            let elapsed = DispatchTime.now().uptimeNanoseconds - start
++                            _ = try #require(output, "Timed compose failed for \(entry.name)")
++                            let gpuMs = composer.lastGpuSecondsForTesting * 1000
++                            try #require(gpuMs.isFinite && gpuMs > 0, "GPU timestamps unavailable for \(entry.name)")
++                            return Sample(pair: pair, frame: frame, position: position, variant: variant,
++                                          gpuMs: gpuMs, wallMs: Double(elapsed) / 1_000_000,
++                                          thermalState: ProcessInfo.processInfo.thermalState.rawValue)
++                        }
++                        if pair >= 0 { samples.append(sample) }
++                    }
++                }
++            }
++            let halfWidth = entry.width == 2 * entry.elWidth || entry.width + 1 == 2 * entry.elWidth
++            let halfHeight = entry.height == 2 * entry.elHeight || entry.height + 1 == 2 * entry.elHeight
++            results.append(Result(entry: entry, chromaIdentical: sameChroma, flags: params.flags.rawValue,
++                                  lumaNlqScale: params.nlqY.nlqScale, lumaNlqShift: params.nlqY.nlqShift,
++                                  cbMmr: params.polyCb.usesMmr, crMmr: params.polyCr.usesMmr,
++                                  annexBEligible: halfWidth && halfHeight, samples: samples))
++        }
++        var traits = ["DualLayerDolbyVision"]
++        #if DolbyVisionFelCurves
++        traits.append("DolbyVisionFelCurves")
++        #endif
++        #if DolbyVisionStillReshaping
++        traits.append("DolbyVisionStillReshaping")
++        #endif
++        #if TrueHDObjectAudio
++        traits.append("TrueHDObjectAudio")
++        #endif
++        #if DTSXObjectAudio
++        traits.append("DTSXObjectAudio")
++        #endif
++        #if os(tvOS)
++        let lowPowerMode: Bool? = nil
++        #else
++        let lowPowerMode: Bool? = ProcessInfo.processInfo.isLowPowerModeEnabled
++        #endif
++        let report = Report(schemaVersion: 1, manifestSHA256: Self.sha256(manifestData),
++                            timestamp: ISO8601DateFormatter().string(from: Date()), device: device.name,
++                            operatingSystem: ProcessInfo.processInfo.operatingSystemVersionString, configuration: "DEBUG",
++                            traits: traits, thermalStateBefore: initialThermalState,
++                            thermalStateAfter: ProcessInfo.processInfo.thermalState.rawValue, lowPowerMode: lowPowerMode,
++                            warmupPairs: manifest.warmupPairs, samplePairs: manifest.samplePairs,
++                            route: "blocking_pool",
++                            timingOutput: "P010, Bayer 8x8; excludes file IO, pixel readback, decode, rendering and in-place playback", results: results)
++        let encoder = JSONEncoder(); encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
++        try encoder.encode(report).write(to: dir.appendingPathComponent("comparison.json"))
++    }
++}
++#endif
 diff --git a/Tests/AetherEngineTests/DoviReconstructionPrecisionTests.swift b/Tests/AetherEngineTests/DoviReconstructionPrecisionTests.swift
 new file mode 100644
 index 0000000..165ef3b

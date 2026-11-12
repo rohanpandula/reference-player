@@ -46,7 +46,10 @@ Int128 model. The 16-bit prediction is stored exactly in the existing Float luma
 MMR coefficients use a separate Int64 table. Removing the duplicate coefficients from the parameter
 block keeps the combined parameter/table allocation unchanged. Layout is checked on the GPU.
 
-Resampling, output formats, dithering policy, routing and audio are unchanged. The internal
+Resampling defaults, output formats, dithering policy, routing and audio are unchanged.
+The patch also carries an opt-in GPU comparison test for the existing bilinear and Annex B
+luma paths. Reference Player owns its independent CPU model, generated inputs, runner and
+[measured resampling comparison](../RESAMPLING.md); it adds no playback setting or dependency. The internal
 reconstruction precision change can affect a final output code. Real-title fidelity and physical
 Apple TV GPU performance have not been measured; integer MMR evaluation needs hardware validation.
 
