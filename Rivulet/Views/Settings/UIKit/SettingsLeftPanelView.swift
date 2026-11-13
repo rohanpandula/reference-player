@@ -199,6 +199,7 @@ final class SettingsLeftPanelView: UIView {
     /// Artwork for an App Icon option row (`ai_<rawValue>`); nil for every other row.
     private static func appIconArtwork(for id: String) -> UIImage? {
         guard id.hasPrefix("ai_"), let icon = AppIcon(rawValue: String(id.dropFirst(3))) else { return nil }
+        if icon == .standard { return UIImage(named: "ReferencePlayerIconPreview") }
         return UIImage(named: "AppIconArt-\(icon.rawValue)")
     }
 }

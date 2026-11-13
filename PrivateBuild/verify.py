@@ -59,6 +59,15 @@ PINS = {
 # The four private Settings pages, as the forwarding `case` lines in upstream's switches name them.
 PRIVATE_PAGES = r"case\s+\.heightSpeakersPicker,\s*\.homeAssistant,\s*\.formatTags,\s*\.metadataKeys\s*:\s*return\s+"
 HOOKS = (
+    ("Rivulet.xcodeproj/project.pbxproj", None,
+     r'(?:"ASSETCATALOG_COMPILER_APPICON_NAME\[sdk=appletv\*\]"\s*=\s*ReferencePlayer;[\s\S]*?){2}',
+     "the tvOS default icon is not Reference Player in both build configurations"),
+    ("Rivulet/Views/Settings/UIKit/SettingsLeftPanelView.swift", "private static func appIconArtwork(",
+     r'if\s+icon\s*==\s*\.standard\s*\{\s*return\s+UIImage\(named:\s*"ReferencePlayerIconPreview"\)\s*\}',
+     "the default icon preview shows upstream's artwork"),
+    ("Rivulet/Views/Components/UIKit/LaunchSplashView.swift", None,
+     r'private\s+let\s+art\s*=\s*UIImage\(named:\s*"ReferencePlayerLaunchMark"\)\?\.cgImage',
+     "the launch splash shows upstream's artwork"),
     ("Rivulet/Views/Player/UniversalPlayerViewModel.swift", "func updatePlaybackState(", r"reportToHomeAssistant\(\s*state\s*\)\s*\{\s*\[weak self\]\s*in\s*self\?\.isSwappingItem\s*\?\?\s*false\s*\}",
      "Home Assistant no longer hears play, pause or stop"),
     ("Rivulet/Views/Player/UniversalPlayerViewModel.swift", "func stopPlayback(", r"endHomeAssistantSession\(\)",
