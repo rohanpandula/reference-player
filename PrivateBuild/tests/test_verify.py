@@ -30,15 +30,6 @@ class VerificationTests(unittest.TestCase):
         self.addCleanup(identity_patch.stop)
         self.project_path = "Rivulet.xcodeproj/project.pbxproj"
         self.player_path = "Rivulet/Services/Plex/Playback/AetherPlayer.swift"
-        self.write(self.project_path, '''
-        B2000020AAAA000000000001 /* XCRemoteSwiftPackageReference "AetherEngine" */ = {
-            repositoryURL = "https://github.com/superuser404notfound/AetherEngine";
-            requirement = { kind = exactVersion; version = 7.61.0; };
-            traits = (DolbyVisionFelCurves, DualLayerDolbyVision, DolbyVisionStillReshaping, TrueHDObjectAudio, DTSXObjectAudio,);
-\t\t};
-DEVELOPMENT_TEAM = ABCDE12345;
-PRODUCT_BUNDLE_IDENTIFIER = net.builder.referenceplayer;
-''')
         self.lock = {"version": 3, "pins": []}
         for identity, (url, version, revision) in verify_module.PINS.items():
             state = {"revision": revision}
@@ -401,6 +392,17 @@ nonisolated enum DirectMetadata {
                     self.assertTrue(any(path in error and repr(literal) in error for error in self.errors()))
             self.write(path, original)
         self.assertEqual([], self.errors())
+
+    def test_each_tvos_configuration_requires_the_private_icon(self):
+        original = (self.root / self.project_path).read_text()
+        setting = '"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletv*]" = ReferencePlayer;'
+        self.assertEqual(2, original.count(setting))
+        for index in range(2):
+            with self.subTest(configuration=index):
+                parts = original.split(setting)
+                parts[index] += parts.pop(index + 1)
+                self.write(self.project_path, setting.join(parts))
+                self.assertTrue(any("tvOS default icon" in error for error in self.errors()))
 
     def test_removing_any_private_hook_fails_and_names_it(self):
         """A line deleted by an upstream merge: each hook's own text goes, and verify.py says what went dark."""

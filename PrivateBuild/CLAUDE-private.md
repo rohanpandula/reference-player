@@ -86,8 +86,10 @@ a fork string to upstream's `Localizable.xcstrings`; `PrivateBuild/SYNC.md` says
 - **Name.** The apps are called Reference Player (display name, `PlexAPI.productName`; user agents
   send the token `ReferencePlayer`, `PrivateBuildPolicy.userAgentProduct`, since a token cannot hold
   a space) and answer the `referenceplayer://` link scheme. Upstream's `rivulet://` examples in
-  `CLAUDE.md` read `referenceplayer://` here (`RivuletLink.scheme`). Type names, the changelog and
-  the artwork stay upstream's.
+  `CLAUDE.md` read `referenceplayer://` here (`RivuletLink.scheme`). Type names and the changelog
+  stay upstream's. The tvOS default icon, static Top Shelf artwork, Settings preview and launch mark
+  use the fork's Reference R artwork in `Rivulet/PrivateAssets.xcassets`; upstream's catalogs and
+  alternate icons remain intact. Editable artwork and export instructions live in `PrivateBuild/branding/`.
 - **Engine traits** (Quick Reference, "AetherEngine"). Upstream sets one optional trait,
   `DolbyVisionFelCurves`, and leaves the other four off. This fork sets five in `project.pbxproj`:
   `DualLayerDolbyVision` (P7 FEL composer), `DolbyVisionFelCurves` (P7 FEL curve fold on the

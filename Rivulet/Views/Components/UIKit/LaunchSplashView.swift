@@ -3,7 +3,7 @@
 
 import UIKit
 
-/// The launch splash: the app icon's river R on its starry sky. The R pours in
+/// The launch splash: the app icon's R on its starry sky. The R pours in
 /// along its curve, a light runs down it while Home loads, and it zooms away
 /// into Home once Home is ready.
 ///
@@ -49,7 +49,7 @@ final class LaunchSplashView: UIView {
     private let sheen = CALayer()
     private let sheenMask = CALayer()
     private let sheenBand = CAGradientLayer()
-    private let art = UIImage(named: "LaunchRiver")?.cgImage
+    private let art = UIImage(named: "ReferencePlayerLaunchMark")?.cgImage
 
     private var hasStarted = false
     private var isFinishing = false
