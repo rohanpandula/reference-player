@@ -1,99 +1,134 @@
 # Reference Player
 
-Reference Player is a noncommercial fork of [Rivulet](https://github.com/l984-451/Rivulet), the Apple TV,
-iPhone, iPad and Mac media client for Plex, Jellyfin, Emby and IPTV by Bain Gurley.
+Reference Player is a noncommercial fork of [Rivulet](https://github.com/l984-451/Rivulet) by Bain
+Gurley. Rivulet is a media client for Plex, Jellyfin, Emby and IPTV on Apple TV, iPhone, iPad and
+Mac.
 
-This is not the original app. It is not affiliated with or endorsed by Rivulet's author. Rivulet's
-App Store and TestFlight builds are upstream's, not this fork's, and upstream's support channels are
-for upstream's app. Questions about this fork belong in this repository.
+This is not the original app. This fork has no affiliation with Rivulet's author, and Rivulet's
+author does not endorse it. The App Store and TestFlight builds of Rivulet come from upstream, not
+from this fork. Upstream's support channels are for upstream's app. Put questions about this fork in
+this repository.
 
 ![Reference Player's first-run screen on Apple TV: sign in to Plex, Jellyfin or Emby, or add a Live TV source](images/welcome.jpg)
 
 ## The idea
 
 The name states the aim: a reference player plays what is in the file. This fork tries to keep a
-source's picture and sound as intact as tvOS allows, and where there is a choice it prefers the path
-that changes the least. On a Dolby Vision TV it asks the engine to compose a Profile 7 FEL title's
-enhancement layer rather than drop it. When your server offers a file directly, the app plays the
-original file, and it turns to a server transcode only when there is no usable direct link, when you
-pick a lower quality, or when the player fails to start. With Height Speakers set, an object
-soundtrack keeps its height channels instead of losing them, sent as lossless PCM over HDMI. Format
-badges are there to tell you what a file is, and none of upstream's hosted services is contacted.
-Where Apple's platform forces a conversion, the app should say so plainly and never label the result
-as more than it is. The limits are just as plain: Apple TV cannot pass the original audio bitstream
-to a receiver, so the receiver's own decoder is not used; the rendered channels have not been shown
-to match a receiver's decoding; and on a physical Apple TV this fork's author has so far only timed
-the FEL route ([FEL on real hardware](#fel-on-real-hardware)), not checked the picture or the sound.
-This is a goal the fork is held to, not a claim that it has been reached.
+source's picture and sound as intact as tvOS permits. When there is a choice, it uses the path that
+changes the least.
+
+In the app, that aim has these results:
+
+- On a Dolby Vision TV, the app asks the engine to compose the enhancement layer of a Profile 7 FEL
+  title. It does not ask the engine to drop that layer.
+- When your server offers a file directly, the app plays the original file.
+- The app uses a server transcode only in these cases:
+  - There is no usable direct link.
+  - You pick a lower quality.
+  - The player fails to start.
+- With Height Speakers set, an object soundtrack keeps its height channels. The app sends the sound
+  as lossless PCM over HDMI.
+- Format badges tell you what a file is.
+- The app does not contact upstream's hosted services.
+- Where Apple's platform forces a conversion, the app must say so plainly. It must never label the
+  result as more than it is.
+
+The limits are just as plain:
+
+- Apple TV cannot pass the original audio bitstream to a receiver. As a result, the receiver does
+  not decode the sound with its own decoder.
+- No test has shown that the rendered channels match a receiver's decoding.
+- On a physical Apple TV, this fork's author has only timed the FEL route so far
+  ([FEL on real hardware](#fel-on-real-hardware)). The author has not checked the picture or the
+  sound there.
+
+This is a goal for the fork. It is not a claim that the fork has reached the goal.
 
 ## What it adds
 
 The settings below are in the Apple TV app only. The iPhone, iPad and Mac apps build from the same
-tree and also refuse upstream's hosted services, but have none of these settings.
+tree. They also refuse upstream's hosted services, but they have none of these settings.
 
 ![Settings > Playback on Apple TV, with Dolby Vision FEL and Height Speakers under Home Theater](images/playback-settings.jpg)
 
-- **Dolby Vision Profile 7 FEL.** For a Profile 7 title with a full enhancement layer (FEL), the
-  playback engine can decode the base and enhancement layers and compose them itself (its dual-layer
-  route) instead of dropping the enhancement layer. Settings > Playback > Dolby Vision FEL turns it
-  on or off. It is on by default. Limits:
-  - The app asks for the route only when the TV reports Dolby Vision support, and only FEL sources
-    take it. Without a Dolby Vision TV, Profile 7 plays its HDR10 base layer.
-  - Profile 7 MEL titles, and FEL titles that do not take the route, are converted to single-layer
-    Profile 8.1. For FEL the engine then folds the enhancement layer's average effect on brightness
-    into each scene's luma curve where it can measure it: the overall tone is kept, the fine detail
-    and grain are not.
-  - The engine refuses the route when a title is over its real-time budget (UHD at 30 fps plus a
-    1080p enhancement layer), and plays the 8.1 conversion instead.
-  - The route is a software path. An AirPlay receiver gets the sound but no picture.
-  - The composed picture leaves the engine as 10-bit video. This is not a promise of 12-bit output
-    to the TV.
-  - A Dolby Vision indicator on the TV does not prove that every frame used the enhancement layer:
-    the engine sends a frame as its base layer when that frame's enhancement layer arrives late or
-    composition fails.
-  - The player's Details tab shows which of these happened, from what the engine reported: Dual
-    Layer (FEL), Profile 8.1 (converted) or HDR10 Base Layer.
-  - It is demanding on older Apple TV hardware. Simulator and Debug builds say nothing about it;
-    [FEL on real hardware](#fel-on-real-hardware) has timings from two Apple TVs.
-  - Whether the TV then shows the composed picture correctly has not yet been checked by this fork's
-    author.
-- **Height speakers for TrueHD Atmos and DTS:X.** Settings > Playback > Height Speakers picks a
-  layout (5.1.2, 5.1.4, 7.1.2, 7.1.4 or 9.1.6). With one set, an object soundtrack keeps its height
-  channels, rendered by the playback engine into that layout and sent as lossless PCM over HDMI. It
-  is off by default. Limits:
-  - tvOS 26 or later, and a 48 kHz track: TrueHD, or DTS-HD Master Audio for DTS:X.
-  - DTS:X heights render only into 7.1.4 or 9.1.6. With a smaller layout a DTS:X track plays its
-    ordinary channels.
-  - The app sends fixed channels, not the original bitstream or movable objects, so your receiver's
-    own Atmos or DTS:X decoder is not used. The rendering has not been shown to match a receiver's.
-  - HDMI is the target. AirPlay is a different, lossy path.
-  - An Atmos or PCM indicator on a receiver does not prove the heights arrived correctly.
-  - It can be demanding on older Apple TV hardware. Simulator and Debug builds say nothing about
-    playback performance.
-- **Format badges** on detail pages and folder lists (DV FEL, DV MEL and TrueHD Atmos), read from an
-  optional index of your own library (Settings > Playback > Format Tags). The tools that build the index are in
-  `PrivateBuild/tools/format-index/`. With no index address set, which is the default, nothing is
-  fetched.
-- **Playback reporting to Home Assistant**, optional and off by default, with no address built in.
-  A package and a dashboard card are in `PrivateBuild/homeassistant/`.
-- **Discover, recommendations, actor biographies and Metacritic and Letterboxd scores** from your
-  own free TMDB and MDBList keys (Settings > Playback > Discover and Scores). Without keys nothing is
-  fetched from those services.
-- **No upstream hosted services.** Rivulet's metadata Workers, in-player trivia, the Live TV sports
-  scoreboard and diagnostics upload are run by its author for his app. This fork does not use them:
-  those screens are still there, but each request to upstream's services is refused inside the app
-  before anything goes out on the network. With your own keys, Discover and scores come from TMDB
-  and MDBList instead (above). No Sentry destination is built in.
-- **Tooling to follow upstream releases**: `PrivateBuild/sync.py` merges an upstream release tag and
-  does the mechanical part, and `PrivateBuild/check.py` runs every check.
+### Dolby Vision Profile 7 FEL
+
+A Profile 7 title can have a full enhancement layer (FEL). For such a title, the playback engine can
+decode the base layer and the enhancement layer and compose them itself. This is the engine's
+dual-layer route. Without this route, the player drops the enhancement layer. Settings > Playback >
+Dolby Vision FEL controls the route. The default is On.
+
+Limits:
+
+- The app asks for the route only when the TV reports Dolby Vision support. Only FEL sources take
+  the route. Without a Dolby Vision TV, Profile 7 plays its HDR10 base layer.
+- The engine converts Profile 7 MEL titles to single-layer Profile 8.1. It does the same for FEL
+  titles that do not take the route.
+- In that conversion of a FEL title, the engine folds the enhancement layer's average effect on
+  brightness into each scene's luma curve. It does this where it can measure the effect. The
+  conversion keeps the overall tone. It does not keep the fine detail and the grain.
+- The engine refuses the route when a title is over its real-time budget. The budget is UHD at
+  30 fps plus a 1080p enhancement layer. The engine then plays the 8.1 conversion.
+- The route is a software path. An AirPlay receiver gets the sound but no picture.
+- The composed picture leaves the engine as 10-bit video. This is not a promise of 12-bit output to
+  the TV.
+- A Dolby Vision indicator on the TV does not prove that every frame used the enhancement layer. The
+  engine sends a frame as its base layer when that frame's enhancement layer arrives late or
+  composition fails.
+- The player's Details tab shows which of these happened, from the engine's report: Dual Layer
+  (FEL), Profile 8.1 (converted) or HDR10 Base Layer.
+- The route is demanding on older Apple TV hardware. Simulator builds and Debug builds give no data
+  about it. [FEL on real hardware](#fel-on-real-hardware) has timings from two Apple TVs.
+- This fork's author has not yet checked that the TV shows the composed picture correctly.
+
+### Height speakers for TrueHD Atmos and DTS:X
+
+Settings > Playback > Height Speakers selects a layout: 5.1.2, 5.1.4, 7.1.2, 7.1.4 or 9.1.6. With a
+layout set, an object soundtrack keeps its height channels. The playback engine renders them into
+that layout, and the app sends lossless PCM over HDMI. The default is Off.
+
+Limits:
+
+- You need tvOS 26 or later and a 48 kHz track: TrueHD, or DTS-HD Master Audio for DTS:X.
+- DTS:X heights render only into 7.1.4 or 9.1.6. With a smaller layout, a DTS:X track plays its
+  ordinary channels.
+- The app sends fixed channels. It does not send the original bitstream or movable objects. As a
+  result, your receiver does not use its own Atmos or DTS:X decoder.
+- No test has shown that the rendering matches a receiver's.
+- HDMI is the target. AirPlay is a different, lossy path.
+- An Atmos or PCM indicator on a receiver does not prove that the heights arrived correctly.
+- The feature can be demanding on older Apple TV hardware. Simulator builds and Debug builds give no
+  data about playback performance.
+
+### Other additions
+
+- **Format badges** on detail pages and folder lists: DV FEL, DV MEL and TrueHD Atmos. The app reads
+  them from an optional index of your own library (Settings > Playback > Format Tags). The tools
+  that build the index are in `PrivateBuild/tools/format-index/`. The default is no index address,
+  and then the app fetches nothing.
+- **Playback reports to Home Assistant.** This is optional and off by default. The app has no
+  built-in address. A package and a dashboard card are in `PrivateBuild/homeassistant/`.
+- **Discover, recommendations, actor biographies, and Metacritic and Letterboxd scores** from your
+  own free TMDB and MDBList keys (Settings > Playback > Discover and Scores). Without keys, the app
+  fetches nothing from those services.
+- **No upstream hosted services.** Rivulet's author runs these services for his app: the metadata
+  Workers, in-player trivia, the Live TV sports scoreboard and diagnostics upload. This fork does
+  not use them. Those screens are still there, but the app refuses each request to upstream's
+  services before the request goes on the network. With your own keys, Discover and scores come from
+  TMDB and MDBList (above). The app has no built-in Sentry destination.
+- **Tools to follow upstream releases.** `PrivateBuild/sync.py` merges an upstream release tag and
+  does the mechanical part. `PrivateBuild/check.py` runs every check.
 
 ## FEL on real hardware
 
-A rough benchmark from two Apple TVs, not a lab measurement. On 2026-11-12 and 2026-11-13 the same
-UHD Blu-ray remux (3840x2160 at 23.976 fps, Dolby Vision Profile 7 FEL) was played through the
-dual-layer route on each, with Release builds on AetherEngine 7.61.0. The engine logs how long the
-GPU took to compose each frame from the two decoded layers, averaged over windows of 120 frames, and
-`PrivateBuild/felbench.py` summarises those lines.
+This is a rough benchmark from two Apple TVs. It is not a lab measurement. On 2026-11-12 and
+2026-11-13, each Apple TV played the same UHD Blu-ray remux through the dual-layer route. The remux
+is 3840x2160 at 23.976 fps, Dolby Vision Profile 7 FEL. The builds were Release builds on
+AetherEngine 7.61.0.
+
+The engine composes each frame from the two decoded layers on the GPU. It logs the GPU time as an
+average for each window of 120 frames. `PrivateBuild/felbench.py` reads those lines and gives a
+summary.
 
 | | Apple TV 4K (2nd generation) | Apple TV 4K (4th generation) |
 | --- | --- | --- |
@@ -107,22 +142,27 @@ GPU took to compose each frame from the two decoded layers, averaged over window
 | Frames lost before the display layer, or dropped by it | 0 | 0 |
 | Rebuffering | none | none |
 
-What it does and does not show:
+What the table shows, and what it does not show:
 
-- The newer Apple TV composed a frame in about half the time. This is the GPU step only: decoding
-  the two HEVC layers is not in the number.
-- The runs are not matched. The 2nd-generation run played the first 1 minute 56 seconds straight
-  through. The 4th-generation run started at the beginning, skipped forward five times by 30 seconds
-  and ended 3 minutes 47 seconds in, and the engine skipped 6 frames that arrived late around those
-  skips. The two app builds differed, on the same engine version.
+- The newer Apple TV composed a frame in half the time: 6.5 ms against 13.1 ms.
+- The number is the GPU step only. It does not include the decode of the two HEVC layers.
+- The runs are not matched. The 2nd-generation run played the first 1 minute 56 seconds without a
+  stop. The 4th-generation run started at the beginning and skipped forward five times by 30
+  seconds. It ended 3 minutes 47 seconds into the film. The engine skipped 6 late frames near those
+  skips.
+- The two app builds were different, on the same engine version.
 - One film is not the worst case. A second FEL title on the 2nd-generation Apple TV had a median of
-  15.8 ms over 4 windows, and its display layer dropped 3 of 553 frames.
-- Neither run checked the picture on the TV. This times composition. It does not show that the TV
-  displayed Dolby Vision.
+  15.8 ms over 4 windows. Its display layer dropped 3 of 553 frames.
+- Neither run checked the picture on the TV. The table gives composition times. It does not show
+  that the TV displayed Dolby Vision.
 
-To measure your own Apple TV, launch your build with the engine's debug lines on (the TV must be
-awake), play a Profile 7 FEL title from the beginning for two minutes without skipping, quit the app,
-and summarise the log:
+To measure your own Apple TV:
+
+1. Make sure that the Apple TV is awake.
+2. Start your build with the first command below. It enables the engine's debug lines.
+3. Play a Profile 7 FEL title from the beginning for two minutes. Do not skip.
+4. Quit the app.
+5. Run the second command to get the summary of the log.
 
 ```bash
 xcrun devicectl device process launch --device "<your Apple TV's name>" --console --terminate-existing \
@@ -131,27 +171,29 @@ xcrun devicectl device process launch --device "<your Apple TV's name>" --consol
 python3 PrivateBuild/felbench.py fel.log
 ```
 
-Keep one film per log. Without a Dolby Vision TV the app does not ask for the route, and the script
-says the log holds no FEL timing.
+Use one film for each log. Without a Dolby Vision TV, the app does not ask for the route. The script
+then reports that the log has no FEL timing.
 
 ## Status
 
-- It builds, and its unit tests pass on the tvOS simulator: 3,536 of 3,536 tvOS unit tests and 169
-  Python tests for the fork's tooling, measured on 2026-11-13 with Xcode 27.1, the version on the
-  machine that ran them (upstream pins Xcode 27.2 in `codemagic.yaml`). The checks also built the
-  tvOS app in Release for a real Apple TV and compiled the iOS and Mac apps in their default
-  configuration.
-- On a physical Apple TV, the FEL route has been run and timed on two models
-  ([FEL on real hardware](#fel-on-real-hardware)). The picture on the TV, the height speakers and
-  the other playback features have not yet been checked there by this fork's author.
-- No binaries are provided. You build it yourself, signed with your own Apple developer account.
+- The fork builds, and its unit tests pass on the tvOS simulator. The run of 2026-11-13 passed 3,536
+  of 3,536 tvOS unit tests and 169 Python tests for the fork's tools.
+- That run used Xcode 27.1, the version on the machine. Upstream pins Xcode 27.2 in
+  `codemagic.yaml`.
+- The checks also built the tvOS app in Release for a real Apple TV. They compiled the iOS and Mac
+  apps in their default configuration.
+- On a physical Apple TV, the author ran and timed the FEL route on two models
+  ([FEL on real hardware](#fel-on-real-hardware)). The author has not yet checked the picture on the
+  TV, the height speakers or the other playback features there.
+- This repository provides no binaries. You build the app yourself and sign it with your own Apple
+  developer account.
 
 ## Build
 
-You need a Mac with Xcode and an Apple developer account. Upstream builds with Xcode 27.2;
-`PrivateBuild/build-tvos.sh` refuses anything older, although this fork's own checks above ran on
-27.1. The App Group and iCloud container the apps use need a paid membership; a free Personal Team
-is not promised to sign them.
+You need a Mac with Xcode and an Apple developer account. Upstream builds with Xcode 27.2, and
+`PrivateBuild/build-tvos.sh` refuses an older version. This fork's own checks above ran on 27.1. The
+apps use an App Group and an iCloud container, and these need a paid membership. This fork does not
+promise that a free Personal Team can sign them.
 
 ```bash
 # Secrets.swift with an empty Sentry DSN (this fork ships no Sentry destination; verify.py insists)
@@ -161,27 +203,44 @@ python3 PrivateBuild/check.py --quick
 open Rivulet.xcodeproj    # scheme: Reference Player
 ```
 
-`configure.py` writes your bundle prefix, App Group (`group.<bundle-id>` unless you pass
-`--app-group`), iCloud container and team into the project, and can set `--display-name` and
-`--url-scheme`. Register the App Group and iCloud container for your team in Xcode or the developer
-portal. Before committing a change, `python3 PrivateBuild/configure.py --placeholder` puts the
-repository's placeholder identifiers back. `python3 PrivateBuild/check.py --all` runs every check,
-including the full tvOS test suite and the iOS and Mac builds.
+`configure.py` writes these values into the project:
 
-To skip typing your format index URL and Home Assistant address with the remote, copy
-`PrivateBuild/PersonalDefaults.example.plist` to `Rivulet/PersonalDefaults.plist` (gitignored) and fill
-it in: the Apple TV app fills those values into Settings on its first launch and turns the
-integration on. The file ships inside the app you build, so do not share that build.
+- your bundle prefix
+- your App Group (`group.<bundle-id>` unless you pass `--app-group`)
+- your iCloud container
+- your team
+
+It can also set `--display-name` and `--url-scheme`. Register the App Group and the iCloud container
+for your team in Xcode or in the developer portal.
+
+Before you commit a change, run `python3 PrivateBuild/configure.py --placeholder`. This command
+restores the placeholder identifiers of the repository. `python3 PrivateBuild/check.py --all` runs
+every check. This includes the full tvOS test suite and the iOS and Mac builds.
+
+Your build can fill in your format index URL and your Home Assistant address, so that you do not
+type them with the remote:
+
+1. Copy `PrivateBuild/PersonalDefaults.example.plist` to `Rivulet/PersonalDefaults.plist`. Git
+   ignores this file.
+2. Fill in your values.
+
+On its first launch, the Apple TV app writes those values into Settings and enables the integration.
+
+CAUTION: Do not share a build that has this file. The file and your addresses ship inside the app
+that you build.
 
 ## Where things are
 
-The root `README.md` and issue templates describe Reference Player. User-facing app text and built
-app names use Reference Player; the tvOS artwork uses the fork's Reference R mark. The body of
-`CLAUDE.md`, historical `Docs/`, source folders and Swift type names retain upstream's names to keep
-merges manageable. Stored-data keys and protocol identifiers also retain their existing spelling.
-Upstream release history and legal credits are explicitly attributed. Funding links in `.github/`
-still support Rivulet's original author. Notes for this fork are in `PrivateBuild/`, starting with
-`PrivateBuild/CLAUDE-private.md` and `PrivateBuild/SYNC.md`.
+- The root `README.md` and the issue templates describe Reference Player.
+- The user-facing app text and the built app names use Reference Player.
+- The tvOS artwork uses the fork's Reference R mark.
+- These keep upstream's names, to keep merges manageable: the body of `CLAUDE.md`, historical
+  `Docs/`, source folders and Swift type names.
+- Stored-data keys and protocol identifiers also keep their existing spelling.
+- Upstream release history and legal credits have explicit attribution.
+- Funding links in `.github/` still support Rivulet's original author.
+- Notes for this fork are in `PrivateBuild/`. Start with `PrivateBuild/CLAUDE-private.md` and
+  `PrivateBuild/SYNC.md`.
 
 ## License and credits
 
@@ -191,13 +250,16 @@ Required Notice: Copyright (C) 2025-2026 Bain Gurley
 
 This fork is free of charge and not for sale.
 
-Playback runs on [AetherEngine](https://github.com/superuser404notfound/AetherEngine) (LGPL-3.0
-with an Apple Store / DRM exception), with [FFmpegBuild](https://github.com/superuser404notfound/FFmpegBuild)
-(FFmpeg, LGPL-2.1-or-later), [LibDovi](https://github.com/superuser404notfound/LibDovi) (libdovi from
-[dovi_tool](https://github.com/quietvoid/dovi_tool), dual-licensed MIT or Apache-2.0) and
-[LibTrueHD](https://github.com/superuser404notfound/LibTrueHD) (MIT, with
-[truehdd](https://github.com/truehdd/truehdd) under Apache-2.0). Subtitles use
-[LibassBuild](https://github.com/l984-451/LibassBuild) (libass, ISC). Each keeps its own license.
+Playback and subtitles run on these components. Each keeps its own license.
+
+- [AetherEngine](https://github.com/superuser404notfound/AetherEngine) (LGPL-3.0 with an Apple
+  Store / DRM exception)
+- [FFmpegBuild](https://github.com/superuser404notfound/FFmpegBuild) (FFmpeg, LGPL-2.1-or-later)
+- [LibDovi](https://github.com/superuser404notfound/LibDovi) (libdovi from
+  [dovi_tool](https://github.com/quietvoid/dovi_tool), dual-licensed MIT or Apache-2.0)
+- [LibTrueHD](https://github.com/superuser404notfound/LibTrueHD) (MIT, with
+  [truehdd](https://github.com/truehdd/truehdd) under Apache-2.0)
+- [LibassBuild](https://github.com/l984-451/LibassBuild) (libass, ISC), for subtitles
 
 Some optional components may be subject to third-party patent licensing. Whoever builds and uses
 them is responsible for their own licensing.
