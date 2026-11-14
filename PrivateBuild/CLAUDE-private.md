@@ -77,7 +77,7 @@ record a deliberate change with `--update` after reading the numbers. Following 
 on an Apple TV. Playback features need checking on real hardware; the simulator says nothing about
 HDMI channels, picture or performance.
 
-The fork's user-visible text lives in `Rivulet/Private.xcstrings` (table `Private`), written as
+The fork's user-visible text lives in each app's `Private.xcstrings` (table `Private`), written as
 `String(localized: "…", table: "Private")` and passed through a funnel's `verbatim:` path. Never add
 a fork string to upstream's `Localizable.xcstrings`; `PrivateBuild/SYNC.md` says why and how.
 
@@ -87,7 +87,10 @@ a fork string to upstream's `Localizable.xcstrings`; `PrivateBuild/SYNC.md` says
   send the token `ReferencePlayer`, `PrivateBuildPolicy.userAgentProduct`, since a token cannot hold
   a space) and answer the `referenceplayer://` link scheme. Upstream's `rivulet://` examples in
   `CLAUDE.md` read `referenceplayer://` here (`RivuletLink.scheme`). Type names and the changelog
-  stay upstream's. The tvOS default icon, static Top Shelf artwork, Settings preview and launch mark
+  storage stay upstream's; the app labels preserved release notes as Upstream Release History.
+  App products, menus, onboarding, Settings, errors and permission prompts use Reference Player.
+  `PRODUCT_MODULE_NAME`, saved-data keys and protocol identifiers keep their old spelling to preserve
+  compatibility. The tvOS default icon, static Top Shelf artwork, Settings preview and launch mark
   use the fork's Reference R artwork in `Rivulet/PrivateAssets.xcassets`; upstream's catalogs and
   alternate icons remain intact. Editable artwork and export instructions live in `PrivateBuild/branding/`.
 - **Engine traits** (Quick Reference, "AetherEngine"). Upstream sets one optional trait,

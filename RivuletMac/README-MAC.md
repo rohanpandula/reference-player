@@ -1,4 +1,4 @@
-# Rivulet for Mac: notes for feature agents
+# Reference Player for Mac: notes for feature agents
 
 Native SwiftUI + AppKit app. Logic lives in `RivuletCore/` (shared with iOS and tvOS, no `#if os`), GUI in
 `RivuletMac/`. Parity target: everything `RivuletiOS/` offers except Downloads (iOS only).
@@ -66,5 +66,5 @@ shuffleShow, addToPlaylist, open, setWatched, setWatchlisted, setFavorite, playE
 - Strings: `String(localized:)` / SwiftUI literals; `RivuletMac/Localizable.xcstrings` (source `en`).
 - New settings keys that should sync must be added to `RivuletCore/Sync/SyncCatalog`. Mac-only keys: `MacSettingsKeys`.
 - Logic that is not view code goes to `RivuletCore/`, not here. No Downloads UI (`BrowseStore.canDownload` is true for Plex; ignore it).
-- `rivulet://` links: `RivuletLink` is in `RivuletCore/Links/` (also compiled into Top Shelf); `MacRootView` resolves them with `RivuletLinkResolver`.
+- `referenceplayer://` links: `RivuletLink` is in `RivuletCore/Links/` (also compiled into Top Shelf); `MacRootView` resolves them with `RivuletLinkResolver`.
 - Offline progress is dropped on the Mac (`NoOfflineHost`).

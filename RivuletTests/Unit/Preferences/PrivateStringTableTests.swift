@@ -24,7 +24,7 @@ final class PrivateStringTableTests: XCTestCase {
     ]
 
     private func german() throws -> Bundle {
-        // Hosted tests run inside the app, so the main bundle is the built Rivulet.app.
+        // Hosted tests run inside the app, so the main bundle is the built app.
         let path = try XCTUnwrap(Bundle.main.path(forResource: "de", ofType: "lproj"), "the app has no German localization")
         return try XCTUnwrap(Bundle(path: path))
     }
@@ -47,5 +47,28 @@ final class PrivateStringTableTests: XCTestCase {
     func test_englishResolvesToTheKey() {
         XCTAssertEqual(String(localized: "Height Speakers", table: "Private", locale: Locale(identifier: "en")), "Height Speakers")
         XCTAssertEqual(DolbyVisionPlayback.dualLayer.title, "Dual Layer (FEL)")
+    }
+
+    func test_brandingKeepsTheExistingTranslations() throws {
+        let keys = ["Welcome to Reference Player",
+                    "This server runs Jellyfin %@. Reference Player needs %lld.%lld or newer."]
+        for language in ["de", "el", "fr"] {
+            let path = try XCTUnwrap(Bundle.main.path(forResource: language, ofType: "lproj"))
+            let bundle = try XCTUnwrap(Bundle(path: path))
+            for key in keys {
+                let translated = bundle.localizedString(forKey: key, value: nil, table: "Private")
+                XCTAssertNotEqual(translated, key, "Missing translation for \(language): \(key)")
+                XCTAssertTrue(translated.contains("Reference Player"), language)
+                XCTAssertFalse(translated.contains("Rivulet"), language)
+            }
+        }
+    }
+
+    @MainActor
+    func test_settingsDescriptionsUseTheForkName() {
+        for (id, descriptor) in SettingsDescriptorStore.descriptors {
+            XCTAssertFalse(descriptor.description.contains("Rivulet"), id)
+        }
+        XCTAssertTrue(SettingsDescriptorStore.descriptor(for: "appIcon")?.description.contains("Reference Player") == true)
     }
 }

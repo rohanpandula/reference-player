@@ -226,7 +226,7 @@ final class TvheadendSourceTests: XCTestCase {
         XCTAssertEqual(copy(TvheadendError.notTvheadend),
                        "That address isn't a Tvheadend server. Check the address and port.")
         XCTAssertEqual(copy(TvheadendError.noTicket),
-                       "Tvheadend didn't give Rivulet a stream for this user. Check its streaming rights, or update Tvheadend.")
+                       "Tvheadend didn't give Reference Player a stream for this user. Check its streaming rights, or update Tvheadend.")
         XCTAssertEqual(copy(TvheadendError.httpError(500)), "Couldn't reach that server. Check the address and port.")
     }
 }

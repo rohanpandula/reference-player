@@ -82,8 +82,8 @@ tree and also refuse upstream's hosted services, but have none of these settings
 
 ## Status
 
-- It builds, and its unit tests pass on the tvOS simulator: 3,534 of 3,534 tvOS unit tests and 166
-  Python tests for the fork's tooling, measured on 2026-11-11 with Xcode 27.1, the version on the
+- It builds, and its unit tests pass on the tvOS simulator: 3,536 of 3,536 tvOS unit tests and 169
+  Python tests for the fork's tooling, measured on 2026-11-13 with Xcode 27.1, the version on the
   machine that ran them (upstream pins Xcode 27.2 in `codemagic.yaml`). The checks also built the
   tvOS app in Release for a real Apple TV and compiled the iOS and Mac apps in their default
   configuration.
@@ -114,11 +114,13 @@ including the full tvOS test suite and the iOS and Mac builds.
 
 ## Where things are
 
-The root `README.md`, the body of `CLAUDE.md`, `Docs/` and the artwork are upstream's, unmodified,
-so that merges stay clean. Everything the root `README.md` says describes upstream's app, not this
-fork. The issue templates and funding links in `.github/` are upstream's files, kept unmodified, and
-donations through them go to Rivulet's author. Notes for this fork are in `PrivateBuild/`, starting
-with `PrivateBuild/CLAUDE-private.md` and `PrivateBuild/SYNC.md`.
+The root `README.md` and issue templates describe Reference Player. User-facing app text and built
+app names use Reference Player; the tvOS artwork uses the fork's Reference R mark. The body of
+`CLAUDE.md`, historical `Docs/`, source folders and Swift type names retain upstream's names to keep
+merges manageable. Stored-data keys and protocol identifiers also retain their existing spelling.
+Upstream release history and legal credits are explicitly attributed. Funding links in `.github/`
+still support Rivulet's original author. Notes for this fork are in `PrivateBuild/`, starting with
+`PrivateBuild/CLAUDE-private.md` and `PrivateBuild/SYNC.md`.
 
 ## License and credits
 

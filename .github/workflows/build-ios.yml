@@ -62,7 +62,7 @@ jobs:
       # ARCHS=arm64: a generic simulator destination otherwise builds the
       # x86_64 slice too, and LibDovi's tvOS-simulator xcframework carries no
       # x86_64 dovi_* symbols — the fat link fails. Runners are arm64 anyway.
-      - name: Build Rivulet iOS (Debug, simulator)
+      - name: Build Reference Player iOS (Debug, simulator)
         run: |
           set -o pipefail
           xcodebuild \

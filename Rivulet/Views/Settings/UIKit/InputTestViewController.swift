@@ -144,7 +144,7 @@ final class InputTestViewController: UIViewController {
         } else {
             promptLabel.text = String(localized: "Done")
             progressLabel.text = didCapture
-                ? String(localized: "Results sent to Rivulet's diagnostics.")
+                ? String(localized: "Input test complete.", table: "Private")
                 : String(localized: "No presses were recorded.")
             hintLabel.text = String(localized: "Press Back to close this screen.")
         }
@@ -165,7 +165,7 @@ final class InputTestViewController: UIViewController {
     private static var header: String {
         let short = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "?"
         let build = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "?"
-        return "Rivulet \(short) (\(build)) · tvOS \(UIDevice.current.systemVersion)"
+        return "\(PrivateBuildPolicy.productName) \(short) (\(build)) · tvOS \(UIDevice.current.systemVersion)"
             + " · hold threshold \(InputPressTracker.ms(InputConfig.holdThreshold))"
     }
 

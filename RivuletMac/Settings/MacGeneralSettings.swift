@@ -77,6 +77,7 @@ private struct MacChangelogSheet: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            Text(String(localized: "Upstream Release History", table: "Private")).font(.headline).padding()
             List(MacChangelog.entries, id: \.version) { entry in
                 Section(entry.version) {
                     MacChangelogLines(lines: entry.lines).padding(.vertical, 4)
@@ -101,7 +102,7 @@ private struct MacLicensesSheet: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Rivulet") {
+                Section(String(localized: "Reference Player", table: "Private")) {
                     Text(OpenSourceLicenses.appLicense).font(.footnote).foregroundStyle(.secondary)
                 }
                 Section("Open Source Software") {

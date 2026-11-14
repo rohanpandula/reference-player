@@ -44,17 +44,19 @@ enum OpenSourceLicenses {
     static let aetherSourceURL = "https://github.com/superuser404notfound/AetherEngine"
 
     /// Shown at the top of the Licenses & Legal screen.
-    static let appLicense = """
-    Rivulet is distributed under the PolyForm Noncommercial License 1.0.0, which permits \
+    static let appLicense = String(localized: """
+    Reference Player is based on Rivulet, Copyright © 2025–2026 Bain Gurley.
+
+    Reference Player is distributed under the PolyForm Noncommercial License 1.0.0, which permits \
     use for noncommercial purposes. The complete license text is included with the source \
     distribution.
 
-    Rivulet is a client for media you provide. It does not host, supply, or distribute any \
+    Reference Player is a client for media you provide. It does not host, supply, or distribute any \
     video, audio, or channel content of its own.
 
     This product uses the TMDB API but is not endorsed or certified by TMDB. Metadata and \
     artwork in Discover and recommendations are provided by The Movie Database (themoviedb.org).
-    """
+    """, table: "Private")
 
     static var entries: [Entry] {
         [
@@ -110,7 +112,7 @@ enum OpenSourceLicenses {
             ),
             Entry(
                 name: "GNU FriBidi",
-                summary: "Used by libass for bidirectional text. FriBidi 1.0.16, statically linked and used under the GNU Lesser General Public License, version 2.1, whose full text is reproduced in the FFmpeg entry above. It is built unmodified from https://github.com/fribidi/fribidi (tag v1.0.16); https://github.com/l984-451/LibassBuild holds the build script, and Rivulet's own source is public, so the app can be rebuilt against a modified FriBidi.",
+                summary: String(localized: "Used by libass for bidirectional text. FriBidi 1.0.16, statically linked and used under the GNU Lesser General Public License, version 2.1, whose full text is reproduced in the FFmpeg entry above. It is built unmodified from https://github.com/fribidi/fribidi (tag v1.0.16); https://github.com/l984-451/LibassBuild holds the build script, and Reference Player's source is at https://github.com/rohanpandula/reference-player, so the app can be rebuilt against a modified FriBidi.", table: "Private"),
                 licenseText: ffmpegLGPL
             ),
             Entry(

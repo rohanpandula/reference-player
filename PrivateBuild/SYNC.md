@@ -135,11 +135,12 @@ deliberate act after reading the numbers it printed, with the reason in the comm
 only shrank passes and says so; recording the smaller numbers is then a choice.
 
 **Files the overlay must not own.** `MUST_EQUAL_UPSTREAM` in `footprint.py` (the one definition;
-`sync.py` reads it) lists `README.md`, `Rivulet/Localizable.xcstrings` and four upstream tests that
+`sync.py` reads it) lists `Rivulet/Localizable.xcstrings` and four upstream tests that
 once carried private lines and were restored on purpose. It is an assertion, never an action: the
 sync refuses to start while one differs from the baseline, reports one that differs from the new
 release, and overwrites nothing; `footprint.py` fails while one is modified. A private correction to
-upstream's `CLAUDE.md` or `README.md` goes into `CLAUDE-private.md`. If a file on that list ever
+upstream's `CLAUDE.md` goes into `CLAUDE-private.md`. The root README now describes Reference Player;
+keep its fork landing page when upstream updates its README. If a file on that list ever
 needs a private line, take it off the list in the same commit.
 
 ## Where private code lives

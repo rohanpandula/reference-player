@@ -180,11 +180,37 @@ class ConfigureTests(unittest.TestCase):
     def test_display_name_is_data_and_reaches_every_app(self):
         self.setup_identity(identity(display_name="Living Room Player"))
         project = (self.root / configure.PROJECT).read_text()
-        self.assertEqual(project.count('INFOPLIST_KEY_CFBundleDisplayName = "Living Room Player";'), 4)
+        self.assertEqual(project.count('INFOPLIST_KEY_CFBundleDisplayName = "Living Room Player";'), 6)
         self.assertEqual(project.count("INFOPLIST_KEY_CFBundleDisplayName = TopShelfExtension;"), 2)
+        self.assertEqual(project.count('PRODUCT_NAME = "Reference Player";'), 6)
+        for module in ("Rivulet", "Rivulet_iOS", "Rivulet_Mac"):
+            self.assertEqual(project.count(f"PRODUCT_MODULE_NAME = {module};"), 2)
+        for name in (configure.TV_INFO, configure.IOS_INFO, configure.MAC_INFO):
+            self.assertEqual(plistlib.loads((self.root / name).read_bytes())["CFBundleName"],
+                             "$(INFOPLIST_KEY_CFBundleDisplayName)", name)
         for name in (configure.IOS_INFO, configure.MAC_INFO):
             self.assertEqual(plistlib.loads((self.root / name).read_bytes())["CFBundleDisplayName"], "Living Room Player", name)
         self.assertEqual(configure.validate_configuration(self.root, require_configured=True)["display_name"], "Living Room Player")
+
+    def test_app_product_and_module_name_drift_is_rejected(self):
+        path = self.root / configure.PROJECT
+        original = path.read_text()
+        for before, after in [('PRODUCT_NAME = "Reference Player";', 'PRODUCT_NAME = Rivulet;'),
+                              ('PRODUCT_MODULE_NAME = Rivulet;', 'PRODUCT_MODULE_NAME = Reference_Player;')]:
+            with self.subTest(binding=before):
+                self.assertIn(before, original)
+                path.write_text(original.replace(before, after, 1))
+                self.assert_no_setup()
+        path.write_text(original)
+
+    def test_bundle_menu_name_drift_is_rejected(self):
+        for name in (configure.TV_INFO, configure.IOS_INFO, configure.MAC_INFO):
+            path = self.root / name
+            original = path.read_text()
+            with self.subTest(platform=name):
+                path.write_text(original.replace('$(INFOPLIST_KEY_CFBundleDisplayName)', 'Rivulet', 1))
+                self.assert_no_setup()
+            path.write_text(original)
 
     def test_placeholder_set_is_all_or_nothing(self):
         # The committed state is the whole placeholder set; any mix with real values is refused.

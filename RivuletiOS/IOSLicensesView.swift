@@ -13,7 +13,7 @@ struct IOSLicensesView: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             } header: {
-                Text("Rivulet")
+                Text(String(localized: "Reference Player", table: "Private"))
             }
 
             Section("Open Source Software") {

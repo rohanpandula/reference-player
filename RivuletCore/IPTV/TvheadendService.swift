@@ -44,7 +44,7 @@ enum TvheadendError: LocalizedError, Equatable {
         // Tvheadend also answers a changed password with 403 once signed in.
         case .forbidden: String(localized: "Tvheadend refused this user. Check its password and rights in Tvheadend.")
         case .notTvheadend: String(localized: "That address isn't a Tvheadend server. Check the address and port.")
-        case .noTicket: String(localized: "Tvheadend didn't give Rivulet a stream for this user. Check its streaming rights, or update Tvheadend.")
+        case .noTicket: String(localized: "Tvheadend didn't give Reference Player a stream for this user. Check its streaming rights, or update Tvheadend.", table: "Private")
         case .httpError: nil
         }
     }

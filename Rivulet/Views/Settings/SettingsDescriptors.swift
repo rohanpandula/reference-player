@@ -58,7 +58,7 @@ enum SettingsDescriptorStore {
         // MARK: Root Categories
         "cat_appearance": SettingDescriptor(
             icon: "paintbrush.fill",
-            description: "Customize how Rivulet looks: the sidebar, Top Shelf, hero banners, Home and library rows, and ratings."
+            verbatim: String(localized: "Customize how Reference Player looks: the sidebar, Top Shelf, hero banners, Home and library rows, and ratings.", table: "Private")
         ),
         "cat_playback": SettingDescriptor(
             icon: "play.fill",
@@ -90,7 +90,7 @@ enum SettingsDescriptorStore {
         ),
         "cat_about": SettingDescriptor(
             icon: "info.circle.fill",
-            description: "App version, changelog, and other information about Rivulet."
+            verbatim: String(localized: "App version, changelog, and other information about Reference Player.", table: "Private")
         ),
 
         // MARK: Appearance
@@ -116,7 +116,7 @@ enum SettingsDescriptorStore {
         ),
         "appIcon": SettingDescriptor(
             icon: "app.badge",
-            description: "Choose the Rivulet icon on the Apple TV Home Screen."
+            verbatim: String(localized: "Choose the Reference Player icon on the Apple TV Home Screen.", table: "Private")
         ),
 
         "homeRows": SettingDescriptor(
@@ -306,7 +306,7 @@ enum SettingsDescriptorStore {
         // MARK: Storage
         "cache": SettingDescriptor(
             icon: "internaldrive",
-            description: "See how much Rivulet has cached, and clear it."
+            verbatim: String(localized: "See how much Reference Player has cached, and clear it.", table: "Private")
         ),
         "iCloudSync": SettingDescriptor(
             icon: "icloud",
@@ -332,7 +332,7 @@ enum SettingsDescriptorStore {
         ),
         "plexServerEnabled": SettingDescriptor(
             icon: "power",
-            description: "Turn off to remove this server from Rivulet: its libraries, Home rows, Continue Watching and Live TV. Your account stays signed in."
+            verbatim: String(localized: "Turn off to remove this server from Reference Player: its libraries, Home rows, Continue Watching and Live TV. Your account stays signed in.", table: "Private")
         ),
         "plexServerLiveTV": SettingDescriptor(
             icon: "tv.and.mediabox",
@@ -364,7 +364,7 @@ enum SettingsDescriptorStore {
         ),
         "signOut": SettingDescriptor(
             icon: "rectangle.portrait.and.arrow.right",
-            description: "Sign out of your Plex account. Every Plex server on it leaves Rivulet until you sign in again."
+            verbatim: String(localized: "Sign out of your Plex account. Every Plex server on it leaves Reference Player until you sign in again.", table: "Private")
         ),
         "jellyfinServer": SettingDescriptor(
             icon: "server.rack",
@@ -380,7 +380,7 @@ enum SettingsDescriptorStore {
         ),
         "jellyfinPassword": SettingDescriptor(
             icon: "key",
-            description: "Used once, to sign in. Rivulet keeps the access token Jellyfin returns, not the password."
+            verbatim: String(localized: "Used once, to sign in. Reference Player keeps the access token Jellyfin returns, not the password.", table: "Private")
         ),
         "jellyfinSignIn": SettingDescriptor(
             icon: "link",
@@ -388,7 +388,7 @@ enum SettingsDescriptorStore {
         ),
         "jellyfinQuickConnect": SettingDescriptor(
             icon: "qrcode",
-            description: "Sign in without typing a password: Rivulet shows a code to approve from a device already signed in to Jellyfin. Quick Connect has to be on in the server's dashboard."
+            verbatim: String(localized: "Sign in without typing a password: Reference Player shows a code to approve from a device already signed in to Jellyfin. Quick Connect has to be on in the server's dashboard.", table: "Private")
         ),
         "jellyfinRefresh": SettingDescriptor(
             icon: "arrow.clockwise",
@@ -420,7 +420,7 @@ enum SettingsDescriptorStore {
         ),
         "embyPassword": SettingDescriptor(
             icon: "key",
-            description: "Used once, to sign in. Rivulet keeps the access token \(embyName) returns, not the password. Leave it empty if your user has none."
+            verbatim: String(localized: "Used once, to sign in. Reference Player keeps the access token \(embyName) returns, not the password. Leave it empty if your user has none.", table: "Private")
         ),
         "embySignIn": SettingDescriptor(
             icon: "link",
@@ -440,11 +440,11 @@ enum SettingsDescriptorStore {
         ),
         "profilePickerOnLaunch": SettingDescriptor(
             icon: "person.2.circle",
-            description: "Shows the profile picker each time Rivulet opens, and when you come back after more than 30 seconds away: on the Home Screen, in another app or on the screensaver."
+            verbatim: String(localized: "Shows the profile picker each time Reference Player opens, and when you come back after more than 30 seconds away: on the Home Screen, in another app or on the screensaver.", table: "Private")
         ),
         "liveTVSources": SettingDescriptor(
             icon: "tv.and.mediabox",
-            description: "Add your own Live TV sources: your Plex server's Live TV or an IPTV playlist from your provider. Rivulet provides no channels of its own."
+            verbatim: String(localized: "Add your own Live TV sources: your Plex server's Live TV or an IPTV playlist from your provider. Reference Player provides no channels of its own.", table: "Private")
         ),
         "plexLiveTVSource": SettingDescriptor(
             icon: "play.rectangle.fill",
@@ -472,7 +472,7 @@ enum SettingsDescriptorStore {
         ),
         "addXtream": SettingDescriptor(
             icon: "person.badge.key",
-            description: "Sign in with the server, username and password from your IPTV provider (an Xtream Codes login). Rivulet loads the channels and guide."
+            verbatim: String(localized: "Sign in with the server, username and password from your IPTV provider (an Xtream Codes login). Reference Player loads the channels and guide.", table: "Private")
         ),
         "xtreamServerField": SettingDescriptor(
             icon: "globe",
@@ -484,19 +484,19 @@ enum SettingsDescriptorStore {
         ),
         "xtreamPasswordField": SettingDescriptor(
             icon: "key",
-            description: "The password your provider gave you. Rivulet keeps it in the Keychain."
+            verbatim: String(localized: "The password your provider gave you. Reference Player keeps it in the Keychain.", table: "Private")
         ),
         "addDispatcharr": SettingDescriptor(
             icon: "antenna.radiowaves.left.and.right",
-            description: "Your Dispatcharr server. Rivulet loads its channels and guide, and records through it if you sign in."
+            verbatim: String(localized: "Your Dispatcharr server. Reference Player loads its channels and guide, and records through it if you sign in.", table: "Private")
         ),
         "addTvheadend": SettingDescriptor(
             icon: "tv",
-            description: "Your Tvheadend server. Rivulet loads its channels and guide, and records through it if you sign in."
+            verbatim: String(localized: "Your Tvheadend server. Reference Player loads its channels and guide, and records through it if you sign in.", table: "Private")
         ),
         "addThreadfin": SettingDescriptor(
             icon: "server.rack",
-            description: "Your Threadfin server. Rivulet loads its playlist and guide from the address."
+            verbatim: String(localized: "Your Threadfin server. Reference Player loads its playlist and guide from the address.", table: "Private")
         ),
         "tvhServerField": SettingDescriptor(
             icon: "globe",
@@ -508,7 +508,7 @@ enum SettingsDescriptorStore {
         ),
         "tvhPasswordField": SettingDescriptor(
             icon: "key",
-            description: "That user's password. Rivulet keeps it in the Keychain."
+            verbatim: String(localized: "That user's password. Reference Player keeps it in the Keychain.", table: "Private")
         ),
         "threadfinServerField": SettingDescriptor(
             icon: "globe",
@@ -516,7 +516,7 @@ enum SettingsDescriptorStore {
         ),
         "addPlaylistURL": SettingDescriptor(
             icon: "list.bullet.rectangle",
-            description: "An M3U playlist link from an IPTV provider you subscribe to, with an optional guide link. Rivulet supplies no channels of its own."
+            verbatim: String(localized: "An M3U playlist link from an IPTV provider you subscribe to, with an optional guide link. Reference Player supplies no channels of its own.", table: "Private")
         ),
         "serverURL": SettingDescriptor(
             icon: "globe",
@@ -532,7 +532,7 @@ enum SettingsDescriptorStore {
         ),
         "passwordField": SettingDescriptor(
             icon: "key",
-            description: "Used once, to fetch your Dispatcharr API key. Rivulet keeps the key, not the password."
+            verbatim: String(localized: "Used once, to fetch your Dispatcharr API key. Reference Player keeps the key, not the password.", table: "Private")
         ),
         "channelProfileField": SettingDescriptor(
             icon: "line.3.horizontal.decrease.circle",
@@ -548,17 +548,17 @@ enum SettingsDescriptorStore {
         ),
         "addSourceConfirm": SettingDescriptor(
             icon: "plus.circle.fill",
-            description: "Checks the connection and adds the source if it works. If it does not, Rivulet tells you why."
+            verbatim: String(localized: "Checks the connection and adds the source if it works. If it does not, Reference Player tells you why.", table: "Private")
         ),
 
         // MARK: About
         "changelog": SettingDescriptor(
             icon: "list.bullet.rectangle",
-            description: "Release notes for every version of Rivulet."
+            verbatim: String(localized: "Release history preserved from the upstream project.", table: "Private")
         ),
         "licensesLegal": SettingDescriptor(
             icon: "doc.text.fill",
-            description: "Rivulet's license and the open-source software it uses, including FFmpeg (LGPL), libdovi, and Sentry."
+            verbatim: String(localized: "Reference Player's license and the open-source software it uses, including FFmpeg (LGPL), libdovi, and Sentry.", table: "Private")
         ),
         "inputDiagnostics": SettingDescriptor(
             icon: "dot.radiowaves.left.and.right",
@@ -566,12 +566,12 @@ enum SettingsDescriptorStore {
         ),
         "inputTest": SettingDescriptor(
             icon: "checklist",
-            description: "Asks you to press a few buttons and records what your remote sent, for Rivulet's diagnostics. Nothing about what you watch is included."
+            verbatim: String(localized: "Asks you to press a few buttons and records what your remote sent, for Reference Player's diagnostics. Nothing about what you watch is included.", table: "Private")
         ),
 
         "sendDiagnostics": SettingDescriptor(
             icon: "stethoscope",
-            description: "Sends a snapshot of Rivulet's setup and recent logs, and gives you a code to quote in a report. No titles, servers, addresses or passwords."
+            verbatim: String(localized: "Sends a snapshot of Reference Player's setup and recent logs, and gives you a code to quote in a report. No titles, servers, addresses or passwords.", table: "Private")
         ),
 
         // MARK: Content Filtering

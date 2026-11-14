@@ -314,7 +314,7 @@ struct LiveTVSourceConnector {
     static func failureCopy(for error: Error) -> String {
         if let dispatcharr = error as? DispatcharrError {
             switch dispatcharr {
-            case .unauthorized: return String(localized: "That server refused Rivulet.")
+            case .unauthorized: return String(localized: "That server refused Reference Player.", table: "Private")
             case .invalidResponse, .notFound, .serverError, .httpError:
                 return String(localized: "Couldn't reach that server. Check the address and port.")
             }
@@ -324,7 +324,7 @@ struct LiveTVSourceConnector {
         }
         let ns = error as NSError
         if ns.domain == NSURLErrorDomain, ns.code == NSURLErrorUserAuthenticationRequired {
-            return String(localized: "That server refused Rivulet.")
+            return String(localized: "That server refused Reference Player.", table: "Private")
         }
         return String(localized: "Couldn't reach that server. Check the address and port.")
     }

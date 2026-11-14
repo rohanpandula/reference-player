@@ -141,7 +141,7 @@ struct IOSWhatsNewSheet: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    Text("What's New")
+                    Text(String(localized: "Upstream Release History", table: "Private"))
                         .font(.largeTitle.bold())
                     ForEach(versions, id: \.self) { version in
                         VStack(alignment: .leading, spacing: 12) {
@@ -180,7 +180,7 @@ struct IOSChangelogView: View {
                     .padding(.vertical, 4)
             }
         }
-        .navigationTitle("Changelog")
+        .navigationTitle(String(localized: "Upstream Release History", table: "Private"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }

@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Rivulet</string>
+	<string>$(INFOPLIST_KEY_CFBundleDisplayName)</string>
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
@@ -32,7 +32,7 @@
 		<true/>
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Rivulet connects to your Plex servers and Live TV sources on your local network to play your media.</string>
+	<string>Reference Player connects to your Plex servers and Live TV sources on your local network to play your media.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

@@ -45,7 +45,7 @@ struct WhatsNewView: View {
         VStack(spacing: 0) {
             // Header (fixed above the scroll area)
             VStack(spacing: 8) {
-                Text("What's New")
+                Text(String(localized: "Upstream Release History", table: "Private"))
                     .font(.system(size: 46, weight: .bold))
                     .foregroundStyle(.white)
 

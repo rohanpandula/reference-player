@@ -206,7 +206,7 @@ enum PrivateSettings {
             SettingsRowItem(id: "ha_webhook", verbatim: String(localized: "Webhook ID", table: "Private"), kind: .textEntry(
                 value: { HomeAssistantReporter.webhookID },
                 placeholder: String(localized: "Webhook ID", table: "Private"),
-                hint: String(localized: "Home Assistant's rivulet_playback package must use the same id. Clear it to make a new one.", table: "Private"),
+                hint: String(localized: "Home Assistant's playback integration package must use the same id. Clear it to make a new one.", table: "Private"),
                 suggestions: [],
                 keyboardType: .asciiCapable,
                 set: { HomeAssistantReporter.webhookID = $0 })),
@@ -217,7 +217,7 @@ enum PrivateSettings {
                     let alert = UIAlertController(
                         title: answered ? String(localized: "Report Sent", table: "Private") : String(localized: "Report Not Sent", table: "Private"),
                         message: answered
-                            ? String(localized: "Home Assistant answered. Check that sensor.rivulet_playback now shows a test report; the webhook id must match its rivulet_playback package.", table: "Private")
+                            ? String(localized: "Home Assistant answered. Check that your playback sensor now shows a test report; the webhook id must match its playback integration package.", table: "Private")
                             : String(localized: "Home Assistant did not answer at that address.", table: "Private"),
                         preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: String(localized: "OK"), style: .default))
@@ -272,7 +272,7 @@ enum PrivateSettings {
         ),
         "ha_webhook": SettingDescriptor(
             icon: "key.horizontal",
-            verbatim: String(localized: "The webhook id Home Assistant listens on. Put the same id in its rivulet_playback package; clear it to make a new one.", table: "Private")
+            verbatim: String(localized: "The webhook id Home Assistant listens on. Put the same id in its playback integration package; clear it to make a new one.", table: "Private")
         ),
         "ha_test": SettingDescriptor(
             icon: "paperplane",

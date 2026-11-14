@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D50000040000000000000004"
-               BuildableName = "Rivulet Mac.app"
+               BuildableName = "Reference Player.app"
                BlueprintName = "Rivulet Mac"
                ReferencedContainer = "container:Rivulet.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D50000040000000000000004"
-            BuildableName = "Rivulet Mac.app"
+            BuildableName = "Reference Player.app"
             BlueprintName = "Rivulet Mac"
             ReferencedContainer = "container:Rivulet.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D50000040000000000000004"
-            BuildableName = "Rivulet Mac.app"
+            BuildableName = "Reference Player.app"
             BlueprintName = "Rivulet Mac"
             ReferencedContainer = "container:Rivulet.xcodeproj">
          </BuildableReference>

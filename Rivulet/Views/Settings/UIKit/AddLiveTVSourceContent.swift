@@ -56,7 +56,7 @@ struct EntryStep {
     let set: (String) -> Void
 
     /// Literal `title`, `message` and `placeholder` are extracted to the string catalog.
-    init(id: String, title: String.LocalizationValue, message: String.LocalizationValue,
+    init(id: String, title: String.LocalizationValue, message: LocalizedStringResource,
          placeholder: String.LocalizationValue = "Optional", keyboard: UIKeyboardType = .default,
          contentType: UITextContentType? = nil, isSecure: Bool = false,
          suggestions: [(label: String, value: String)] = [],
@@ -197,7 +197,7 @@ extension SettingsContent {
                       placeholder: "Required", keyboard: .URL, contentType: .URL,
                       value: { draft.m3uURL }, set: { draft.m3uURL = $0; draft.status = .idle }),
             EntryStep(id: "epgURLField", title: "Guide URL",
-                      message: "If your provider gave you a guide link (XMLTV), enter it. Otherwise leave this empty: Rivulet uses the guide the playlist names, if it has one.",
+                      message: LocalizedStringResource("If your provider gave you a guide link (XMLTV), enter it. Otherwise leave this empty: Reference Player uses the guide the playlist names, if it has one.", table: "Private"),
                       keyboard: .URL, contentType: .URL,
                       value: { draft.epgURL }, set: { draft.epgURL = $0; draft.status = .idle }),
             nameStep(draft, fallback: LiveTVSourceConnector.defaultPlaylistName)
@@ -258,7 +258,7 @@ extension SettingsContent {
     }
 
     private static func tvheadendSteps(_ draft: AddSourceDraft) -> [EntryStep] {
-        let loginMessage: String.LocalizationValue = "Only needed if your server asks for a login, and to record. Leave both empty to just watch."
+        let loginMessage = LocalizedStringResource("Only needed if your server asks for a login, and to record. Leave both empty to just watch.", table: "Private")
         return [
             EntryStep(id: "tvhServerField", title: "Server Address",
                       message: "Enter your Tvheadend server's address, with its port.",

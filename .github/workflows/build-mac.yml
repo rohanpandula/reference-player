@@ -55,7 +55,7 @@ jobs:
           key: spm-${{ runner.os }}-${{ hashFiles('Rivulet.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: spm-${{ runner.os }}-
 
-      - name: Build Rivulet Mac (Release, so #if !DEBUG code compiles)
+      - name: Build Reference Player Mac (Release, so #if !DEBUG code compiles)
         run: |
           set -o pipefail
           xcodebuild \

@@ -148,7 +148,7 @@ final class EmbySettingsTests: XCTestCase {
         let copy = EmbySession.failureMessage
         XCTAssertTrue(copy(EmbySignInError.notEmby).contains("isn't an Emby server"))
         XCTAssertTrue(copy(EmbySignInError.notEmby).contains("Jellyfin"))
-        XCTAssertEqual(copy(EmbySignInError.serverTooOld(version: "4.7.0.0")), "Rivulet needs Emby Server 4.8.11 or newer.")
+        XCTAssertEqual(copy(EmbySignInError.serverTooOld(version: "4.7.0.0")), "Reference Player needs Emby Server 4.8.11 or newer.")
         XCTAssertTrue(copy(EmbySignInError.untrustedCertificate).localizedCaseInsensitiveContains("certificate"))
         XCTAssertEqual(copy(EmbySignInError.invalidCredentials), "Emby didn't accept that username and password.")
         XCTAssertEqual(copy(MediaProviderError.unauthorized), copy(EmbySignInError.invalidCredentials))

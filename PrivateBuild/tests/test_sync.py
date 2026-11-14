@@ -311,9 +311,10 @@ class SyncRunTests(TempRepos):
         git(self.cand, "merge", "--abort")
 
     def test_a_private_change_in_a_must_equal_file_refuses_before_merging(self):
-        self.commit(self.cand, {"README.md": "readme\nprivate line\n"}, "a private line in README")
-        self.assert_refused_unchanged("v1.0.0-2", says="the overlay now modifies README.md")
-        self.assertEqual("readme\nprivate line\n", (self.cand / "README.md").read_text())
+        path = "Rivulet/Localizable.xcstrings"
+        self.commit(self.cand, {path: '{"strings": {"private": {}}}\n'}, "a private upstream-catalog key")
+        self.assert_refused_unchanged("v1.0.0-2", says=f"the overlay now modifies {path}")
+        self.assertEqual('{"strings": {"private": {}}}\n', (self.cand / path).read_text())
 
     def test_claude_md_with_a_private_line_inside_upstreams_text_refuses_before_merging(self):
         self.commit(self.cand, {"CLAUDE.md": self.BLOCK + "# Upstream\n\nText.\nprivate\n"}, "private line")

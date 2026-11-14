@@ -93,7 +93,7 @@ final class LiveTVSourceConnectorTests: XCTestCase {
         MockURLProtocol.mockHTTPError(url: m3u, statusCode: 401)
         let request = try connector.serverRequest(address: "server.test:9191", username: "", password: "",
                                                   channelProfile: "")
-        await assertThrows(source("That server refused Rivulet.")) {
+        await assertThrows(source("That server refused Reference Player.")) {
             try await connector.connect(request, name: "")
         }
     }
@@ -147,7 +147,7 @@ final class LiveTVSourceConnectorTests: XCTestCase {
         let request = try LiveTVSourceConnector.playlistRequest(m3uURL: playlist.absoluteString, epgURL: "")
 
         MockURLProtocol.mockHTTPError(url: playlist, statusCode: 403)
-        await assertThrows(source("That server refused Rivulet.")) { try await connector.connect(request, name: "") }
+        await assertThrows(source("That server refused Reference Player.")) { try await connector.connect(request, name: "") }
 
         MockURLProtocol.mockHTTPError(url: playlist, statusCode: 404)
         await assertThrows(source("Couldn't reach that server. Check the address and port.")) {

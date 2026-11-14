@@ -28,10 +28,9 @@ RECORD = "PrivateBuild/footprint.json"
 # the footprint (checked here) and sync.py refuses to merge while one differs from the baseline (it
 # never overwrites one). The one definition of the list; sync.py reads it from this module. Each once
 # carried private lines that were moved out on purpose: the five catalog keys (now Private.xcstrings),
-# README's private lines (now CLAUDE-private.md), and four upstream test files restored to upstream's.
+# and four upstream test files restored to upstream's. README.md now belongs to the fork's branding.
 # A path that needs a private line again leaves this list in the same commit.
 MUST_EQUAL_UPSTREAM = (
-    "README.md",
     "Rivulet/Localizable.xcstrings",
     "RivuletTests/Unit/DolbyVisionPlaybackTests.swift",
     "RivuletTests/Unit/SettingsUsageTelemetryTests.swift",
