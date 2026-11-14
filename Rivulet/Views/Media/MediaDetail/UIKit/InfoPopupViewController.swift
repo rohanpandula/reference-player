@@ -535,7 +535,7 @@ enum InfoPopupContent {
     /// holds focus). Present content-sized.
     static func changelog(_ entries: [(version: String, features: [String])]) -> UIView {
         let stack = verticalStack(spacing: 8)
-        stack.addArrangedSubview(label(String(localized: "What's New"), size: 44, weight: .bold, color: .white, lines: 1))
+        stack.addArrangedSubview(label(String(localized: "Upstream Release History", table: "Private"), size: 44, weight: .bold, color: .white, lines: 1))
         for (i, entry) in entries.enumerated() {
             if i > 0, let last = stack.arrangedSubviews.last { stack.setCustomSpacing(40, after: last) }
             let ver = label(String(localized: "Version \(entry.version)"), size: 22, weight: .regular, color: .white.withAlphaComponent(0.5), lines: 1)
@@ -581,7 +581,7 @@ enum InfoPopupContent {
     /// Present with `scrollable: true` — Up/Down pages, Select/Menu dismiss.
     static func changelogHistory(_ entries: [(version: String, features: [String])]) -> UIView {
         let stack = verticalStack(spacing: 8)
-        stack.addArrangedSubview(label(String(localized: "Changelog"), size: 44, weight: .bold, color: .white, lines: 1))
+        stack.addArrangedSubview(label(String(localized: "Upstream Release History", table: "Private"), size: 44, weight: .bold, color: .white, lines: 1))
         for entry in entries {
             if let last = stack.arrangedSubviews.last { stack.setCustomSpacing(40, after: last) }
             let ver = label(String(localized: "Version \(entry.version)"), size: 27, weight: .semibold, color: .white.withAlphaComponent(0.92), lines: 1)

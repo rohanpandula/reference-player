@@ -1,6 +1,6 @@
 workflows:
   rivulet-tvos-testflight:
-    name: Rivulet tvOS → TestFlight
+    name: Reference Player tvOS → TestFlight
     instance_type: mac_mini_m2
     max_build_duration: 90
 
@@ -15,7 +15,7 @@ workflows:
         XCODE_PROJECT: "Rivulet.xcodeproj"
         BUNDLE_ID: "com.gstudios.rivulet"
         APP_STORE_APPLE_ID: 6756892857
-        RELEASE_ASSET: "Rivulet.ipa"
+        RELEASE_ASSET: "ReferencePlayer.ipa"
       # Keep this the Xcode you build with locally; the GitHub build checks
       # read it. Older compilers time out type-checking code newer ones accept.
       xcode: 27.2
@@ -167,7 +167,7 @@ workflows:
           # Whichever platform finishes first creates the release; the other uploads to it.
           GH_TOKEN="$GITHUB_TOKEN" gh release create "$CM_TAG" \
             --repo "$CM_REPO_SLUG" \
-            --title "Rivulet $CM_TAG" \
+            --title "Reference Player $CM_TAG" \
             --generate-notes \
             --latest \
             "$ASSET" \
@@ -187,7 +187,7 @@ workflows:
           - Rivulet External Plex Forum
 
   rivulet-ios-testflight:
-    name: Rivulet iOS → TestFlight
+    name: Reference Player iOS → TestFlight
     instance_type: mac_mini_m2
     max_build_duration: 90
 
@@ -202,7 +202,7 @@ workflows:
         XCODE_PROJECT: "Rivulet.xcodeproj"
         BUNDLE_ID: "com.gstudios.rivulet"
         APP_STORE_APPLE_ID: 6756892857
-        RELEASE_ASSET: "Rivulet-iOS.ipa"
+        RELEASE_ASSET: "ReferencePlayer-iOS.ipa"
       xcode: 27.2
 
     # One vX.Y.Z-<build> tag releases tvOS, iOS and macOS together.
@@ -326,7 +326,7 @@ workflows:
           - Rivulet External Plex Forum
 
   rivulet-macos-testflight:
-    name: Rivulet macOS → TestFlight
+    name: Reference Player macOS → TestFlight
     instance_type: mac_mini_m2
     max_build_duration: 90
 
@@ -341,7 +341,7 @@ workflows:
         XCODE_PROJECT: "Rivulet.xcodeproj"
         BUNDLE_ID: "com.gstudios.rivulet"
         APP_STORE_APPLE_ID: 6756892857
-        ARCHIVE_PATH: "build/macos/Rivulet.xcarchive"
+        ARCHIVE_PATH: "build/macos/ReferencePlayer.xcarchive"
       xcode: 27.2
 
     # Same App Store record, bundle id and release tag as tvOS and iOS.
@@ -455,7 +455,7 @@ workflows:
             -archivePath "$CM_BUILD_DIR/$ARCHIVE_PATH" \
             -onlyUsePackageVersionsFromResolvedFile \
             2>&1 | tee /tmp/xcodebuild_logs/archive.log | grep -E "error:|\*\* ARCHIVE" || true
-          test -d "$CM_BUILD_DIR/$ARCHIVE_PATH/Products/Applications/Rivulet.app"
+          test -d "$CM_BUILD_DIR/$ARCHIVE_PATH/Products/Applications/Reference Player.app"
 
       # build-ipa can't be used: it fails when the export holds a .pkg, not an .ipa.
       - name: Export signed installer package
@@ -495,7 +495,7 @@ workflows:
 
     artifacts:
       - build/macos/pkg/*.pkg
-      - build/macos/Rivulet.xcarchive/dSYMs/**/*
+      - build/macos/ReferencePlayer.xcarchive/dSYMs/**/*
       - /tmp/xcodebuild_logs/*.log
 
     publishing:

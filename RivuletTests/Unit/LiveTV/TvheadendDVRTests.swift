@@ -97,6 +97,7 @@ final class TvheadendDVRTests: XCTestCase {
                                                   newOnly: false)
         XCTAssertEqual(conf["title"] as? String, "^Who Wants to Be a Millionaire\\?$")
         XCTAssertEqual(conf["channel"] as? String, "c")
+        XCTAssertEqual(conf["comment"] as? String, "Reference Player")
         XCTAssertEqual(conf["btype"] as? Int, 0)
         XCTAssertEqual(TvheadendService.titleRuleConf(title: "A", channelUUID: "c", newOnly: true)["btype"] as? Int, 3)
     }

@@ -37,3 +37,18 @@ saved preferences and dynamic Top Shelf content are unchanged.
 
 Run `python3 PrivateBuild/check.py --all` after changing the integration. Inspect the exported
 artwork and check the focused icon/parallax on a physical Apple TV before release.
+
+## App name
+
+The built apps, their menus and current interface copy use **Reference Player**. Each platform's
+`Private.xcstrings` keeps the fork's copy and the existing German, Greek and French translations;
+upstream's `Localizable.xcstrings` stays untouched. No replacement runs over media or server names.
+
+Source folders, Swift modules, targets, saved-data keys and protocol identifiers retain their
+upstream spelling. In particular, changing the product filename must not change `PRODUCT_MODULE_NAME`,
+which can affect persisted Swift type identities. Legal notices and clearly labelled upstream
+release history retain their original attribution.
+
+The Home Assistant example uses the new display name but preserves its existing entity address
+with [`default_entity_id`](https://www.home-assistant.io/integrations/template/#default_entity_id)
+and its existing unique ID, so the supplied dashboard continues to find it.

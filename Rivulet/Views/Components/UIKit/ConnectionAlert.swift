@@ -67,7 +67,7 @@ enum ConnectionAlert {
         let name = PlexAuthManager.shared.savedServerName ?? String(localized: "your Plex server")
         let popup = ConfirmationPopupViewController(
             title: String(localized: "Can't Reach Your Server"),
-            message: String(localized: "Rivulet can't connect to \(name). Check that the server is running and your network is connected. Recently loaded content is still available to browse."),
+            message: String(localized: "Reference Player can't connect to \(name). Check that the server is running and your network is connected. Recently loaded content is still available to browse.", table: "Private"),
             confirmTitle: String(localized: "Retry"),
             cancelTitle: String(localized: "OK"),
             onConfirm: { retryConnection(from: presenter, then: retry) }

@@ -118,7 +118,7 @@ extension TvheadendService {
         ["title": "^" + NSRegularExpression.escapedPattern(for: title) + "$",
          "channel": channelUUID,
          "enabled": 1,
-         "comment": "Rivulet",
+         "comment": PrivateBuildPolicy.productName,
          "btype": newOnly ? newOnlyBroadcastType : 0]
     }
 

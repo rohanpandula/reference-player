@@ -244,7 +244,7 @@ enum JellyfinSession {
         case JellyfinSignInError.notJellyfin:
             String(localized: "That address isn't a Jellyfin server. Check the port. An Emby server signs in under Emby Server.")
         case JellyfinSignInError.serverTooOld(let version):
-            String(localized: "This server runs Jellyfin \(version). Rivulet needs \(minimumVersion.major).\(minimumVersion.minor) or newer.")
+            String(localized: "This server runs Jellyfin \(version). Reference Player needs \(minimumVersion.major).\(minimumVersion.minor) or newer.", table: "Private")
         case JellyfinSignInError.untrustedCertificate:
             String(localized: "This server's HTTPS certificate isn't trusted. Try its http:// address.")
         case MediaProviderError.unauthorized:

@@ -55,7 +55,7 @@ struct MacWhatsNewView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("What's New").font(.largeTitle.bold())
+            Text(String(localized: "Upstream Release History", table: "Private")).font(.largeTitle.bold())
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     ForEach(versions, id: \.self) { version in

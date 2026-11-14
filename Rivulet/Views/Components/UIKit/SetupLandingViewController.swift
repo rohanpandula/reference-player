@@ -42,7 +42,7 @@ final class SetupLandingViewController: UIViewController {
         view.addSubview(glow)
 
         let title = UILabel()
-        title.text = String(localized: "Welcome to Rivulet")
+        title.text = String(localized: "Welcome to Reference Player", table: "Private")
         title.font = .systemFont(ofSize: 57, weight: .bold)
         title.textColor = .white
         let subtitle = UILabel()

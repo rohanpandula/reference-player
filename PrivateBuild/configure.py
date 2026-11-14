@@ -218,16 +218,22 @@ def _project(text: str, old: dict, new: dict) -> str:
     _need(Counter((m[1], m[2]) for m in found) ==
           Counter((configuration, target) for configuration in ("Debug", "Release")
                   for target in target_suffixes), "Source drift in target configuration blocks.")
+    modules = {"Rivulet": "Rivulet", "Rivulet iOS": "Rivulet_iOS", "Rivulet Mac": "Rivulet_Mac"}
     for configuration in found:
         target = configuration[2]
         identifiers = [_unquote(m[2]) for m in bundle.finditer(configuration[3])]
         _need(identifiers == [old["bundle_id"] + target_suffixes[target]],
               f"Bundle ID is attached to the wrong target: {target} {configuration[1]}.")
+        if target in modules:
+            # Product filenames change; module names must not change persisted Swift type identities.
+            _need('PRODUCT_NAME = "Reference Player";' in configuration[3]
+                  and f'PRODUCT_MODULE_NAME = {modules[target]};' in configuration[3],
+                  f"App product/module name drift: {target} {configuration[1]}.")
     mapping = {value: new["bundle_id"] + value[len(old["bundle_id"]):] for value in expected}
     text = bundle.sub(lambda m: f'{m[1]}{mapping[_unquote(m[2])]}{m[3]}', text)
     display = re.compile(r"^[ \t]*INFOPLIST_KEY_CFBundleDisplayName = ([^;\n]+);[ \t]*$", re.MULTILINE)
     _need(Counter(_unquote(m[1]) for m in display.finditer(text)) ==
-          Counter({old["display_name"]: 4, "TopShelfExtension": 2, "AssetPackExtension": 2}),
+          Counter({old["display_name"]: 6, "TopShelfExtension": 2, "AssetPackExtension": 2}),
           "Source drift in target display names.")
     text = display.sub(lambda m: m[0] if _unquote(m[1]) in ("TopShelfExtension", "AssetPackExtension")
                        else m[0].replace(m[1], f'"{new["display_name"]}"'), text)
@@ -243,6 +249,9 @@ def _edits(raw: dict[str, bytes], modes: dict[str, int], old: dict, new: dict) -
     except UnicodeError as exc:
         raise ConfigurationError("An identity source file is not valid UTF-8.") from exc
     texts[PROJECT] = _project(texts[PROJECT], old, new)
+    for name in (TV_INFO, IOS_INFO, MAC_INFO):
+        _need(_plist(texts[name], name).get("CFBundleName") == "$(INFOPLIST_KEY_CFBundleDisplayName)",
+              f"Bundle/menu name no longer follows the configured display name in {name}.")
     for name in ENTITLEMENTS:
         values = _plist(texts[name], name)
         _need(values.get("com.apple.security.application-groups") == [old["app_group"]],

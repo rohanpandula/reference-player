@@ -446,7 +446,7 @@ final class IOSDownloadCenter: ObservableObject {
             if status == 404 { forgetConversion(id) }
             if let reason = DownloadRules.failureReason(httpStatus: status, kind: .plex) { fail(id, reason) } else { set(id, .waitingForServer) }
         } catch PlexAPIError.parsingError {
-            fail(id, String(localized: "The server sent a response Rivulet couldn't read"))
+            fail(id, String(localized: "The server sent a response Reference Player couldn't read", table: "Private"))
         } catch {
             set(id, .waitingForServer)
         }

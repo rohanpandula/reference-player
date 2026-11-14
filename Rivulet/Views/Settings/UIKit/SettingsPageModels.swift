@@ -761,7 +761,7 @@ enum SettingsContent {
                     guard !isOn else { return }
                     vc.present(ConfirmationPopupViewController(
                         title: String(localized: "Erase What For You Learned?"),
-                        message: String(localized: "Suggestions are off. Erase what Rivulet learned from what you watch, or keep it for if you turn them back on."),
+                        message: String(localized: "Suggestions are off. Erase what Reference Player learned from what you watch, or keep it for if you turn them back on.", table: "Private"),
                         confirmTitle: String(localized: "Erase"), cancelTitle: String(localized: "Keep"), destructive: true,
                         onConfirm: { LiveTVDataStore.shared.forgetViewings() }), animated: true)
                 })),
@@ -1580,7 +1580,7 @@ enum SettingsContent {
         let version = "\(short) (\(build))"
         return [
             SettingsRowItem(id: "about_version", title: "Version", kind: .info(value: { version })),
-            SettingsRowItem(id: "changelog", title: "Changelog", kind: .action(destructive: false, handler: { vc in
+            SettingsRowItem(id: "changelog", verbatim: String(localized: "Upstream Release History", table: "Private"), kind: .action(destructive: false, handler: { vc in
                 presentChangelog(on: vc)
             })),
             SettingsRowItem(id: "licensesLegal", title: "Licenses & Legal", kind: .action(destructive: false, handler: { vc in

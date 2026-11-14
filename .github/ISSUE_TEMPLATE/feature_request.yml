@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        **Saw a shiny new [AetherEngine](https://github.com/superuser404notfound/AetherEngine/releases) release?** I probably did too. It'll be in Rivulet within a week. Please give it 7 days before filing a "can we get the new AetherEngine thing" request. Thanks!
+        This repository is for Reference Player. Include the app version and the platform you use.
 
   - type: checkboxes
     id: search-check

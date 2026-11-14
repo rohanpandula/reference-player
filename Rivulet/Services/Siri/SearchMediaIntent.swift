@@ -14,7 +14,7 @@ import Foundation
 
 struct SearchMediaIntent: AppIntent {
     static var title: LocalizedStringResource = "Search Media"
-    static var description = IntentDescription("Search for movies and TV shows on Rivulet")
+    static var description = IntentDescription(LocalizedStringResource("Search for movies and TV shows on Reference Player", table: "Private"))
     static var openAppWhenRun: Bool = false
 
     @Parameter(title: "Query")
@@ -24,7 +24,7 @@ struct SearchMediaIntent: AppIntent {
     func perform() async throws -> some IntentResult & ReturnsValue<[MediaItemEntity]> & ProvidesDialog {
         guard let serverURL = PlexAuthManager.shared.selectedServerURL,
               let token = PlexAuthManager.shared.selectedServerToken else {
-            return .result(value: [], dialog: "Please sign in to Rivulet first")
+            return .result(value: [], dialog: IntentDialog(LocalizedStringResource("Please sign in to Reference Player first", table: "Private")))
         }
 
         do {

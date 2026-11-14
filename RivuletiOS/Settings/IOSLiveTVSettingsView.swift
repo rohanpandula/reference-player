@@ -309,7 +309,7 @@ private struct IOSLiveXtreamForm: View {
             Section {
                 IOSFormField("Server", text: $address, prompt: "http://provider.example:8080", kind: .url)
             } footer: {
-                Text("The server address from your provider, with its port. You can also paste a get.php link: Rivulet fills in the username and password from it.")
+                Text(String(localized: "The server address from your provider, with its port. You can also paste a get.php link: Reference Player fills in the username and password from it.", table: "Private"))
             }
             Section {
                 IOSFormField("Username", text: $username, prompt: "Required", kind: .username)

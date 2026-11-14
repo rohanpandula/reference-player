@@ -18,7 +18,9 @@ template:
           - POST
         local_only: true
     sensor:
-      - name: "Rivulet playback"
+      - name: "Reference Player playback"
+        # Keep the existing dashboard/entity address when the display name changes.
+        default_entity_id: sensor.rivulet_playback
         unique_id: rivulet_playback
         icon: mdi:apple
         state: "{{ trigger.json.get('state') or 'unknown' }}"

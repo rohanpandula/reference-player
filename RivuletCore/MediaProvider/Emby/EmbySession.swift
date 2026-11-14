@@ -233,7 +233,7 @@ enum EmbySession {
         case EmbySignInError.notEmby:
             return String(localized: "That address isn't an \(name) server. Check the port. A Jellyfin server signs in under Jellyfin Server.")
         case EmbySignInError.serverTooOld:
-            return String(localized: "Rivulet needs \(name) Server \(floor.major).\(floor.minor).\(floor.patch) or newer.")
+            return String(localized: "Reference Player needs \(name) Server \(floor.major).\(floor.minor).\(floor.patch) or newer.", table: "Private")
         case EmbySignInError.untrustedCertificate:
             return String(localized: "This server's HTTPS certificate isn't trusted. Try its http:// address.")
         case EmbySignInError.invalidCredentials, MediaProviderError.unauthorized:

@@ -74,7 +74,7 @@ class CheckPrivateStringsTests(unittest.TestCase):
 
     def test_a_key_nothing_uses_fails(self):
         # Untranslated, a sync drops it; translated (Height Speakers has German), a sync marks it stale.
-        for key in ("Check Keys", "Height Speakers"):
+        for key in ("Check Keys", "Height Speakers", "Reference Player needs %@ Server %lld.%lld.%lld or newer."):
             with self.subTest(key=key):
                 self.setUp()
                 self.edit(lambda tables: tables.__setitem__("Private", [e for e in tables["Private"] if e["key"] != key]))

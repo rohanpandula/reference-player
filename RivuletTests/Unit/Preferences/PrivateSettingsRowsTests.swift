@@ -236,7 +236,7 @@ final class PrivateSettingsRowsTests: XCTestCase {
             ("homeAssistant", "house.fill", "Tells Home Assistant what is playing and how: codec, resolution, Dolby Vision route, audio format and height rendering. Off sends nothing."),
             ("ha_enabled", "house.fill", "Posts a report when playback starts, changes or stops, and every ten seconds while it plays. Reports go to the address below, so give it Home Assistant's local address."),
             ("ha_address", "network", "Where Home Assistant answers on your network, with its port. With no address, nothing is sent."),
-            ("ha_webhook", "key.horizontal", "The webhook id Home Assistant listens on. Put the same id in its rivulet_playback package; clear it to make a new one."),
+            ("ha_webhook", "key.horizontal", "The webhook id Home Assistant listens on. Put the same id in its playback integration package; clear it to make a new one."),
             ("ha_test", "paperplane", "Sends one test report now and says whether Home Assistant accepted it."),
             ("metadataKeys", "key.horizontal.fill", "Discover, recommendations and scores come from TMDB and MDBList with your own free keys. Without a key nothing is fetched from them. Your server's details show either way."),
             ("mk_tmdb", "film", "Your TMDB API Key or Read Access Token (themoviedb.org, Settings, API). It turns on Discover, recommendations and actor biographies. Reopen the app after."),
