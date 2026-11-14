@@ -1,13 +1,13 @@
 {
   "baseline": "eabb7cf7833e6d1bb92d6fad116cb38a47305a0a",
-  "totals": {"files": 85, "added": 771, "removed": 427},
+  "totals": {"files": 85, "added": 773, "removed": 427},
   "files": {
     ".github/ISSUE_TEMPLATE/bug_report.yml": [1, 1],
     ".github/ISSUE_TEMPLATE/feature_request.yml": [1, 1],
     ".github/workflows/build-ios.yml": [1, 1],
     ".github/workflows/build-mac.yml": [1, 1],
     ".github/workflows/build-tvos-core.yml": [1, 1],
-    ".gitignore": [6, 0],
+    ".gitignore": [8, 0],
     "AssetPackExtension/AssetPackExtension.entitlements": [1, 1],
     "CHANGELOG.md": [5, 4],
     "CLAUDE.md": [3, 0],

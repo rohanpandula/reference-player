@@ -214,7 +214,8 @@ PRIVATE_SWIFT = (
     "Rivulet/Views/Settings/UIKit/PrivateSettingsContent.swift", "RivuletCore/Config/PrivateBuildPolicy.swift",
     "RivuletCore/Integrations/DeviceIdentity.swift", "RivuletCore/Integrations/DirectMetadata.swift",
     "RivuletCore/Integrations/FormatIndex.swift", "RivuletCore/Integrations/FormatTagBadges.swift",
-    "RivuletCore/Integrations/HomeAssistantReporter.swift", "RivuletCore/Playback/SpatialBridgeLogReader.swift",
+    "RivuletCore/Integrations/HomeAssistantReporter.swift", "RivuletCore/Integrations/PersonalDefaults.swift",
+    "RivuletCore/Playback/SpatialBridgeLogReader.swift",
 )
 SHARED_WORDS = ("On", "Off", "OK")   # upstream's catalog owns these; private code keeps upstream's key and table
 # funnel call -> the labels that take a `String.LocalizationValue` (a bare literal there is extracted to Localizable)

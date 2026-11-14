@@ -116,5 +116,7 @@ Screenshots/AppStore/*
 # Reference Player build artifacts and local captures (PrivateBuild/); never commit credentials or logs.
 PrivateBuild/.build/
 PrivateBuild/captures/
+# A builder's own integration addresses, bundled into their build only (PrivateBuild/PersonalDefaults.example.plist).
+Rivulet/PersonalDefaults.plist
 __pycache__/
 *.pyc
