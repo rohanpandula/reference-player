@@ -48,7 +48,9 @@ allows. Working rules:
   before a change is committed. Never commit a real team ID or bundle prefix.
 - Nothing the app contacts is built in beyond the user's own media servers: the format index URL and
   the Home Assistant address are empty until a user sets them, and Format Tags and Home Assistant
-  reporting start off.
+  reporting start off. A builder's own values go in the gitignored `Rivulet/PersonalDefaults.plist`
+  (template: `PrivateBuild/PersonalDefaults.example.plist`); `PersonalDefaults.seed` fills them into
+  Settings once per set of values. Never commit that file or put its values in tracked source.
 - Review every added or changed block adversarially. Do not turn failures into passing tests by
   deleting assertions. Keep the overlay small and commented; prefer code or a focused test over a new
   abstraction.

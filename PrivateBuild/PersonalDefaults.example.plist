@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Copy to Rivulet/PersonalDefaults.plist (gitignored) and fill in. Your build then fills these into
+     Settings on its first launch and turns the integration on; leave a value empty to skip it.
+     The file ships inside your app bundle, so never share a build made with it. -->
+<plist version="1.0">
+<dict>
+	<key>formatIndexURL</key>
+	<string></string>
+	<key>homeAssistantAddress</key>
+	<string></string>
+	<key>homeAssistantWebhookID</key>
+	<string></string>
+</dict>
+</plist>

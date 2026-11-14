@@ -112,6 +112,11 @@ portal. Before committing a change, `python3 PrivateBuild/configure.py --placeho
 repository's placeholder identifiers back. `python3 PrivateBuild/check.py --all` runs every check,
 including the full tvOS test suite and the iOS and Mac builds.
 
+To skip typing your format index URL and Home Assistant address with the remote, copy
+`PrivateBuild/PersonalDefaults.example.plist` to `Rivulet/PersonalDefaults.plist` (gitignored) and fill
+it in: the Apple TV app fills those values into Settings on its first launch and turns the
+integration on. The file ships inside the app you build, so do not share that build.
+
 ## Where things are
 
 The root `README.md` and issue templates describe Reference Player. User-facing app text and built
