@@ -7,6 +7,8 @@ This is not the original app. It is not affiliated with or endorsed by Rivulet's
 App Store and TestFlight builds are upstream's, not this fork's, and upstream's support channels are
 for upstream's app. Questions about this fork belong in this repository.
 
+![Reference Player's first-run screen on Apple TV: sign in to Plex, Jellyfin or Emby, or add a Live TV source](images/welcome.jpg)
+
 ## The idea
 
 The name states the aim: a reference player plays what is in the file. This fork tries to keep a
@@ -20,13 +22,16 @@ badges are there to tell you what a file is, and none of upstream's hosted servi
 Where Apple's platform forces a conversion, the app should say so plainly and never label the result
 as more than it is. The limits are just as plain: Apple TV cannot pass the original audio bitstream
 to a receiver, so the receiver's own decoder is not used; the rendered channels have not been shown
-to match a receiver's decoding; and nothing here has yet been checked on a physical Apple TV by this
-fork's author. This is a goal the fork is held to, not a claim that it has been reached or measured.
+to match a receiver's decoding; and on a physical Apple TV this fork's author has so far only timed
+the FEL route ([FEL on real hardware](#fel-on-real-hardware)), not checked the picture or the sound.
+This is a goal the fork is held to, not a claim that it has been reached.
 
 ## What it adds
 
 The settings below are in the Apple TV app only. The iPhone, iPad and Mac apps build from the same
 tree and also refuse upstream's hosted services, but have none of these settings.
+
+![Settings > Playback on Apple TV, with Dolby Vision FEL and Height Speakers under Home Theater](images/playback-settings.jpg)
 
 - **Dolby Vision Profile 7 FEL.** For a Profile 7 title with a full enhancement layer (FEL), the
   playback engine can decode the base and enhancement layers and compose them itself (its dual-layer
@@ -48,8 +53,10 @@ tree and also refuse upstream's hosted services, but have none of these settings
     composition fails.
   - The player's Details tab shows which of these happened, from what the engine reported: Dual
     Layer (FEL), Profile 8.1 (converted) or HDR10 Base Layer.
-  - It is demanding on older Apple TV hardware. Simulator and Debug builds say nothing about it.
-  - Like everything here, it has not yet been checked on a physical Apple TV by this fork's author.
+  - It is demanding on older Apple TV hardware. Simulator and Debug builds say nothing about it;
+    [FEL on real hardware](#fel-on-real-hardware) has timings from two Apple TVs.
+  - Whether the TV then shows the composed picture correctly has not yet been checked by this fork's
+    author.
 - **Height speakers for TrueHD Atmos and DTS:X.** Settings > Playback > Height Speakers picks a
   layout (5.1.2, 5.1.4, 7.1.2, 7.1.4 or 9.1.6). With one set, an object soundtrack keeps its height
   channels, rendered by the playback engine into that layout and sent as lossless PCM over HDMI. It
@@ -80,6 +87,53 @@ tree and also refuse upstream's hosted services, but have none of these settings
 - **Tooling to follow upstream releases**: `PrivateBuild/sync.py` merges an upstream release tag and
   does the mechanical part, and `PrivateBuild/check.py` runs every check.
 
+## FEL on real hardware
+
+A rough benchmark from two Apple TVs, not a lab measurement. On 2026-11-12 and 2026-11-13 the same
+UHD Blu-ray remux (3840x2160 at 23.976 fps, Dolby Vision Profile 7 FEL) was played through the
+dual-layer route on each, with Release builds on AetherEngine 7.61.0. The engine logs how long the
+GPU took to compose each frame from the two decoded layers, averaged over windows of 120 frames, and
+`PrivateBuild/felbench.py` summarises those lines.
+
+| | Apple TV 4K (2nd generation) | Apple TV 4K (4th generation) |
+| --- | --- | --- |
+| Model and system | AppleTV11,1, tvOS 27.2 | AppleTV18,1, tvOS 27.0 |
+| GPU time per composed frame, median | 13.1 ms | 6.5 ms |
+| Fastest and slowest window | 12.5 and 18.7 ms | 5.3 and 10.9 ms |
+| Median as a share of the 41.7 ms each frame lasts | 31% | 16% |
+| Windows timed | 23 (2,760 frames) | 16 (1,920 frames) |
+| Frames composed, at the engine's last count | 2,569 | 1,785 |
+| Frames sent as base layer only | 0 | 0 |
+| Frames lost before the display layer, or dropped by it | 0 | 0 |
+| Rebuffering | none | none |
+
+What it does and does not show:
+
+- The newer Apple TV composed a frame in about half the time. This is the GPU step only: decoding
+  the two HEVC layers is not in the number.
+- The runs are not matched. The 2nd-generation run played the first 1 minute 56 seconds straight
+  through. The 4th-generation run started at the beginning, skipped forward five times by 30 seconds
+  and ended 3 minutes 47 seconds in, and the engine skipped 6 frames that arrived late around those
+  skips. The two app builds differed, on the same engine version.
+- One film is not the worst case. A second FEL title on the 2nd-generation Apple TV had a median of
+  15.8 ms over 4 windows, and its display layer dropped 3 of 553 frames.
+- Neither run checked the picture on the TV. This times composition. It does not show that the TV
+  displayed Dolby Vision.
+
+To measure your own Apple TV, launch your build with the engine's debug lines on (the TV must be
+awake), play a Profile 7 FEL title from the beginning for two minutes without skipping, quit the app,
+and summarise the log:
+
+```bash
+xcrun devicectl device process launch --device "<your Apple TV's name>" --console --terminate-existing \
+  --environment-variables '{"OS_ACTIVITY_DT_MODE":"YES","OS_ACTIVITY_MODE":"debug"}' \
+  com.yourname.referenceplayer > fel.log
+python3 PrivateBuild/felbench.py fel.log
+```
+
+Keep one film per log. Without a Dolby Vision TV the app does not ask for the route, and the script
+says the log holds no FEL timing.
+
 ## Status
 
 - It builds, and its unit tests pass on the tvOS simulator: 3,536 of 3,536 tvOS unit tests and 169
@@ -87,7 +141,9 @@ tree and also refuse upstream's hosted services, but have none of these settings
   machine that ran them (upstream pins Xcode 27.2 in `codemagic.yaml`). The checks also built the
   tvOS app in Release for a real Apple TV and compiled the iOS and Mac apps in their default
   configuration.
-- Playback features have not yet been checked by this fork's author on a physical Apple TV.
+- On a physical Apple TV, the FEL route has been run and timed on two models
+  ([FEL on real hardware](#fel-on-real-hardware)). The picture on the TV, the height speakers and
+  the other playback features have not yet been checked there by this fork's author.
 - No binaries are provided. You build it yourself, signed with your own Apple developer account.
 
 ## Build
