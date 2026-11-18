@@ -60,8 +60,6 @@ final class MediaItemDetailPageViewController: UIViewController {
     private let dateRow = UIStackView()
     private let dateLabel = UILabel()
     private let badgeRow = UIStackView()
-    /// The detail the badge row was built from, kept so a format-index change can rebuild it.
-    private var detail: MediaItemDetail?
     private var playButton: FocusableActionButton?
     private weak var lastFocusedHeroButton: FocusableActionButton?
     /// The Play pill's own label, held so a post-playback refresh can flip
