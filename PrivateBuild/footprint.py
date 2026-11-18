@@ -32,7 +32,6 @@ RECORD = "PrivateBuild/footprint.json"
 # A path that needs a private line again leaves this list in the same commit.
 MUST_EQUAL_UPSTREAM = (
     "Rivulet/Localizable.xcstrings",
-    "RivuletTests/Unit/DolbyVisionPlaybackTests.swift",
     "RivuletTests/Unit/SettingsUsageTelemetryTests.swift",
     "RivuletTests/Unit/TMDBDiscoverServiceTests.swift",
     "RivuletTests/Unit/TMDBLogoCacheTests.swift",

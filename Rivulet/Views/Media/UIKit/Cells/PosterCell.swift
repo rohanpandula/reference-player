@@ -80,15 +80,13 @@ final class PosterCell: UICollectionViewCell {
     private static let blankMusicArtwork = blank(for: MediaRowMetrics.music)
 
     static func blank(for tile: MediaRowMetrics.Tile) -> UIImage {
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = 1
-        return UIGraphicsImageRenderer(size: tile.art, format: format).image { _ in }
+        UIGraphicsImageRenderer(size: tile.art, format: .layeredArtwork(scale: 1)).image { _ in }
     }
 
     private var tileBlankArtwork: UIImage { tile.art == MediaRowMetrics.music.art ? Self.blankMusicArtwork : Self.blankArtwork }
 
-    /// The system image corner on tvOS 26.
-    private let cornerRadius: CGFloat = 20
+    /// The poster corner, drawn into the artwork (`RoundedPoster`).
+    private let cornerRadius = RoundedPoster.cornerRadius
     /// The tile the cell shows; the host view is TVUIKit's focused size (`hostSize`).
     private var tile = MediaRowMetrics.poster
 
@@ -396,7 +394,8 @@ final class PosterCell: UICollectionViewCell {
         currentURL = url
         // Memory hit paints in this pass, so a tile realized for a carousel
         // exit has artwork to fly to.
-        if let cached = ImageCacheManager.shared.cachedImage(for: url) {
+        let shape = RoundedPoster.Shape(tile: tile, scale: traitCollection.displayScale)
+        if let cached = RoundedPoster.cached(for: url, shape: shape) {
             posterView.image = cached
             hasArtwork = true
             hidePlaceholder()
@@ -409,7 +408,7 @@ final class PosterCell: UICollectionViewCell {
         let key = url.absoluteString as AnyHashable
         imageLoadTask = Task { [weak self] in
             let image: UIImage? = await Perf.interval(.imageDecode, key: key) {
-                await ImageCacheManager.shared.image(for: url)
+                await RoundedPoster.image(for: url, shape: shape)
             }
             await MainActor.run {
                 guard let self, self.currentURL == url else { return }

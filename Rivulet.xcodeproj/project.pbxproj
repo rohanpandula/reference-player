@@ -14,6 +14,8 @@
 		B2000001AAAA000000000001 /* AetherEngine in Frameworks */ = {isa = PBXBuildFile; productRef = B2000010AAAA000000000001 /* AetherEngine */; };
 		B2000001AAAA000000000002 /* Libass in Frameworks */ = {isa = PBXBuildFile; productRef = B2000010AAAA000000000002 /* Libass */; };
 		B2000001AAAA000000000004 /* SwiftDraw in Frameworks */ = {isa = PBXBuildFile; productRef = B2000010AAAA000000000004 /* SwiftDraw */; };
+		B2000001AAAA000000000005 /* OpenWatchParty in Frameworks */ = {isa = PBXBuildFile; productRef = B2000010AAAA000000000005 /* OpenWatchParty */; };
+		B30000240000000000000024 /* OpenWatchParty in Frameworks */ = {isa = PBXBuildFile; productRef = B2000010AAAA000000000005 /* OpenWatchParty */; };
 		B2000001AAAA000000000003 /* FluidAudio in Frameworks */ = {isa = PBXBuildFile; productRef = B2000010AAAA000000000003 /* FluidAudio */; };
 		B30000190000000000000019 /* AetherEngine in Frameworks */ = {isa = PBXBuildFile; productRef = B2000010AAAA000000000001 /* AetherEngine */; };
 		B30000210000000000000021 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = A7F159542F04124A001B2177 /* Sentry */; };
@@ -22,6 +24,7 @@
 		D5000001000000000000000A /* AetherEngine in Frameworks */ = {isa = PBXBuildFile; productRef = B2000010AAAA000000000001 /* AetherEngine */; };
 		D5000001000000000000000B /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = A7F159542F04124A001B2177 /* Sentry */; };
 		D5000001000000000000000C /* SwiftDraw in Frameworks */ = {isa = PBXBuildFile; productRef = B2000010AAAA000000000004 /* SwiftDraw */; };
+		D5000001000000000000000D /* OpenWatchParty in Frameworks */ = {isa = PBXBuildFile; productRef = B2000010AAAA000000000005 /* OpenWatchParty */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +49,8 @@
 			remoteGlobalIDString = C40000040000000000000004;
 			remoteInfo = AssetPackExtension;
 		};
+		E60100000000000000000003 = {isa = PBXContainerItemProxy; containerPortal = A72E03D22EDA297D003A73DA; proxyType = 1; remoteGlobalIDString = B30000040000000000000004; remoteInfo = "Rivulet iOS"; };
+		E60200000000000000000003 = {isa = PBXContainerItemProxy; containerPortal = A72E03D22EDA297D003A73DA; proxyType = 1; remoteGlobalIDString = D50000040000000000000004; remoteInfo = "Rivulet Mac"; };
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -78,6 +83,8 @@
 		B30000010000000000000001 /* Reference Player.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Reference Player.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C40000020000000000000002 /* AssetPackExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = AssetPackExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D50000010000000000000001 /* Reference Player.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Reference Player.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E60100000000000000000002 /* RivuletiOSPlaybackTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = RivuletiOSPlaybackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E60200000000000000000002 /* RivuletMacPlaybackTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = RivuletMacPlaybackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -179,6 +186,7 @@
 			path = RivuletMac;
 			sourceTree = "<group>";
 		};
+		E60000000000000000000001 /* NativePlaybackTests */ = {isa = PBXFileSystemSynchronizedRootGroup; path = NativePlaybackTests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -197,6 +205,7 @@
 				B2000001AAAA000000000003 /* FluidAudio in Frameworks */,
 				A7F159552F04124A001B2177 /* Sentry in Frameworks */,
 				B2000001AAAA000000000004 /* SwiftDraw in Frameworks */,
+				B2000001AAAA000000000005 /* OpenWatchParty in Frameworks */,
 			);
 		};
 		A78483072F062C2000F9E6D0 /* Frameworks */ = {
@@ -210,6 +219,7 @@
 				B30000190000000000000019 /* AetherEngine in Frameworks */,
 				B30000210000000000000021 /* Sentry in Frameworks */,
 				B30000220000000000000022 /* SwiftDraw in Frameworks */,
+				B30000240000000000000024 /* OpenWatchParty in Frameworks */,
 			);
 		};
 		C40000080000000000000008 /* Frameworks */ = {
@@ -223,8 +233,11 @@
 				D5000001000000000000000A /* AetherEngine in Frameworks */,
 				D5000001000000000000000B /* Sentry in Frameworks */,
 				D5000001000000000000000C /* SwiftDraw in Frameworks */,
+				D5000001000000000000000D /* OpenWatchParty in Frameworks */,
 			);
 		};
+		E60100000000000000000006 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		E60200000000000000000006 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -238,6 +251,7 @@
 				A70B443C2F05AF3200DEF5ED /* TopShelfExtension */,
 				C40000070000000000000007 /* AssetPackExtension */,
 				A784830B2F062C2000F9E6D0 /* RivuletTests */,
+				E60000000000000000000001 /* NativePlaybackTests */,
 				A7F159532F04124A001B2177 /* Frameworks */,
 				A72E03DB2EDA297D003A73DA /* Products */,
 			);
@@ -252,6 +266,8 @@
 				A70B44392F05AF3200DEF5ED /* TopShelfExtension.appex */,
 				C40000020000000000000002 /* AssetPackExtension.appex */,
 				A784830A2F062C2000F9E6D0 /* RivuletTests.xctest */,
+				E60200000000000000000002 /* RivuletMacPlaybackTests.xctest */,
+				E60100000000000000000002 /* RivuletiOSPlaybackTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -314,6 +330,7 @@
 				B2000010AAAA000000000002 /* Libass */,
 				B2000010AAAA000000000003 /* FluidAudio */,
 				B2000010AAAA000000000004 /* SwiftDraw */,
+				B2000010AAAA000000000005 /* OpenWatchParty */,
 			);
 			productName = Rivulet;
 			productReference = A72E03DA2EDA297D003A73DA /* Reference Player.app */;
@@ -359,6 +376,7 @@
 				B2000010AAAA000000000001 /* AetherEngine */,
 				A7F159542F04124A001B2177 /* Sentry */,
 				B2000010AAAA000000000004 /* SwiftDraw */,
+				B2000010AAAA000000000005 /* OpenWatchParty */,
 			);
 			productName = "Rivulet iOS";
 			productReference = B30000010000000000000001 /* Reference Player.app */;
@@ -401,11 +419,36 @@
 				B2000010AAAA000000000001 /* AetherEngine */,
 				A7F159542F04124A001B2177 /* Sentry */,
 				B2000010AAAA000000000004 /* SwiftDraw */,
+				B2000010AAAA000000000005 /* OpenWatchParty */,
 			);
 			productName = "Rivulet Mac";
 			productReference = D50000010000000000000001 /* Reference Player.app */;
 			productType = "com.apple.product-type.application";
 		};
+		E60100000000000000000001 /* RivuletiOSPlaybackTests */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = E60100000000000000000008;
+            buildPhases = (E60100000000000000000005, E60100000000000000000006, E60100000000000000000007);
+            buildRules = ();
+            dependencies = (E60100000000000000000004);
+            fileSystemSynchronizedGroups = (E60000000000000000000001);
+            name = RivuletiOSPlaybackTests;
+            productName = RivuletiOSPlaybackTests;
+            productReference = E60100000000000000000002;
+            productType = "com.apple.product-type.bundle.unit-test";
+        };
+		E60200000000000000000001 /* RivuletMacPlaybackTests */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = E60200000000000000000008;
+            buildPhases = (E60200000000000000000005, E60200000000000000000006, E60200000000000000000007);
+            buildRules = ();
+            dependencies = (E60200000000000000000004);
+            fileSystemSynchronizedGroups = (E60000000000000000000001);
+            name = RivuletMacPlaybackTests;
+            productName = RivuletMacPlaybackTests;
+            productReference = E60200000000000000000002;
+            productType = "com.apple.product-type.bundle.unit-test";
+        };
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -455,6 +498,7 @@
 				B2000020AAAA000000000002 /* XCRemoteSwiftPackageReference "LibassBuild" */,
 				B2000020AAAA000000000003 /* XCRemoteSwiftPackageReference "FluidAudio" */,
 				B2000020AAAA000000000004 /* XCRemoteSwiftPackageReference "SwiftDraw" */,
+				B2000020AAAA000000000005 /* XCRemoteSwiftPackageReference "openwatchparty" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A72E03DB2EDA297D003A73DA /* Products */;
@@ -467,6 +511,8 @@
 				A70B44382F05AF3200DEF5ED /* TopShelfExtension */,
 				C40000040000000000000004 /* AssetPackExtension */,
 				A78483092F062C2000F9E6D0 /* RivuletTests */,
+				E60200000000000000000001 /* RivuletMacPlaybackTests */,
+				E60100000000000000000001 /* RivuletiOSPlaybackTests */,
 			);
 		};
 /* End PBXProject section */
@@ -502,6 +548,8 @@
 			files = (
 			);
 		};
+		E60100000000000000000007 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		E60200000000000000000007 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -545,6 +593,8 @@
 			files = (
 			);
 		};
+		E60100000000000000000005 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		E60200000000000000000005 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -563,6 +613,8 @@
 			target = C40000040000000000000004 /* AssetPackExtension */;
 			targetProxy = C40000030000000000000003 /* PBXContainerItemProxy */;
 		};
+		E60100000000000000000004 = {isa = PBXTargetDependency; target = B30000040000000000000004; targetProxy = E60100000000000000000003; };
+		E60200000000000000000004 = {isa = PBXTargetDependency; target = D50000040000000000000004; targetProxy = E60200000000000000000003; };
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -582,7 +634,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.referenceplayer.TopShelfExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -613,7 +665,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.referenceplayer.TopShelfExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -662,7 +714,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.1;
 				OTHER_LDFLAGS = (
 					"-lbz2",
 					"-liconv",
@@ -722,7 +774,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.1;
 				OTHER_LDFLAGS = (
 					"-lbz2",
 					"-liconv",
@@ -940,7 +992,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.referenceplayer;
 				PRODUCT_MODULE_NAME = Rivulet_iOS;
 				PRODUCT_NAME = "Reference Player";
@@ -981,7 +1033,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.referenceplayer;
 				PRODUCT_MODULE_NAME = Rivulet_iOS;
 				PRODUCT_NAME = "Reference Player";
@@ -1015,7 +1067,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.referenceplayer.AssetPackExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -1044,7 +1096,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.referenceplayer.AssetPackExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -1081,7 +1133,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.referenceplayer;
 				PRODUCT_MODULE_NAME = Rivulet_Mac;
 				PRODUCT_NAME = "Reference Player";
@@ -1118,7 +1170,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.referenceplayer;
 				PRODUCT_MODULE_NAME = Rivulet_Mac;
 				PRODUCT_NAME = "Reference Player";
@@ -1133,6 +1185,70 @@
 			};
 			name = Release;
 		};
+		E60100000000000000000009 /* Debug configuration for PBXNativeTarget "RivuletiOSPlaybackTests" */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                BUNDLE_LOADER = "$(TEST_HOST)";
+                GENERATE_INFOPLIST_FILE = YES;
+                PRODUCT_BUNDLE_IDENTIFIER = com.example.referenceplayer.iOSPlaybackTests;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SDKROOT = iphoneos;
+                IPHONEOS_DEPLOYMENT_TARGET = 26.0; TARGETED_DEVICE_FAMILY = "1,2";
+                SWIFT_VERSION = 6.0;
+                SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+                SWIFT_APPROACHABLE_CONCURRENCY = YES;
+                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reference Player.app/Reference Player";
+            };
+            name = Debug;
+        };
+		E6010000000000000000000A /* Release configuration for PBXNativeTarget "RivuletiOSPlaybackTests" */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                BUNDLE_LOADER = "$(TEST_HOST)";
+                GENERATE_INFOPLIST_FILE = YES;
+                PRODUCT_BUNDLE_IDENTIFIER = com.example.referenceplayer.iOSPlaybackTests;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SDKROOT = iphoneos;
+                IPHONEOS_DEPLOYMENT_TARGET = 26.0; TARGETED_DEVICE_FAMILY = "1,2";
+                SWIFT_VERSION = 6.0;
+                SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+                SWIFT_APPROACHABLE_CONCURRENCY = YES;
+                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reference Player.app/Reference Player";
+            };
+            name = Release;
+        };
+		E60200000000000000000009 /* Debug configuration for PBXNativeTarget "RivuletMacPlaybackTests" */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                BUNDLE_LOADER = "$(TEST_HOST)";
+                GENERATE_INFOPLIST_FILE = YES;
+                PRODUCT_BUNDLE_IDENTIFIER = com.example.referenceplayer.MacPlaybackTests;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SDKROOT = macosx;
+                MACOSX_DEPLOYMENT_TARGET = 26.0;
+                SWIFT_VERSION = 6.0;
+                SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+                SWIFT_APPROACHABLE_CONCURRENCY = YES;
+                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reference Player.app/Contents/MacOS/Reference Player";
+            };
+            name = Debug;
+        };
+		E6020000000000000000000A /* Release configuration for PBXNativeTarget "RivuletMacPlaybackTests" */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                BUNDLE_LOADER = "$(TEST_HOST)";
+                GENERATE_INFOPLIST_FILE = YES;
+                PRODUCT_BUNDLE_IDENTIFIER = com.example.referenceplayer.MacPlaybackTests;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SDKROOT = macosx;
+                MACOSX_DEPLOYMENT_TARGET = 26.0;
+                SWIFT_VERSION = 6.0;
+                SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+                SWIFT_APPROACHABLE_CONCURRENCY = YES;
+                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reference Player.app/Contents/MacOS/Reference Player";
+            };
+            name = Release;
+        };
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1192,6 +1308,8 @@
 			);
 			defaultConfigurationName = Release;
 		};
+		E60100000000000000000008 = {isa = XCConfigurationList; buildConfigurations = (E60100000000000000000009, E6010000000000000000000A); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		E60200000000000000000008 = {isa = XCConfigurationList; buildConfigurations = (E60200000000000000000009, E6020000000000000000000A); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -1208,7 +1326,7 @@
 			repositoryURL = "https://github.com/superuser404notfound/AetherEngine";
 			requirement = {
 				kind = exactVersion;
-				version = 7.61.0;
+				version = 7.66.1;
 			};
 			traits = (
 				DolbyVisionFelCurves,
@@ -1244,6 +1362,14 @@
 				version = 0.29.0;
 			};
 		};
+		B2000020AAAA000000000005 /* XCRemoteSwiftPackageReference "openwatchparty" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/edde746/openwatchparty";
+			requirement = {
+				kind = exactVersion;
+				version = 1.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1271,6 +1397,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B2000020AAAA000000000004 /* XCRemoteSwiftPackageReference "SwiftDraw" */;
 			productName = SwiftDraw;
+		};
+		B2000010AAAA000000000005 /* OpenWatchParty */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B2000020AAAA000000000005 /* XCRemoteSwiftPackageReference "openwatchparty" */;
+			productName = OpenWatchParty;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

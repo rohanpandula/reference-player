@@ -155,6 +155,29 @@ struct WhatsNewView: View {
     // MARK: - Changelog Data
 
     static let changelogs: [(version: String, features: [String])] = [
+        ("1.3.1 (129)", [
+            "New: Watch Together. Start or join a room and watch in sync with friends",
+            "Subtitles follow your Subtitles setting, not a track Plex has selected",
+            "Auto quality no longer drops to 720p on a very fast connection",
+            "Fixed a crash while browsing posters",
+            "Fixed a crash when reopening Settings > Servers > Plex",
+        ]),
+        ("1.3.1 (128)", [
+            "Home can show your favorite Live TV channels: Settings > Home > Rows",
+            "Libraries remember the Unwatched filter",
+            "Posters have the Apple TV app's rounder corners",
+            "Smoother episode pages on touch remotes. @danieldjupvik",
+            "Delete shows up again on a remote connection",
+            "Plex's dashboard, Tautulli and webhooks show which device is playing",
+            "Fixed finding some Plex servers",
+            "Updated AetherEngine to 7.66.1",
+        ]),
+        ("1.3.0 (127)", [
+            "Updated AetherEngine to 7.62.1",
+            "Fixed watch progress reporting through credits, reloads and episode changes",
+            "Photos fixes",
+            "French: fixed the Play and Continue Watching labels",
+        ]),
         ("1.3.0 (126)", [
             "New pause screen with the title's art and details. @priyanshuppal",
             "New launch screen: Rivulet's R pours in and zooms into Home. @priyanshuppal",

@@ -161,6 +161,7 @@
         }
       }
     },
+    "%@ joined" : {},
     "%@ left" : {
       "localizations" : {
         "de" : {
@@ -183,6 +184,9 @@
         }
       }
     },
+    "%@ paused" : {},
+    "%@ pressed play" : {},
+    "%@ skipped" : {},
     "%@ to %@" : {
       "localizations" : {
         "de" : {
@@ -3919,6 +3923,7 @@
         }
       }
     },
+    "Buffering" : {},
     "Building Personalized Recommendations" : {
       "localizations" : {
         "de" : {
@@ -4789,6 +4794,22 @@
         }
       }
     },
+    "Select to show or hide your favorite Live TV channels on Home. Once they are shown, hold Select to move them up or down." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drücke die Auswahltaste, um deine Lieblingssender auf der Startseite ein- oder auszublenden. Werden sie angezeigt, halte die Taste gedrückt, um sie zu verschieben."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez pour afficher ou masquer vos chaînes favorites sur l’accueil. Une fois affichées, maintenez Sélectionner pour les déplacer."
+          }
+        }
+      }
+    },
     "Select to show or hide your favorite movies on Home. Once they are shown, hold Select to move them up or down." : {
       "localizations" : {
         "de" : {
@@ -5502,7 +5523,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reprendre la lecture"
+            "value" : "Continuer à regarder"
           }
         }
       }
@@ -5683,6 +5704,7 @@
         }
       }
     },
+    "Couldn't Join" : {},
     "Couldn't Load" : {
       "localizations" : {
         "de" : {
@@ -5837,6 +5859,7 @@
         }
       }
     },
+    "Couldn't join that room." : {},
     "Couldn't load the next episode." : {
       "localizations" : {
         "de" : {
@@ -5903,6 +5926,7 @@
         }
       }
     },
+    "Couldn't reach Watch Together. Check your connection and try again." : {},
     "Couldn't reach that server. Check the address and port." : {
       "localizations" : {
         "de" : {
@@ -5991,6 +6015,7 @@
         }
       }
     },
+    "Couldn't start a room." : {},
     "Couldn't switch streams." : {
       "localizations" : {
         "de" : {
@@ -6627,6 +6652,7 @@
         }
       }
     },
+    "Different Version" : {},
     "Dimensions" : {
       "localizations" : {
         "de" : {
@@ -7059,6 +7085,7 @@
         }
       }
     },
+    "Doesn't have this title" : {},
     "Dolby Vision, TV not confirmed" : {
       "localizations" : {
         "de" : {
@@ -7729,6 +7756,7 @@
         }
       }
     },
+    "Enter the code from the person hosting and select Continue." : {},
     "Enter the password for this %@ user. Leave it empty if the user has none." : {
       "localizations" : {
         "de" : {
@@ -8449,6 +8477,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bonus"
+          }
+        }
+      }
+    },
+    "Favorite Channels" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lieblingssender"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Αγαπημένα κανάλια"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaînes favorites"
           }
         }
       }
@@ -9411,6 +9461,7 @@
         }
       }
     },
+    "Get a code to share" : {},
     "Go to Album" : {
       "localizations" : {
         "de" : {
@@ -10091,6 +10142,7 @@
         }
       }
     },
+    "Host • %@" : {},
     "How far a single Left press skips back during playback." : {
       "localizations" : {
         "de" : {
@@ -10727,6 +10779,7 @@
         }
       }
     },
+    "Join a Room" : {},
     "Jumped ahead %lld min. The pause ran past what the rewind buffer holds." : {
       "localizations" : {
         "de" : {
@@ -10947,6 +11000,7 @@
         }
       }
     },
+    "Leave Room" : {},
     "Letterboxd members" : {
       "localizations" : {
         "de" : {
@@ -12791,6 +12845,7 @@
         }
       }
     },
+    "No room has that code. Rooms end when everyone leaves." : {},
     "No stream URL available" : {
       "localizations" : {
         "de" : {
@@ -12835,6 +12890,7 @@
         }
       }
     },
+    "None of your servers have %@." : {},
     "Not Connected" : {
       "localizations" : {
         "de" : {
@@ -12901,6 +12957,7 @@
         }
       }
     },
+    "Not in Your Library" : {},
     "Not set" : {
       "localizations" : {
         "de" : {
@@ -13399,6 +13456,8 @@
         }
       }
     },
+    "Only the host can change what's playing." : {},
+    "Only the host can control playback." : {},
     "Open in YouTube" : {
       "localizations" : {
         "de" : {
@@ -13968,7 +14027,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire"
+            "value" : "Regarder"
           }
         }
       }
@@ -14012,11 +14071,12 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire à nouveau"
+            "value" : "Regarder à nouveau"
           }
         }
       }
     },
+    "Play Anyway" : {},
     "Play Clips in Slideshow" : {
       "localizations" : {
         "de" : {
@@ -14050,7 +14110,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire le premier épisode"
+            "value" : "Regarder le premier épisode"
           }
         }
       }
@@ -14116,7 +14176,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire maintenant"
+            "value" : "Regarder maintenant"
           }
         }
       }
@@ -14144,7 +14204,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire S%1$lld, É%2$lld"
+            "value" : "Regarder S%1$lld, É%2$lld"
           }
         }
       }
@@ -14166,7 +14226,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire la version"
+            "value" : "Regarder la version"
           }
         }
       }
@@ -14210,7 +14270,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire depuis le début"
+            "value" : "Regarder depuis le début"
           }
         }
       }
@@ -14232,7 +14292,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire à partir d’ici"
+            "value" : "Regarder à partir d’ici"
           }
         }
       }
@@ -15513,6 +15573,7 @@
         }
       }
     },
+    "Ready" : {},
     "Recap" : {
       "localizations" : {
         "de" : {
@@ -15733,6 +15794,7 @@
         }
       }
     },
+    "Reconnecting to Watch Together…" : {},
     "Record" : {
       "localizations" : {
         "de" : {
@@ -16458,7 +16520,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Retirer de Reprendre la lecture"
+            "value" : "Retirer de Continuer à regarder"
           }
         }
       }
@@ -17019,6 +17081,8 @@
         }
       }
     },
+    "Room Code" : {},
+    "Room codes have 6 letters and numbers." : {},
     "Rotten" : {
       "localizations" : {
         "de" : {
@@ -18054,7 +18118,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sélectionner une vignette de Reprendre la lecture la relance aussitôt. Désactivé ouvre l’aperçu et désactive l’invite Reprendre ou Recommencer."
+            "value" : "Sélectionner une vignette de Continuer à regarder la relance aussitôt. Désactivé ouvre l’aperçu et désactive l’invite Reprendre ou Recommencer."
           }
         }
       }
@@ -18951,6 +19015,7 @@
         }
       }
     },
+    "Sit This One Out" : {},
     "Size" : {
       "localizations" : {
         "de" : {
@@ -19645,6 +19710,7 @@
         }
       }
     },
+    "Start a Room" : {},
     "Start from Beginning" : {
       "localizations" : {
         "de" : {
@@ -19662,7 +19728,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire depuis le début"
+            "value" : "Regarder depuis le début"
           }
         }
       }
@@ -19711,6 +19777,7 @@
         }
       }
     },
+    "Stay" : {},
     "Step %lld of %lld   ·   %llds" : {
       "localizations" : {
         "de" : {
@@ -20609,6 +20676,7 @@
         }
       }
     },
+    "That room is full or locked." : {},
     "That server has no Dispatcharr sign-in. Clear the username and password." : {
       "localizations" : {
         "de" : {
@@ -22674,7 +22742,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Désactivez pour retirer ce serveur de Rivulet : bibliothèques, rangées d’Accueil, Reprendre la lecture et TV en direct. Votre compte reste connecté."
+            "value" : "Désactivez pour retirer ce serveur de Rivulet : bibliothèques, rangées d’Accueil, Continuer à regarder et TV en direct. Votre compte reste connecté."
           }
         }
       }
@@ -23697,6 +23765,8 @@
         }
       }
     },
+    "Watch Together" : {},
+    "Watch Together ended" : {},
     "Watch from Beginning" : {
       "localizations" : {
         "de" : {
@@ -24817,6 +24887,8 @@
         }
       }
     },
+    "Your copy is %lld seconds longer than the room's, so it may not line up." : {},
+    "Your copy is %lld seconds shorter than the room's, so it may not line up." : {},
     "Your favorite was %@" : {
       "localizations" : {
         "de" : {

@@ -405,6 +405,8 @@
         }
       }
     },
+    "%@ joined" : {},
+    "%@ left" : {},
     "%@ of %@" : {
       "localizations" : {
         "de" : {
@@ -433,6 +435,9 @@
         }
       }
     },
+    "%@ paused" : {},
+    "%@ pressed play" : {},
+    "%@ skipped" : {},
     "%@ to %@" : {
       "localizations" : {
         "de" : {
@@ -2075,6 +2080,7 @@
         }
       }
     },
+    "Buffering" : {},
     "Browse" : {
       "localizations" : {
         "de" : {
@@ -2888,7 +2894,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reprendre la lecture"
+            "value" : "Continuer à regarder"
           }
         }
       }
@@ -3145,6 +3151,7 @@
         }
       }
     },
+    "Couldn't Join" : {},
     "Couldn't Load" : {
       "localizations" : {
         "de" : {
@@ -3439,6 +3446,8 @@
         }
       }
     },
+    "Couldn't join that room." : {},
+    "Couldn't reach Watch Together. Check your connection and try again." : {},
     "Couldn't reach that server. Check the address and port." : {
       "localizations" : {
         "de" : {
@@ -3505,6 +3514,7 @@
         }
       }
     },
+    "Couldn't start a room." : {},
     "Couldn't tune this channel." : {
       "localizations" : {
         "de" : {
@@ -4043,6 +4053,7 @@
         }
       }
     },
+    "Different Version" : {},
     "Dismiss" : {
       "localizations" : {
         "de" : {
@@ -4219,6 +4230,7 @@
         }
       }
     },
+    "Doesn't have this title" : {},
     "Download" : {
       "localizations" : {
         "de" : {
@@ -4687,6 +4699,7 @@
         }
       }
     },
+    "Each person streams from their own server. To start a room, open the Watch Together button in the player." : {},
     "Earlier" : {
       "localizations" : {
         "de" : {
@@ -4775,6 +4788,7 @@
         }
       }
     },
+    "Enter the code from the person hosting." : {},
     "Enter the username and password from your provider." : {
       "localizations" : {
         "de" : {
@@ -4939,6 +4953,7 @@
         }
       }
     },
+    "Episode %lld" : {},
     "Episodes" : {
       "localizations" : {
         "de" : {
@@ -5143,6 +5158,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bonus"
+          }
+        }
+      }
+    },
+    "Favorite Channels" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lieblingssender"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Αγαπημένα κανάλια"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaînes favorites"
           }
         }
       }
@@ -5695,6 +5732,7 @@
         }
       }
     },
+    "Get a code to share. Playback pauses here until someone presses play." : {},
     "Go Live" : {
       "localizations" : {
         "de" : {
@@ -5935,6 +5973,7 @@
         }
       }
     },
+    "Here Now" : {},
     "Hero" : {
       "localizations" : {
         "de" : {
@@ -6023,6 +6062,7 @@
         }
       }
     },
+    "Host • %@" : {},
     "How this source appears in Live TV." : {
       "localizations" : {
         "de" : {
@@ -6303,6 +6343,8 @@
         }
       }
     },
+    "Join" : {},
+    "Join a Room" : {},
     "Jellyfin didn't accept that username and password." : {
       "localizations" : {
         "de" : {
@@ -6467,6 +6509,7 @@
         }
       }
     },
+    "Leave Room" : {},
     "Leave the password empty if the user has none." : {
       "localizations" : {
         "de" : {
@@ -6663,6 +6706,7 @@
         }
       }
     },
+    "Loading" : {},
     "Lower" : {
       "localizations" : {
         "de" : {
@@ -7519,6 +7563,8 @@
         }
       }
     },
+    "No room has that code. Rooms end when everyone leaves." : {},
+    "None of your servers have %@." : {},
     "No Subtitles Found" : {
       "localizations" : {
         "de" : {
@@ -7601,6 +7647,7 @@
         }
       }
     },
+    "Not in Your Library" : {},
     "Nothing On Right Now" : {
       "localizations" : {
         "de" : {
@@ -8007,6 +8054,7 @@
         }
       }
     },
+    "Only the host can control playback." : {},
     "Only Plex converts. Jellyfin and Emby always download the original file." : {
       "localizations" : {
         "de" : {
@@ -8494,11 +8542,12 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire"
+            "value" : "Regarder"
           }
         }
       }
     },
+    "Play Anyway" : {},
     "Play Again" : {
       "localizations" : {
         "de" : {
@@ -8510,7 +8559,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire à nouveau"
+            "value" : "Regarder à nouveau"
           }
         }
       }
@@ -8526,7 +8575,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire le premier épisode"
+            "value" : "Regarder le premier épisode"
           }
         }
       }
@@ -8548,7 +8597,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire S%1$lld, É%2$lld"
+            "value" : "Regarder S%1$lld, É%2$lld"
           }
         }
       }
@@ -8570,7 +8619,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire depuis le début"
+            "value" : "Regarder depuis le début"
           }
         }
       }
@@ -8592,7 +8641,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire à partir d’ici"
+            "value" : "Regarder à partir d’ici"
           }
         }
       }
@@ -9419,6 +9468,7 @@
         }
       }
     },
+    "Ready" : {},
     "Recap" : {
       "localizations" : {
         "de" : {
@@ -9567,6 +9617,7 @@
         }
       }
     },
+    "Reconnecting to Watch Together…" : {},
     "Record" : {
       "localizations" : {
         "de" : {
@@ -10309,6 +10360,8 @@
         }
       }
     },
+    "Room Code" : {},
+    "Room codes have 6 letters and numbers." : {},
     "Rivulet needs %@ Server %lld.%lld.%lld or newer." : {
       "localizations" : {
         "de" : {
@@ -10853,6 +10906,7 @@
         }
       }
     },
+    "Share Code" : {},
     "Shared by %@" : {
       "localizations" : {
         "de" : {
@@ -11313,6 +11367,7 @@
         }
       }
     },
+    "Sit This One Out" : {},
     "Skip %@" : {
       "localizations" : {
         "de" : {
@@ -11653,6 +11708,7 @@
         }
       }
     },
+    "Start a Room" : {},
     "Starting Soon" : {
       "localizations" : {
         "de" : {
@@ -11675,6 +11731,7 @@
         }
       }
     },
+    "Starting…" : {},
     "Starts %@" : {
       "localizations" : {
         "de" : {
@@ -11719,6 +11776,7 @@
         }
       }
     },
+    "Stay" : {},
     "Stereo" : {
       "localizations" : {
         "de" : {
@@ -12307,6 +12365,7 @@
         }
       }
     },
+    "That room is full or locked." : {},
     "That server has no Dispatcharr sign-in. Clear the username and password." : {
       "localizations" : {
         "de" : {
@@ -14217,6 +14276,8 @@
         }
       }
     },
+    "Watch Together" : {},
+    "Watch Together ended" : {},
     "Watch from Beginning" : {
       "localizations" : {
         "de" : {
@@ -14601,6 +14662,8 @@
         }
       }
     },
+    "Your copy is %lld seconds longer than the room's, so it may not line up." : {},
+    "Your copy is %lld seconds shorter than the room's, so it may not line up." : {},
     "Your provider has blocked this account." : {
       "localizations" : {
         "de" : {

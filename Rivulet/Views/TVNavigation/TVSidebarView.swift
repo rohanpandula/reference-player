@@ -118,6 +118,7 @@ struct TVSidebarView: View {
             showDiscover: showDiscoverTab && authManager.hasCredentials,
             showWatchlist: showWatchlistTab && authManager.hasCredentials,
             showFavorites: showFavoritesTab && hasFavoritesServer,
+            showWatchTogether: WatchTogetherSession.isAvailable,
             order: librarySettings.libraryOrder,
             hiddenKeys: librarySettings.hiddenLibraryKeys,
             profileName: profileName,
@@ -154,6 +155,12 @@ struct TVSidebarView: View {
                         showProfileSwitcher = true
                     }
                     return  // Never store .account — selectedTab stays unchanged
+                }
+                if newTab == .watchTogether {
+                    if let top = Self.topPresentedViewController() {
+                        WatchTogetherCoordinator.shared.presentJoin(from: top)
+                    }
+                    return
                 }
                 selectedTab = newTab
             }
@@ -646,7 +653,7 @@ struct TVSidebarView: View {
             if let lib = dataStore.libraries.first(where: { $0.key == key }) {
                 if lib.isVideoLibrary { return LibraryModeViewController(plex: lib) }
                 if lib.isPhotoLibrary {
-                    return PhotoLibraryViewController(title: lib.title) {
+                    return PhotoLibraryViewController {
                         guard let provider = MediaProviderRegistry.shared.plexProvider,
                               let photos = provider as? any PhotoProvider else { return nil }
                         return (photos, PlexMediaMapper.library(lib, providerID: provider.id))
@@ -663,7 +670,7 @@ struct TVSidebarView: View {
                     return LibraryModeViewController(provider: library)
                 }
                 if library.kind == .photos {
-                    return PhotoLibraryViewController(title: library.title, source: PhotoListing.source(for: library))
+                    return PhotoLibraryViewController(source: PhotoListing.source(for: library))
                 }
                 if library.kind == .music {
                     return MusicLibraryViewController(libraryKey: library.id, title: library.title,
@@ -690,7 +697,7 @@ struct TVSidebarView: View {
         // content's SwiftUI identity and rebuilds or orphans the UIKit home.
         Group {
             switch tab {
-            case .account:
+            case .account, .watchTogether:
                 Color.clear
             case .search:
                 // Unreachable: `contentViewController(for:)` mounts

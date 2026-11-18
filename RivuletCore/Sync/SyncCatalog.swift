@@ -38,8 +38,8 @@ nonisolated enum SyncCatalog {
     /// Keys stored once per Plex Home profile (`_user_<id>`) or non-Plex server (`_provider_<id>`).
     static let profileFamilies: [String] = [
         "hiddenHomeRowIdentifiers", "homeRowOrder", "homeCollectionPins", "homePlaylistPins", "heroPlaylistPins",
-        "homeHeroSources", "showHomeFavoriteMovies", "showHomeFavoriteShows", "libraryCollectionPins",
-        "hiddenLibraryKeys", "hiddenSidebarLibraries", "libraryOrder", "libraryOrderAllServers", "librarySortOptions", "libraryViewMode",
+        "homeHeroSources", "showHomeFavoriteMovies", "showHomeFavoriteShows", "showHomeFavoriteChannels", "libraryCollectionPins",
+        "hiddenLibraryKeys", "hiddenSidebarLibraries", "libraryOrder", "libraryOrderAllServers", "librarySortOptions", "libraryViewMode", "libraryUnwatchedOnly",
         "trackIntent.subtitle", "trackIntent.audio",
     ]
 

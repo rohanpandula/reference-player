@@ -199,20 +199,20 @@ def _project(text: str, old: dict, new: dict) -> str:
           "Source drift in DEVELOPMENT_TEAM fields; expected 14 matching settings.")
     text = team.sub(lambda m: f'{m[1]}"{new["team_id"]}"{m[3]}', text)
     bundle = re.compile(r"^([ \t]*PRODUCT_BUNDLE_IDENTIFIER = )([^;\n]+)(;[ \t]*)$", re.MULTILINE)
-    expected = Counter({old["bundle_id"]: 6, old["bundle_id"] + ".Tests": 2,
-                        old["bundle_id"] + ".TopShelfExtension": 2,
-                        old["bundle_id"] + ".AssetPackExtension": 2})
-    _need(Counter(_unquote(m[2]) for m in bundle.finditer(text)) == expected,
-          "Source drift in bundle IDs; expected tvOS/iOS/Mac, Tests, and both extension pairs.")
     # Counts alone cannot catch two valid IDs swapped between targets. Inspect
     # each existing target/configuration before rewriting any setting. If Xcode
     # changes this serialization, setup stops for a deliberate review.
     target_suffixes = {"Rivulet": "", "Rivulet iOS": "", "Rivulet Mac": "", "RivuletTests": ".Tests",
                        "TopShelfExtension": ".TopShelfExtension",
-                       "AssetPackExtension": ".AssetPackExtension"}
+                       "AssetPackExtension": ".AssetPackExtension",
+                       "RivuletiOSPlaybackTests": ".iOSPlaybackTests",
+                       "RivuletMacPlaybackTests": ".MacPlaybackTests"}
+    expected = Counter(old["bundle_id"] + suffix for suffix in target_suffixes.values() for _ in range(2))
+    _need(Counter(_unquote(m[2]) for m in bundle.finditer(text)) == expected,
+          "Source drift in bundle IDs; expected Debug and Release IDs for each target.")
     configurations = re.compile(
         r'/\* (Debug|Release) configuration for PBXNativeTarget "([^"]+)" \*/ = \{\n'
-        r'\t\t\tisa = XCBuildConfiguration;\n\t\t\tbuildSettings = \{(.*?)\n\t\t\t\};',
+        r'[ \t]+isa = XCBuildConfiguration;\n[ \t]+buildSettings = \{(.*?)\n[ \t]+\};',
         re.DOTALL)
     found = list(configurations.finditer(text))
     _need(Counter((m[1], m[2]) for m in found) ==

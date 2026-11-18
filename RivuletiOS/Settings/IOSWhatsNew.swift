@@ -8,6 +8,27 @@ import SwiftUI
 /// A line starting with "## " is a heading; any other line is a bullet.
 enum IOSChangelog {
     static let entries: [(version: String, lines: [String])] = [
+        ("1.3.1 (129)", [
+            "New: Watch Together. Start or join a room and watch in sync with friends",
+            "Subtitles follow your Subtitles setting, not a track Plex has selected",
+            "Auto quality no longer drops to 720p on a very fast connection",
+        ]),
+        ("1.3.1 (128)", [
+            "Home can show your favorite Live TV channels",
+            "Library sorting matches Apple TV, New Episodes included",
+            "Libraries remember the Unwatched filter",
+            "The Home hero follows the rows you show on Home",
+            "Delete shows up again on a remote connection",
+            "Plex's dashboard, Tautulli and webhooks show which device is playing",
+            "Fixed finding some Plex servers",
+            "Updated AetherEngine to 7.66.1",
+        ]),
+        ("1.3.0 (127)", [
+            "Updated AetherEngine to 7.62.1",
+            "Fixed watch progress reporting through credits, reloads and episode changes",
+            "Photos fixes",
+            "French: fixed the Play and Continue Watching labels",
+        ]),
         ("1.3.0 (126)", [
             "Video libraries can be browsed by folder",
             "Season tiles show the show's poster and open the show",

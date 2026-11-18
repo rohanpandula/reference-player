@@ -1,6 +1,27 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ joined" : {},
+    "%@ left" : {},
+    "%@ paused" : {},
+    "%@ pressed play" : {},
+    "%@ skipped" : {},
+    "Buffering" : {},
+    "Copy" : {},
+    "Couldn't Join" : {},
+    "Couldn't join that room." : {},
+    "Couldn't reach Watch Together. Check your connection and try again." : {},
+    "Couldn't start a room." : {},
+    "Different Version" : {},
+    "Doesn't have this title" : {},
+    "Enter the code from the person hosting." : {},
+    "Get a code to share. Playback pauses here until someone presses play." : {},
+    "Host • %@" : {},
+    "Join" : {},
+    "Join Watch Together…" : {},
+    "Join a Room" : {},
+    "Leave Room" : {},
+    "Loading" : {},
     "Map" : {
       "localizations" : {
         "de" : {
@@ -17,6 +38,9 @@
         }
       }
     },
+    "No room has that code. Rooms end when everyone leaves." : {},
+    "None of your servers have %@." : {},
+    "Not in Your Library" : {},
     "On This Day" : {
       "localizations" : {
         "de" : {
@@ -33,6 +57,7 @@
         }
       }
     },
+    "Only the host can control playback." : {},
     "Photos from %@" : {
       "localizations" : {
         "de" : {
@@ -49,6 +74,12 @@
         }
       }
     },
+    "Play Anyway" : {},
+    "Ready" : {},
+    "Reconnecting to Watch Together…" : {},
+    "Room Code" : {},
+    "Room codes have 6 letters and numbers." : {},
+    "Sit This One Out" : {},
     "Slideshow" : {
       "localizations" : {
         "de" : {
@@ -81,6 +112,10 @@
         }
       }
     },
+    "Start a Room" : {},
+    "Starting…" : {},
+    "Stay" : {},
+    "That room is full or locked." : {},
     "Unfavorite" : {
       "localizations" : {
         "de" : {
@@ -145,6 +180,10 @@
         }
       }
     },
+    "Watch Together" : {},
+    "Watch Together ended" : {},
+    "Your copy is %lld seconds longer than the room's, so it may not line up." : {},
+    "Your copy is %lld seconds shorter than the room's, so it may not line up." : {},
     "Z to A" : {
       "localizations" : {
         "de" : {
@@ -3318,7 +3357,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reprendre la lecture"
+            "value" : "Continuer à regarder"
           }
         }
       }
@@ -5541,6 +5580,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Favori"
+          }
+        }
+      }
+    },
+    "Favorite Channels" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lieblingssender"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Αγαπημένα κανάλια"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaînes favorites"
           }
         }
       }
@@ -8892,7 +8953,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire"
+            "value" : "Regarder"
           }
         }
       }
@@ -8908,7 +8969,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire à nouveau"
+            "value" : "Regarder à nouveau"
           }
         }
       }
@@ -8924,7 +8985,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire le premier épisode"
+            "value" : "Regarder le premier épisode"
           }
         }
       }
@@ -8946,7 +9007,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire S%1$lld, É%2$lld"
+            "value" : "Regarder S%1$lld, É%2$lld"
           }
         }
       }
@@ -8968,7 +9029,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire une autre version"
+            "value" : "Regarder une autre version"
           }
         }
       }
@@ -8990,7 +9051,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire depuis le début"
+            "value" : "Regarder depuis le début"
           }
         }
       }
@@ -9012,7 +9073,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire à partir d’ici"
+            "value" : "Regarder à partir d’ici"
           }
         }
       }
@@ -10331,7 +10392,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Retirer de Reprendre la lecture"
+            "value" : "Retirer de Continuer à regarder"
           }
         }
       }

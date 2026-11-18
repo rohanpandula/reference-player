@@ -27,6 +27,18 @@ enum PlexAPI: Sendable {
     static var deviceName = "Apple TV"
     static var platform = "tvOS"
 
+    /// X-Plex-Device-Name: the player's title on the Plex dashboard, Tautulli and webhooks
+    /// (`Player.title`). tvOS sets the Apple TV's own name; the other apps send `deviceName`.
+    static var playerTitle: String { customPlayerTitle ?? deviceName }
+    private static var customPlayerTitle: String?
+
+    /// Keeps ASCII only: the name rides in request headers.
+    static func setPlayerTitle(_ name: String) {
+        let ascii = name.replacingOccurrences(of: "\u{2019}", with: "'").unicodeScalars.filter(\.isASCII)
+        let title = String(ascii).trimmingCharacters(in: .whitespaces)
+        customPlayerTitle = title.isEmpty ? nil : title
+    }
+
     /// Per-install UUID generated on first launch and persisted in UserDefaults.
     /// Plex uses this to distinguish devices in its Dashboard, attribute transcode
     /// sessions, and route /player control messages — sharing one identifier across
@@ -75,6 +87,11 @@ nonisolated struct PlexDevice: Codable, Sendable {
     /// from /api/v2/resources; used for provider IDs and last-known-good matching.
     /// NOT the plex.direct subdomain hash — that lives in each connection's `uri`.
     var machineIdentifier: String?
+
+    /// `provides` is a comma list ("server,client,player" on a server that is also a player).
+    var isServer: Bool {
+        provides.split(separator: ",").contains { $0.trimmingCharacters(in: .whitespaces) == "server" }
+    }
 
     enum CodingKeys: String, CodingKey {
         case name, product, productVersion, platform, platformVersion, device

@@ -394,7 +394,8 @@ final class PlexSession: ObservableObject {
                 timeMs: offsetMs,
                 state: state,
                 duration: request.item.duration,
-                sessionIdentifier: request.directPlaySessionID
+                sessionIdentifier: request.directPlaySessionID,
+                reportingTimeout: PlaybackReportTimeout.duration
             )
             if let owner = plexProviderID(of: request) { ClientHost.offline.progressReached(owner, itemID: key, at: at) }
             return terminated
@@ -423,6 +424,7 @@ final class PlexSession: ObservableObject {
         query.append(URLQueryItem(name: "X-Plex-Token", value: token))
         query.append(URLQueryItem(name: "X-Plex-Client-Identifier", value: PlexAPI.clientIdentifier))
         query.append(URLQueryItem(name: "X-Plex-Platform", value: PlexAPI.platform))
+        query.append(URLQueryItem(name: "X-Plex-Device-Name", value: PlexAPI.playerTitle))
         query.append(URLQueryItem(name: "X-Plex-Product", value: PlexAPI.productName))
         components.queryItems = query
         return components.url

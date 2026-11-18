@@ -133,8 +133,9 @@ exit 0
         self.assertTrue(any("exactVersion" in error for error in self.errors()))
 
     def test_new_engine_version_rejected(self):
-        self.replace(self.project_path, "7.61.0", "7.62.0")
-        self.assertTrue(any("7.61.0" in error for error in self.errors()))
+        version = verify_module.PINS["aetherengine"][1]
+        self.replace(self.project_path, version, "0.0.0")
+        self.assertTrue(any(version in error for error in self.errors()))
 
     def test_missing_audio_trait_rejected(self):
         self.replace(self.project_path, "TrueHDObjectAudio,", "")
@@ -176,11 +177,11 @@ exit 0
         self.assertTrue(any("aetherengine" in error for error in self.errors()))
 
     def test_commented_out_runtime_audio_rejected(self):
-        self.replace(self.player_path, "if let heightLayout", "// if let heightLayout")
+        self.replace(self.player_path, "if Self.buildsHeightAudio, let heightLayout", "// if Self.buildsHeightAudio, let heightLayout")
         self.assertTrue(any("Height Speakers" in error for error in self.errors()))
 
     def test_commented_out_runtime_fel_rejected(self):
-        self.replace(self.player_path, "options.preferDualLayerDolbyVision = panelDV && felOn", "/* options.preferDualLayerDolbyVision = panelDV && felOn */")
+        self.replace(self.player_path, "options.preferDualLayerDolbyVision = Self.buildsFEL && panelDV && felOn", "/* options.preferDualLayerDolbyVision = Self.buildsFEL && panelDV && felOn */")
         self.assertTrue(any("FEL setting" in error for error in self.errors()))
 
     def test_empty_secrets_required(self):

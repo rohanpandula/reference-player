@@ -6,10 +6,9 @@
 	<array>
 		<string>group.com.example.referenceplayer</string>
 	</array>
-	<!-- Reference Player: no upstream App Attest identity, and no aps-environment (it
-	     rode the removed APPATTEST_ENVIRONMENT setting; only App Store Connect requires
-	     it beside CloudKit). The owned App Group and iCloud container need a
-	     provisioning team that supports them. -->
+	<!-- App Store Connect requires push notifications with CloudKit on tvOS. -->
+	<key>aps-environment</key>
+	<string>development</string>
 	<!-- iCloud sync of preferences (NSUbiquitousKeyValueStore). Same store as iOS: one bundle id. -->
 	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
 	<string>$(TeamIdentifierPrefix)$(CFBundleIdentifier)</string>

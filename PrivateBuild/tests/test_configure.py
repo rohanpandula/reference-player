@@ -100,7 +100,7 @@ class ConfigureTests(unittest.TestCase):
         project = (self.root / configure.PROJECT).read_text()
         self.assertEqual(project.count('DEVELOPMENT_TEAM = "ABCDE12345";'), 14)
         self.assertEqual(project.count("PRODUCT_BUNDLE_IDENTIFIER = net.builder.referenceplayer;"), 6)
-        for suffix in [".Tests", ".TopShelfExtension", ".AssetPackExtension"]:
+        for suffix in (".Tests", ".iOSPlaybackTests", ".MacPlaybackTests", ".TopShelfExtension", ".AssetPackExtension"):
             self.assertEqual(project.count("PRODUCT_BUNDLE_IDENTIFIER = net.builder.referenceplayer" + suffix + ";"), 2)
         for name in configure.ENTITLEMENTS:
             values = plistlib.loads((self.root / name).read_bytes())

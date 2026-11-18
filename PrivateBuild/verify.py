@@ -2,7 +2,7 @@
 """Fail-closed source/configuration guard for this fork's reviewed baseline.
 
 Contract: upstream Rivulet plus the restored FEL/Height Speakers code on the engine upstream
-pins, AetherEngine 7.61.0 with its bed-regression audio.
+pins, AetherEngine 7.66.1 with its bed-regression audio.
 
 This is deliberately not a Swift compiler, a licence opinion, or an HDMI test.
 Keep these expectations independent of UPSTREAM.json: changing a manifest must
@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-BASELINE = "eabb7cf7833e6d1bb92d6fad116cb38a47305a0a"  # upstream v1.3.0-126, the last upstream release merged into this fork
+BASELINE = "220c3b56121fe4252f2c2b46afbecb17b4a435db"  # upstream v1.3.1-129, the last upstream release merged into this fork
 LOCK = Path("Rivulet.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved")
 # Reviewed source, pinned byte for byte (sha256). These two files decide what may reach upstream's
 # Workers and where the user's own TMDB and MDBList keys may be sent. Any edit to either, a comment
@@ -36,12 +36,13 @@ REVIEWED_SOURCES = {
 TRAITS = {"DualLayerDolbyVision", "DolbyVisionFelCurves", "DolbyVisionStillReshaping", "TrueHDObjectAudio", "DTSXObjectAudio"}
 # identity: (source URL, semantic version or None, immutable Git revision)
 PINS = {
-    "aetherengine": ("https://github.com/superuser404notfound/AetherEngine", "7.61.0", "d612bedb3e60f8bc403c646fe44c0a852ee8a995"),
-    "ffmpegbuild": ("https://github.com/superuser404notfound/FFmpegBuild", "3.13.0", "9282e592b81d9aa1d699dcc70d46cf6b4d66b55f"),
+    "aetherengine": ("https://github.com/superuser404notfound/AetherEngine", "7.66.1", "d46c27028db88457a86c04b2c8c4aa7ab41a5f32"),
+    "ffmpegbuild": ("https://github.com/superuser404notfound/FFmpegBuild", "3.15.0", "d445e6daa180db73f12d47606a00c914f682e278"),
     "fluidaudio": ("https://github.com/FluidInference/FluidAudio", None, "1b0ed50d686873128a4129b3510ce3914c849bab"),
     "libassbuild": ("https://github.com/l984-451/LibassBuild", "0.17.5-2", "434a18a439ece78631d671cce0ee7bab1622f725"),
     "libdovi": ("https://github.com/superuser404notfound/LibDovi", "2.2.0", "caff700968700467c089a3f38c8b4180620518b5"),
     "libtruehd": ("https://github.com/superuser404notfound/LibTrueHD", "3.2.0", "12b26e487a2ade918e53380d47f5727883fedafc"),
+    "openwatchparty": ("https://github.com/edde746/openwatchparty", "1.1.0", "d2579d7c7e9fce1bf3844f04379d6bc009b219c0"),
     "sentry-cocoa": ("https://github.com/getsentry/sentry-cocoa", "9.17.1", "2c420d31d0c31b525fa9e7c552ef0fc9d924befc"),
     "smbclient": ("https://github.com/kishikawakatsumi/SMBClient", "0.3.1", "e636c2b2458930770932a36d311ec9d478575b90"),
     "swiftdraw": ("https://github.com/swhitty/SwiftDraw", "0.29.0", "82699f4bdf2f075793cfa0d392eb27c59b41a3fe"),
@@ -412,7 +413,9 @@ def verify(root: Path, require_signing: bool = False,
     check('repositoryURL = "https://github.com/superuser404notfound/AetherEngine";' in engine,
           "AetherEngine source URL changed")
     check(bool(re.search(r"kind\s*=\s*exactVersion\s*;", engine)), "AetherEngine must use exactVersion, not an upgrade range")
-    check(bool(re.search(r'version\s*=\s*"?7\.61\.0"?\s*;', engine)), "AetherEngine must remain 7.61.0 until explicitly re-reviewed")
+    engine_version = PINS["aetherengine"][1]
+    check(bool(re.search(rf'version\s*=\s*"?{re.escape(engine_version)}"?\s*;', engine)),
+          f"AetherEngine must remain {engine_version} until explicitly re-reviewed")
     traits_match = re.search(r"traits\s*=\s*\((.*?)\);", engine, re.S)
     traits = set(re.findall(r"\b[A-Za-z][A-Za-z0-9]*\b", traits_match.group(1))) if traits_match else set()
     check(traits == TRAITS, "Engine traits must be the five reviewed features: both FEL routes, P5 stills, TrueHD and DTS:X heights")
@@ -449,9 +452,9 @@ def verify(root: Path, require_signing: bool = False,
 
     player = without_comments(read("Rivulet/Services/Plex/Playback/AetherPlayer.swift"))
     check(bool(re.search(r"audioBridgeMode\s*:\s*\.lossless", player)), "The VOD audio bridge is no longer configured losslessly")
-    check(bool(re.search(r"if\s+let\s+heightLayout\s*\{\s*options\.objectAudioRendering\s*=\s*\.render\(heightLayout\)\s*\}", player)),
+    check(bool(re.search(r"if\s+Self\.buildsHeightAudio,\s+let\s+heightLayout\s*\{\s*options\.objectAudioRendering\s*=\s*\.render\(heightLayout\)\s*\}", player)),
           "The existing Height Speakers setting is not wired to objectAudioRendering.render")
-    check(bool(re.search(r"options\.preferDualLayerDolbyVision\s*=\s*panelDV\s*&&\s*felOn", player)),
+    check(bool(re.search(r"options\.preferDualLayerDolbyVision\s*=\s*Self\.buildsFEL\s*&&\s*panelDV\s*&&\s*felOn", player)),
           "The existing FEL setting is not wired to the full dual-layer route")
     check("Self.heightSpeakersKey" in player and "Self.dolbyVisionFELKey" in player,
           "The existing playback preferences must remain connected")

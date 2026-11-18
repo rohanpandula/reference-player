@@ -56,7 +56,7 @@ struct MacHomeView: View {
     private var heroItems: [MediaItem] {
         HomeHero.items(sources: HeroSources.sources, continueWatching: browse.continueWatching, shelves: browse.shelves,
                        watchlist: watchlist, trending: trending, personal: browse.personalRows,
-                       heroPins: HomePlaylistPins.pins(in: .hero))
+                       heroPins: HomePlaylistPins.pins(in: .hero), isRowHidden: browse.isHomeRowHidden)
     }
 }
 
@@ -79,7 +79,13 @@ struct MacHeroFeed: View {
                     MacHomeHero(items: heroItems, width: width, selection: $selection)
                 }
                 ForEach(banners) { MacServerFailureBanner(failure: $0) }
-                ForEach(rows) { MacShelfView(hub: $0) }
+                ForEach(rows) { hub in
+                    if hub.id == FavoriteChannelsRow.identifier {
+                        MacFavoriteChannelsRow()
+                    } else {
+                        MacShelfView(hub: hub)
+                    }
+                }
             }
             .padding(.bottom, 28)
         }

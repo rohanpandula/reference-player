@@ -286,25 +286,19 @@ private struct IOSPlexLibraryBrowseView: View {
     @State private var isFetchingFirstPage = false
 
     private static let pageSize = 90
-    private static let sorts: [(LibrarySortOption, String)] = [
-        (.titleAsc, String(localized: "Title")),
-        (.addedAtDesc, String(localized: "Date Added")),
-        (.releaseDateDesc, String(localized: "Release Date")),
-        (.ratingDesc, String(localized: "Rating"))
-    ]
 
     init(library: MediaLibrary) {
         self.library = library
         _sortRaw = AppStorage(wrappedValue: LibrarySortOption.titleAsc.rawValue, "iosLibrarySort.\(library.settingKey)")
+        _filter = State(initialValue: .remembered(library.settingKey))
     }
 
-    /// The sorts the library page offers, in its order: all of them on Plex, else what the server can apply.
-    private var sorts: [(LibrarySortOption, String)] {
+    /// The provider's sorts, as on tvOS.
+    private var sorts: [LibrarySortOption] {
         let provider = browse.provider(for: library.providerID)
-        let offered = IOSLibrarySorts.menu(
+        return IOSLibrarySorts.menu(
             offered: provider?.sortOptions(for: library.kind) ?? LibrarySortOption.expressible(for: library.kind),
             isPlex: provider?.kind == .plex)
-        return Self.sorts.filter { offered.contains($0.0) }
     }
 
     private var sort: LibrarySortOption { LibrarySortOption(rawValue: sortRaw) ?? .titleAsc }
@@ -356,7 +350,7 @@ private struct IOSPlexLibraryBrowseView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
                     Picker("Sort By", selection: $sortRaw) {
-                        ForEach(sorts, id: \.0) { Text($0.1).tag($0.0.rawValue) }
+                        ForEach(sorts, id: \.self) { Text($0.displayName).tag($0.rawValue) }
                     }
                 } label: {
                     Label("Sort", systemImage: "arrow.up.arrow.down")
@@ -387,6 +381,9 @@ private struct IOSPlexLibraryBrowseView: View {
                 }
                 .tint(filter.isActive ? .accentColor : nil)
             }
+        }
+        .onChange(of: filter.unwatchedOnly) { _, on in
+            UserDefaults.standard.set(on, forKey: LibraryFilter.unwatchedOnlyKey(library.settingKey))
         }
         .task(id: library.id) {
             guard offersGenreAndDecade, let provider = browse.provider(for: library.providerID) else { return }

@@ -1108,6 +1108,7 @@ enum SettingsContent {
         var on: [SettingsRowItem] = []
         var off: [SettingsRowItem] = []
         var listedFavorites: Set<MediaLibrary.LibraryKind> = []
+        var listedChannels = false
         var listedPlaylists: Set<String> = []
         func add(_ item: SettingsRowItem, isOn: Bool) {
             if isOn { on.append(item) } else { off.append(item) }
@@ -1131,6 +1132,9 @@ enum SettingsContent {
             }) {
                 listedFavorites.insert(favoriteKind)
                 add(favoritesRow(favoriteKind, onReorder: isOn ? move(key) : nil), isOn: isOn)
+            } else if key == FavoriteChannelsRow.identifier {
+                listedChannels = true
+                add(favoriteChannelsRow(onReorder: isOn ? move(key) : nil), isOn: isOn)
             } else if row.id.hasPrefix(PersonalRows.playlistRowPrefix) {
                 // A playlist just switched off can outlive its pin for a moment:
                 // it is listed with the others under "Hidden from Home".
@@ -1162,6 +1166,9 @@ enum SettingsContent {
         where PersonalHomeRows.offersFavorites && !listedFavorites.contains(kind) {
             add(favoritesRow(kind, onReorder: nil), isOn: PersonalRows.showsFavorites(kind))
         }
+        if LiveTVDataStore.shared.offersHomeFavorites && !listedChannels {
+            add(favoriteChannelsRow(onReorder: nil), isOn: FavoriteChannelsRow.isShown)
+        }
         for entry in homePlaylists() where !listedPlaylists.contains("\(entry.providerID)/\(entry.playlistID)") {
             add(playlistToggle(providerID: entry.providerID, playlistID: entry.playlistID,
                                title: entry.title, label: serverLabeled(entry.title, providerID: entry.providerID), onReorder: nil),
@@ -1176,6 +1183,7 @@ enum SettingsContent {
                 HomeRowSettings.showAll()
                 HomeRowOrder.reset()
                 PersonalRows.favoriteKinds.forEach { PersonalRows.setShowsFavorites(false, $0) }
+                FavoriteChannelsRow.setShown(false)
                 HomePlaylistPins.removeAll()
                 (vc as? SettingsPageViewController)?.reloadRows()
             }
@@ -1203,6 +1211,7 @@ enum SettingsContent {
         if let kind = PersonalRows.favoriteKinds.first(where: { PersonalRows.favoritesIdentifier($0) == row.hubIdentifier }) {
             return PersonalRows.showsFavorites(kind)
         }
+        if row.hubIdentifier == FavoriteChannelsRow.identifier { return FavoriteChannelsRow.isShown }
         if row.id.hasPrefix(PersonalRows.playlistRowPrefix) {
             return HomePlaylistPins.pins.contains {
                 PersonalRows.playlistRowID(providerID: $0.providerID, playlistID: $0.playlistID) == row.id
@@ -1223,6 +1232,17 @@ enum SettingsContent {
             set: { shown in
                 if shown { HomeRowOrder.placeLast(PersonalRows.favoritesIdentifier(kind), among: shownHomeRowKeys()) }
                 PersonalRows.setShowsFavorites(shown, kind)
+            },
+            didChange: reloadPage),
+            onReorder: onReorder, reorderGroup: onReorder == nil ? nil : "homeRows")
+    }
+
+    private static func favoriteChannelsRow(onReorder: ((Bool) -> Void)?) -> SettingsRowItem {
+        SettingsRowItem(id: "homeFavoriteChannels", title: "Favorite Channels", kind: .toggle(
+            get: { FavoriteChannelsRow.isShown },
+            set: { shown in
+                if shown { HomeRowOrder.placeLast(FavoriteChannelsRow.identifier, among: shownHomeRowKeys()) }
+                FavoriteChannelsRow.setShown(shown)
             },
             didChange: reloadPage),
             onReorder: onReorder, reorderGroup: onReorder == nil ? nil : "homeRows")

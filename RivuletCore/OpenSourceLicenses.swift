@@ -45,13 +45,13 @@ enum OpenSourceLicenses {
 
     /// Shown at the top of the Licenses & Legal screen.
     static let appLicense = String(localized: """
-    Reference Player is based on Rivulet, Copyright © 2025–2026 Bain Gurley.
+    Reference Video Player is based on Rivulet, Copyright © 2025–2026 Bain Gurley.
 
-    Reference Player is distributed under the PolyForm Noncommercial License 1.0.0, which permits \
+    Reference Video Player is distributed under the PolyForm Noncommercial License 1.0.0, which permits \
     use for noncommercial purposes. The complete license text is included with the source \
     distribution.
 
-    Reference Player is a client for media you provide. It does not host, supply, or distribute any \
+    Reference Video Player is a client for media you provide. It does not host, supply, or distribute any \
     video, audio, or channel content of its own.
 
     This product uses the TMDB API but is not endorsed or certified by TMDB. Metadata and \
@@ -62,7 +62,7 @@ enum OpenSourceLicenses {
         [
             Entry(
                 name: "AetherEngine",
-                summary: "Video playback engine — the default player for on-demand titles. Dynamically linked and used under the GNU Lesser General Public License, version 3, with an Apple Store / DRM Exception. Copyright © 2026 Vincent Herbst. The complete corresponding source for the exact version linked by this app (tag 7.61.0, commit d612bed) is available at \(aetherSourceURL).",
+                summary: "Video playback engine — the default player for on-demand titles. Dynamically linked and used under the GNU Lesser General Public License, version 3, with an Apple Store / DRM Exception. Copyright © 2026 Vincent Herbst. The complete corresponding source for the exact version linked by this app (tag 7.66.1, commit d46c270) is available at \(aetherSourceURL).",
                 licenseText: aetherLGPLv3
             ),
             Entry(
@@ -112,7 +112,7 @@ enum OpenSourceLicenses {
             ),
             Entry(
                 name: "GNU FriBidi",
-                summary: String(localized: "Used by libass for bidirectional text. FriBidi 1.0.16, statically linked and used under the GNU Lesser General Public License, version 2.1, whose full text is reproduced in the FFmpeg entry above. It is built unmodified from https://github.com/fribidi/fribidi (tag v1.0.16); https://github.com/l984-451/LibassBuild holds the build script, and Reference Player's source is at https://github.com/rohanpandula/reference-player, so the app can be rebuilt against a modified FriBidi.", table: "Private"),
+                summary: String(localized: "Used by libass for bidirectional text. FriBidi 1.0.16, statically linked and used under the GNU Lesser General Public License, version 2.1, whose full text is reproduced in the FFmpeg entry above. It is built unmodified from https://github.com/fribidi/fribidi (tag v1.0.16); https://github.com/l984-451/LibassBuild holds the build script, and Reference Video Player's source is at https://github.com/rohanpandula/reference-player, so the app can be rebuilt against a modified FriBidi.", table: "Private"),
                 licenseText: ffmpegLGPL
             ),
             Entry(
@@ -121,9 +121,9 @@ enum OpenSourceLicenses {
                 licenseText: libunibreakZlib
             ),
             Entry(
-                name: "LibTrueHD",
-                summary: "Used to keep the height channels of Dolby TrueHD Atmos soundtracks. LibTrueHD 3.2.0, used under the MIT License. It includes the truehd and oamd crates from the truehdd project (https://github.com/truehdd/truehdd), Copyright © Rainbaby and the truehdd contributors, used under the Apache License, Version 2.0. Source: https://github.com/superuser404notfound/LibTrueHD (tag 3.2.0).",
-                licenseText: libTrueHDLicenses
+                name: "Open Watch Party",
+                summary: "Keeps players in sync for Watch Together. Open Watch Party SDK 1.1.0, used under the Apache License, Version 2.0. Source: https://github.com/edde746/openwatchparty",
+                licenseText: fluidAudioApache2
             ),
             Entry(
                 name: "FluidAudio",
@@ -145,7 +145,19 @@ enum OpenSourceLicenses {
                 summary: "Used for crash and error diagnostics. Used under the MIT License.",
                 licenseText: sentryMIT
             ),
-        ]
+        ] + heightAudioEntries
+    }
+
+    /// Set by the host when its engine links LibTrueHD (a self-built height audio app, #609).
+    nonisolated(unsafe) static var linksLibTrueHD = false
+
+    private static var heightAudioEntries: [Entry] {
+        guard linksLibTrueHD else { return [] }
+        return [Entry(
+            name: "LibTrueHD",
+            summary: "Used to keep the height channels of Dolby TrueHD Atmos soundtracks. LibTrueHD 3.2.0, used under the MIT License. It includes the truehd and oamd crates from the truehdd project (https://github.com/truehdd/truehdd), Copyright © Rainbaby and the truehdd contributors, used under the Apache License, Version 2.0. Source: https://github.com/superuser404notfound/LibTrueHD (tag 3.2.0).",
+            licenseText: libTrueHDLicenses
+        )]
     }
 
     static let aetherLGPLv3 = #"""

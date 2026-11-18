@@ -29,12 +29,29 @@ public enum SentryStartup {
     /// actor it trips the Main Thread Checker on every launch.
     @MainActor
     /// `configure` sets options that only exist on the caller's platform.
+    /// Starts at once on a stored ingest pass (so last launch's crash goes out), or after fetching one.
     public static func start(platform: Platform, configure: @escaping (Options) -> Void = { _ in }) {
-        // This fork ships an empty DSN. Enforce the opt-out centrally so
-        // both app targets avoid SDK startup, not just outbound event delivery.
+        // An empty DSN keeps this fork out of both attestation and telemetry.
         guard !Secrets.sentryDSN.isEmpty else { return }
+        if let pass = IngestPass.cached() {
+            start(platform: platform, pass: pass, configure: configure)
+            if IngestPass.cached(margin: IngestPass.refreshMargin) == nil {
+                // ponytail: the new pass serves the next launch; a process alive past the old one's expiry goes quiet.
+                Task { _ = await IngestPass.fetch() }
+            }
+        } else {
+            Task {
+                guard let pass = await IngestPass.fetch() else { return }
+                start(platform: platform, pass: pass, configure: configure)
+            }
+        }
+    }
+
+    @MainActor
+    private static func start(platform: Platform, pass: String, configure: @escaping (Options) -> Void) {
+        guard let dsn = IngestPass.dsn(Secrets.sentryDSN, pass: pass) else { return }
         SentrySDK.start { options in
-            options.dsn = Secrets.sentryDSN
+            options.dsn = dsn
             options.debug = false
             // Initial scope, so startup events carry the tag. It tags without
             // splitting grouping: a shared-code crash stays one issue.

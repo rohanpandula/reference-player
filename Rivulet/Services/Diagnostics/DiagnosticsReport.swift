@@ -70,8 +70,10 @@ enum DiagnosticsReport {
             "plex": plex(),
             "plex_profile": profile(),
             "streaming": streaming(),
+            "captions": captions(),
             "home": home(),
             "other_servers": otherServers(),
+            "library_browse": libraryBrowse(),
             "live_tv": liveTV(),
             "top_shelf": topShelf(),
         ]
@@ -157,6 +159,18 @@ enum DiagnosticsReport {
         return result
     }
 
+    /// What decides when subtitles show: the saved choice, the skip lengths, and the system's
+    /// own caption settings, which the settings snapshot cannot see.
+    private static func captions() -> [String: Any] {
+        [
+            "subtitle_choice": TrackIntentStore.subtitleIntent.map { String(describing: $0) } ?? "none saved",
+            "skip_forward_seconds": Int(InputConfig.tapSeekSeconds),
+            "skip_back_seconds": Int(InputConfig.tapSeekBackSeconds),
+            "system_show_on_skip_back": UniversalPlayerViewModel.systemShowsSubtitlesOnSkipBack(),
+            "system_caption_display": SystemMediaAccessibility.captionDisplayName,
+        ]
+    }
+
     /// Which of the server's connections is in use, described without the address.
     private static func connectionKind(_ url: String, server: PlexDevice?) -> String {
         let scheme = URL(string: url)?.scheme ?? "?"
@@ -219,6 +233,24 @@ enum DiagnosticsReport {
             "libraries": store.libraries.count,
             "home_rows": store.homeRows.count,
         ]
+    }
+
+    /// Each library's saved sort, view and Unwatched choice for this profile, by kind (no names).
+    private static func libraryBrowse() -> [[String: Any]] {
+        let settings = LibrarySettingsManager.shared
+        let plex = PlexDataStore.shared.libraries.map { ($0.key, "plex", $0.type) }
+        let others = ServerDataStore.shared.libraries.map {
+            ($0.settingsKey, String($0.providerID.prefix { $0 != ":" }), String(describing: $0.kind))
+        }
+        return (plex + others).map { key, server, kind in
+            [
+                "server": server,
+                "kind": kind,
+                "sort": settings.librarySortOptions[key]?.rawValue ?? "default",
+                "view": settings.savedViewMode(key)?.rawValue ?? "default",
+                "unwatched_only": settings.unwatchedOnly(key),
+            ]
+        }
     }
 
     private static func liveTV() -> [String: Any] {

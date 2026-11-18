@@ -195,7 +195,10 @@ final class AetherPlayer: PlayerProtocol {
     }
 
     private func wireUpPublishers() {
-        engine.$state
+        PlaybackTransportState.publisher(state: engine.$state.map(\.transportState).eraseToAnyPublisher(),
+                                         phase: engine.$playbackPhase.map(\.transportPhase).eraseToAnyPublisher(),
+                                         nativeReady: PlaybackTransportState.nativeReadiness(engine.$currentAVPlayer.eraseToAnyPublisher()))
+            .map(\.engineState)
             // Read `errorInfo` on the PUBLISHING turn, not after the hop.
             // AetherEngine assigns it immediately before `state` and clears it
             // when state leaves `.error`, so it is exact here and merely
@@ -205,7 +208,7 @@ final class AetherPlayer: PlayerProtocol {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] aetherState, errorInfo in
                 guard let self else { return }
-                self.engineIsPlaying = (aetherState == .playing)
+                self.engineIsPlaying = (self.engine.state == .playing)
                 // A load of another file (a stacked part, a version) drops the engine's speed; put it back.
                 if aetherState == .playing, self._playbackRate != 1 { self.engine.setRate(self._playbackRate) }
                 // Recompute BEFORE publishing the state so the view model's
@@ -678,6 +681,7 @@ final class AetherPlayer: PlayerProtocol {
     // MARK: - PlayerProtocol state
 
     var isPlaying: Bool { engine.state == .playing }
+    var playbackState: UniversalPlaybackState { stateSubject.value }
     var currentTime: TimeInterval { engine.currentTime + partStart }
     var duration: TimeInterval { stack?.duration ?? engine.duration }
 
@@ -1019,8 +1023,19 @@ final class AetherPlayer: PlayerProtocol {
         return text.contains(".m3u8") || text.contains("format=hls")
     }
 
+    /// Speaker layout ("7.1.4"…) object audio renders into; absent = off.
+    static let heightSpeakersKey = "heightSpeakers"
+
     /// ML upscaling of SDR below 1080p (#846); absent = off.
     static let upscaleKey = "upscaleLowResolution"
+
+    /// Profile 7 FEL composition; absent = on.
+    static let dolbyVisionFELKey = "dolbyVisionFEL"
+
+    /// Engine traits only a self-built app carries (#609, Scripts/enthusiast-build.py).
+    static let buildsFEL = AetherEngine.OptionalComponent.dualLayerDolbyVision.isBuiltIn
+    static let buildsHeightAudio = AetherEngine.OptionalComponent.trueHDObjectAudio.isBuiltIn
+        || AetherEngine.OptionalComponent.dtsxObjectAudio.isBuiltIn
 
     /// DVB teletext caption page, applied to BOTH live and VOD loads. A
     /// `liveTeletextPage` UserDefaults key overrides everything (0 = force
@@ -1271,6 +1286,16 @@ final class AetherPlayer: PlayerProtocol {
         let item = CMSyncConvertTime(host, from: CMClockGetHostTimeClock(), to: timebase)
         guard item.isNumeric else { return nil }
         return engine.presentationAxisMap.sourceSeconds(forItemSeconds: item.seconds)
+    }
+
+    /// The playhead on the title's axis, read off the presentation clock: the
+    /// engine's tick is 10 Hz, too coarse for Watch Together. The tick wins when they
+    /// disagree (a seek or a reload is under way).
+    var precisePosition: TimeInterval {
+        let tick = currentTime
+        guard let source = sourceTime(atHostTime: CACurrentMediaTime()),
+              abs(source + partStart - tick) < 1 else { return tick }
+        return source + partStart
     }
 
     /// Hand external metadata (title, artwork, description, genre) to the
@@ -1834,11 +1859,6 @@ extension AetherPlayer {
         return true
     }()
 
-    /// Speaker layout ("7.1.4"…) object audio renders into; absent = off.
-    static let heightSpeakersKey = "heightSpeakers"
-
-    /// Profile 7 FEL composition; absent = off.
-    static let dolbyVisionFELKey = "dolbyVisionFEL"
     private static let felDefaultSettledKey = "dolbyVisionFELDefaultSettled"
 
     /// FEL used to default on. Once, pin it on for an install that already had a server,
@@ -1863,13 +1883,13 @@ extension AetherPlayer {
         // Settings → Playback → Height Speakers: TrueHD Atmos and DTS:X keep their heights as a
         // rendered bed (lossless PCM, APAC on AirPlay) instead of 7.1 without them.
         let heightLayout = SpatialSpeakerLayout(rawValue: UserDefaults.standard.string(forKey: Self.heightSpeakersKey) ?? "")
-        if let heightLayout { options.objectAudioRendering = .render(heightLayout) }
+        if Self.buildsHeightAudio, let heightLayout { options.objectAudioRendering = .render(heightLayout) }
         // Profile 7 FEL composes both layers (#345). The engine doesn't check the panel,
         // so keep the native route (HDR10 base) where the TV can't show Dolby Vision.
         // The FEL route renders heights too, so both settings apply to one title (#362).
         let panelDV = AetherEngine.displayCapabilities.supportsDolbyVision
         let felOn = UserDefaults.standard.bool(forKey: Self.dolbyVisionFELKey)
-        options.preferDualLayerDolbyVision = panelDV && felOn
+        options.preferDualLayerDolbyVision = Self.buildsFEL && panelDV && felOn
         return PrivateLoadSettings(heightLayout: heightLayout, panelDV: panelDV, felOn: felOn)
     }
 
@@ -1912,6 +1932,45 @@ extension AetherPlayer {
                 "height_speakers": heightLayout?.rawValue ?? "off",
                 "fel_setting": felOn
             ])
+        }
+    }
+}
+
+private extension PlaybackState {
+    var transportState: PlaybackTransportState.State {
+        switch self {
+        case .idle: .idle
+        case .loading: .loading
+        case .playing: .playing
+        case .paused: .paused
+        case .seeking: .seeking
+        case .ended: .ended
+        case .error(let message): .error(message)
+        }
+    }
+}
+
+private extension PlaybackTransportState.State {
+    var engineState: PlaybackState {
+        switch self {
+        case .idle: .idle
+        case .loading: .loading
+        case .playing: .playing
+        case .paused: .paused
+        case .seeking: .seeking
+        case .ended: .ended
+        case .error(let message): .error(message)
+        }
+    }
+}
+
+private extension PlaybackPhase {
+    var transportPhase: PlaybackTransportState.Phase {
+        switch self {
+        case .playing: .playing
+        case .paused: .paused
+        case .rebuffering: .rebuffering
+        default: .loading
         }
     }
 }
