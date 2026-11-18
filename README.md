@@ -3,8 +3,8 @@
 A noncommercial media player for Apple TV, focused on preserving the picture and sound in your
 media. Connect your own Plex, Jellyfin, Emby or IPTV sources.
 
-The beta requires tvOS 26 or later. Public TestFlight invitations will open after Apple approves
-the beta.
+[Join the Apple TV beta on TestFlight](https://testflight.apple.com/join/d18PdcjP). The beta
+requires tvOS 26 or later. The invitation opens after Apple approves the beta.
 
 See the [build instructions, features and validation limits](.github/README.md).
 Report issues and request features in [this repository](https://github.com/rohanpandula/reference-player/issues).

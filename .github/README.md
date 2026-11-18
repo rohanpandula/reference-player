@@ -6,8 +6,8 @@ Put questions about Reference Video Player in this repository.
 
 ## TestFlight
 
-The beta requires an Apple TV running tvOS 26 or later. Public TestFlight invitations will open
-after Apple approves the beta.
+[Join the Apple TV beta on TestFlight](https://testflight.apple.com/join/d18PdcjP). The beta
+requires tvOS 26 or later. The invitation opens after Apple approves the beta.
 
 ![First-run screen on Apple TV with Plex, Jellyfin, Emby and Live TV setup options](images/welcome.jpg)
 
