@@ -3956,12 +3956,12 @@ final class UniversalPlayerViewModel: ObservableObject, WatchTogetherPlayer {
     }
 
     func stopPlayback() {
+        endHomeAssistantSession()
         if case .plex = source, !isPlayingCinemaExtra {
             sendTimeline(time: currentTime, state: "stopped", force: true)
         }
         plexStopDelivery?.allowsReplay = false
         stopCount += 1
-        endHomeAssistantSession()
         countdownTimer?.invalidate()
         countdownTimer = nil
         countdownSeconds = 0
