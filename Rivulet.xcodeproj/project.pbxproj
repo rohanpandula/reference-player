@@ -698,7 +698,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Rivulet/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Reference Player";
+				INFOPLIST_KEY_CFBundleDisplayName = "Reference Video Player";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -758,7 +758,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Rivulet/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Reference Player";
+				INFOPLIST_KEY_CFBundleDisplayName = "Reference Video Player";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -980,9 +980,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = RivuletiOS/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Reference Player";
+				INFOPLIST_KEY_CFBundleDisplayName = "Reference Video Player";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Reference Player connects to media servers on your local network, such as your Plex server, to stream your library.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Reference Video Player connects to media servers on your local network, such as your Plex server, to stream your library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -1021,9 +1021,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = RivuletiOS/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Reference Player";
+				INFOPLIST_KEY_CFBundleDisplayName = "Reference Video Player";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Reference Player connects to media servers on your local network, such as your Plex server, to stream your library.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Reference Video Player connects to media servers on your local network, such as your Plex server, to stream your library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -1127,7 +1127,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = RivuletMac/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Reference Player";
+				INFOPLIST_KEY_CFBundleDisplayName = "Reference Video Player";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1164,7 +1164,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = RivuletMac/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Reference Player";
+				INFOPLIST_KEY_CFBundleDisplayName = "Reference Video Player";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1326,7 +1326,7 @@
 			repositoryURL = "https://github.com/superuser404notfound/AetherEngine";
 			requirement = {
 				kind = exactVersion;
-				version = 7.66.1;
+				version = 7.69.0;
 			};
 			traits = (
 				DolbyVisionFelCurves,

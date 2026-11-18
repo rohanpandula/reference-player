@@ -44,79 +44,79 @@
         }
       }
     },
-    "Add your own Live TV sources: your Plex server's Live TV or an IPTV playlist from your provider. Reference Player provides no channels of its own." : {
+    "Add your own Live TV sources: your Plex server's Live TV or an IPTV playlist from your provider. Reference Video Player provides no channels of its own." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Füge deine eigenen Live-TV-Quellen hinzu: das Live-TV deines Plex-Servers oder eine IPTV-Playlist deines Anbieters. Reference Player stellt selbst keine Sender bereit."
+            "value" : "Füge deine eigenen Live-TV-Quellen hinzu: das Live-TV deines Plex-Servers oder eine IPTV-Playlist deines Anbieters. Reference Video Player stellt selbst keine Sender bereit."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Πρόσθεσε δικές σου πηγές ζωντανής τηλεόρασης: την τηλεόραση του Plex ή μια λίστα IPTV από τον πάροχό σου. Το Reference Player δεν παρέχει κανάλια."
+            "value" : "Πρόσθεσε δικές σου πηγές ζωντανής τηλεόρασης: την τηλεόραση του Plex ή μια λίστα IPTV από τον πάροχό σου. Το Reference Video Player δεν παρέχει κανάλια."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajoutez vos propres sources TV en direct : celles de votre serveur Plex ou une playlist IPTV de votre fournisseur. Reference Player ne fournit aucune chaîne."
+            "value" : "Ajoutez vos propres sources TV en direct : celles de votre serveur Plex ou une playlist IPTV de votre fournisseur. Reference Video Player ne fournit aucune chaîne."
           }
         }
       }
     },
-    "An M3U playlist link from an IPTV provider you subscribe to, with an optional guide link. Reference Player supplies no channels of its own." : {
+    "An M3U playlist link from an IPTV provider you subscribe to, with an optional guide link. Reference Video Player supplies no channels of its own." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ein M3U-Playlist-Link eines IPTV-Anbieters, den du abonniert hast, optional mit einem Programm-Link. Reference Player stellt selbst keine Sender bereit."
+            "value" : "Ein M3U-Playlist-Link eines IPTV-Anbieters, den du abonniert hast, optional mit einem Programm-Link. Reference Video Player stellt selbst keine Sender bereit."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Σύνδεσμος λίστας M3U από τον συνδρομητικό πάροχο IPTV, με προαιρετικό σύνδεσμο οδηγού. Το Reference Player δεν παρέχει δικά του κανάλια."
+            "value" : "Σύνδεσμος λίστας M3U από τον συνδρομητικό πάροχο IPTV, με προαιρετικό σύνδεσμο οδηγού. Το Reference Video Player δεν παρέχει δικά του κανάλια."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un lien de playlist M3U d’un fournisseur IPTV auquel vous êtes abonné, avec un lien de guide en option. Reference Player ne fournit aucune chaîne."
+            "value" : "Un lien de playlist M3U d’un fournisseur IPTV auquel vous êtes abonné, avec un lien de guide en option. Reference Video Player ne fournit aucune chaîne."
           }
         }
       }
     },
-    "App version, changelog, and other information about Reference Player." : {
+    "App version, changelog, and other information about Reference Video Player." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App-Version, Änderungsprotokoll und weitere Infos über Reference Player."
+            "value" : "App-Version, Änderungsprotokoll und weitere Infos über Reference Video Player."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Έκδοση εφαρμογής, ιστορικό αλλαγών και άλλες πληροφορίες για το Reference Player."
+            "value" : "Έκδοση εφαρμογής, ιστορικό αλλαγών και άλλες πληροφορίες για το Reference Video Player."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Version de l’app, historique des versions et autres informations sur Reference Player."
+            "value" : "Version de l’app, historique des versions et autres informations sur Reference Video Player."
           }
         }
       }
     },
     "Asks each service once whether it accepts your key, and says what each answered: accepted, refused, or not checked because the service was busy or out of reach." : {},
-    "Asks you to press a few buttons and records what your remote sent, for Reference Player's diagnostics. Nothing about what you watch is included." : {
+    "Asks you to press a few buttons and records what your remote sent, for Reference Video Player's diagnostics. Nothing about what you watch is included." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fordert dich auf, einige Tasten zu drücken, und zeichnet für die Diagnose von Reference Player auf, was deine Fernbedienung sendet. Was du schaust, ist nicht enthalten."
+            "value" : "Fordert dich auf, einige Tasten zu drücken, und zeichnet für die Diagnose von Reference Video Player auf, was deine Fernbedienung sendet. Was du schaust, ist nicht enthalten."
           }
         },
         "el" : {
@@ -128,69 +128,69 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous invite à appuyer sur quelques boutons et enregistre ce qu’envoie votre télécommande, pour les diagnostics de Reference Player. Rien sur ce que vous regardez n’est inclus."
+            "value" : "Vous invite à appuyer sur quelques boutons et enregistre ce qu’envoie votre télécommande, pour les diagnostics de Reference Video Player. Rien sur ce que vous regardez n’est inclus."
           }
         }
       }
     },
     "Check Keys" : {},
-    "Checks the connection and adds the source if it works. If it does not, Reference Player tells you why." : {
+    "Checks the connection and adds the source if it works. If it does not, Reference Video Player tells you why." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Prüft die Verbindung und fügt die Quelle hinzu, wenn sie funktioniert. Wenn nicht, sagt dir Reference Player, warum."
+            "value" : "Prüft die Verbindung und fügt die Quelle hinzu, wenn sie funktioniert. Wenn nicht, sagt dir Reference Video Player, warum."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ελέγχει τη σύνδεση και προσθέτει την πηγή αν λειτουργεί. Διαφορετικά, το Reference Player εξηγεί το πρόβλημα."
+            "value" : "Ελέγχει τη σύνδεση και προσθέτει την πηγή αν λειτουργεί. Διαφορετικά, το Reference Video Player εξηγεί το πρόβλημα."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vérifie la connexion et ajoute la source si elle fonctionne. Sinon, Reference Player vous dit pourquoi."
+            "value" : "Vérifie la connexion et ajoute la source si elle fonctionne. Sinon, Reference Video Player vous dit pourquoi."
           }
         }
       }
     },
-    "Choose the Reference Player icon on the Apple TV Home Screen." : {
+    "Choose the Reference Video Player icon on the Apple TV Home Screen." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wähle das Reference Player-Symbol auf dem Home-Bildschirm des Apple TV."
+            "value" : "Wähle das Reference Video Player-Symbol auf dem Home-Bildschirm des Apple TV."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Επίλεξε το εικονίδιο του Reference Player στην αρχική οθόνη του Apple TV."
+            "value" : "Επίλεξε το εικονίδιο του Reference Video Player στην αρχική οθόνη του Apple TV."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choisissez l’icône Reference Player sur l’écran d’accueil de l’Apple TV."
+            "value" : "Choisissez l’icône Reference Video Player sur l’écran d’accueil de l’Apple TV."
           }
         }
       }
     },
     "Close and reopen the app to load what a new key turns on." : {},
-    "Customize how Reference Player looks: the sidebar, Top Shelf, hero banners, Home and library rows, and ratings." : {
+    "Customize how Reference Video Player looks: the sidebar, Top Shelf, hero banners, Home and library rows, and ratings." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lege fest, wie Reference Player aussieht: Seitenleiste, Top Shelf, Hero-Banner, Reihen auf der Startseite und in den Mediatheken sowie Bewertungen."
+            "value" : "Lege fest, wie Reference Video Player aussieht: Seitenleiste, Top Shelf, Hero-Banner, Reihen auf der Startseite und in den Mediatheken sowie Bewertungen."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Personnalisez l’apparence de Reference Player : barre latérale, Top Shelf, bannières, rangées de l’accueil et des bibliothèques, et notes."
+            "value" : "Personnalisez l’apparence de Reference Video Player : barre latérale, Top Shelf, bannières, rangées de l’accueil et des bibliothèques, et notes."
           }
         }
       }
@@ -266,24 +266,24 @@
       }
     },
     "How many files the loaded index describes and when it was built." : {},
-    "If your provider gave you a guide link (XMLTV), enter it. Otherwise leave this empty: Reference Player uses the guide the playlist names, if it has one." : {
+    "If your provider gave you a guide link (XMLTV), enter it. Otherwise leave this empty: Reference Video Player uses the guide the playlist names, if it has one." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wenn dir dein Anbieter einen Programm-Link (XMLTV) gegeben hat, gib ihn ein. Andernfalls lass das Feld leer: Reference Player verwendet dann das Programm, das in der Playlist angegeben ist, falls vorhanden."
+            "value" : "Wenn dir dein Anbieter einen Programm-Link (XMLTV) gegeben hat, gib ihn ein. Andernfalls lass das Feld leer: Reference Video Player verwendet dann das Programm, das in der Playlist angegeben ist, falls vorhanden."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Αν ο πάροχος έδωσε σύνδεσμο οδηγού XMLTV, πληκτρολόγησέ τον. Διαφορετικά, άφησέ τον κενό: το Reference Player χρησιμοποιεί τον οδηγό που ορίζει η λίστα, αν υπάρχει."
+            "value" : "Αν ο πάροχος έδωσε σύνδεσμο οδηγού XMLTV, πληκτρολόγησέ τον. Διαφορετικά, άφησέ τον κενό: το Reference Video Player χρησιμοποιεί τον οδηγό που ορίζει η λίστα, αν υπάρχει."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si votre fournisseur vous a donné un lien de guide (XMLTV), saisissez-le. Sinon, laissez vide : Reference Player utilise le guide indiqué par la playlist, s’il y en a un."
+            "value" : "Si votre fournisseur vous a donné un lien de guide (XMLTV), saisissez-le. Sinon, laissez vide : Reference Video Player utilise le guide indiqué par la playlist, s’il y en a un."
           }
         }
       }
@@ -352,24 +352,24 @@
         }
       }
     },
-    "Play a movie or TV show on Reference Player" : {
+    "Play a movie or TV show on Reference Video Player" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Einen Film oder eine TV-Sendung in Reference Player wiedergeben"
+            "value" : "Einen Film oder eine TV-Sendung in Reference Video Player wiedergeben"
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Παίξτε μια ταινία ή σειρά στο Reference Player"
+            "value" : "Παίξτε μια ταινία ή σειρά στο Reference Video Player"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lire un film ou une série sur Reference Player"
+            "value" : "Lire un film ou une série sur Reference Video Player"
           }
         }
       }
@@ -384,101 +384,101 @@
         }
       }
     },
-    "Please sign in to Reference Player first" : {
+    "Please sign in to Reference Video Player first" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bitte melde dich zuerst bei Reference Player an"
+            "value" : "Bitte melde dich zuerst bei Reference Video Player an"
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Συνδεθείτε πρώτα στο Reference Player"
+            "value" : "Συνδεθείτε πρώτα στο Reference Video Player"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Veuillez d’abord vous connecter à Reference Player"
+            "value" : "Veuillez d’abord vous connecter à Reference Video Player"
           }
         }
       }
     },
     "Posts a report when playback starts, changes or stops, and every ten seconds while it plays. Reports go to the address below, so give it Home Assistant's local address." : {},
-    "Reference Player can't connect to %@. Check that the server is running and your network is connected. Recently loaded content is still available to browse." : {
+    "Reference Video Player can't connect to %@. Check that the server is running and your network is connected. Recently loaded content is still available to browse." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reference Player kann keine Verbindung zu %@ herstellen. Prüfe, ob der Server läuft und dein Netzwerk verbunden ist. Zuletzt geladene Inhalte kannst du weiterhin durchstöbern."
+            "value" : "Reference Video Player kann keine Verbindung zu %@ herstellen. Prüfe, ob der Server läuft und dein Netzwerk verbunden ist. Zuletzt geladene Inhalte kannst du weiterhin durchstöbern."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Το Reference Player δεν συνδέεται στο %@. Βεβαιώσου ότι ο διακομιστής λειτουργεί και το δίκτυο είναι συνδεδεμένο. Μπορείς ακόμη να περιηγηθείς στο πρόσφατα φορτωμένο περιεχόμενο."
+            "value" : "Το Reference Video Player δεν συνδέεται στο %@. Βεβαιώσου ότι ο διακομιστής λειτουργεί και το δίκτυο είναι συνδεδεμένο. Μπορείς ακόμη να περιηγηθείς στο πρόσφατα φορτωμένο περιεχόμενο."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reference Player ne peut pas se connecter à %@. Vérifiez que le serveur est en marche et que votre réseau est connecté. Le contenu récent reste disponible."
+            "value" : "Reference Video Player ne peut pas se connecter à %@. Vérifiez que le serveur est en marche et que votre réseau est connecté. Le contenu récent reste disponible."
           }
         }
       }
     },
-    "Reference Player is based on Rivulet, Copyright © 2025–2026 Bain Gurley.\n\nReference Player is distributed under the PolyForm Noncommercial License 1.0.0, which permits use for noncommercial purposes. The complete license text is included with the source distribution.\n\nReference Player is a client for media you provide. It does not host, supply, or distribute any video, audio, or channel content of its own.\n\nThis product uses the TMDB API but is not endorsed or certified by TMDB. Metadata and artwork in Discover and recommendations are provided by The Movie Database (themoviedb.org)." : {
+    "Reference Video Player is based on Rivulet, Copyright © 2025–2026 Bain Gurley.\n\nReference Video Player is distributed under the PolyForm Noncommercial License 1.0.0, which permits use for noncommercial purposes. The complete license text is included with the source distribution.\n\nReference Video Player is a client for media you provide. It does not host, supply, or distribute any video, audio, or channel content of its own.\n\nThis product uses the TMDB API but is not endorsed or certified by TMDB. Metadata and artwork in Discover and recommendations are provided by The Movie Database (themoviedb.org)." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reference Player is based on Rivulet, Copyright © 2025–2026 Bain Gurley.\n\nReference Player is distributed under the PolyForm Noncommercial License 1.0.0, which permits use for noncommercial purposes. The complete license text is included with the source distribution.\n\nReference Player is a client for media you provide. It does not host, supply, or distribute any video, audio, or channel content of its own.\n\nThis product uses the TMDB API but is not endorsed or certified by TMDB. Metadata and artwork in Discover and recommendations are provided by The Movie Database (themoviedb.org)."
+            "value" : "Reference Video Player is based on Rivulet, Copyright © 2025–2026 Bain Gurley.\n\nReference Video Player is distributed under the PolyForm Noncommercial License 1.0.0, which permits use for noncommercial purposes. The complete license text is included with the source distribution.\n\nReference Video Player is a client for media you provide. It does not host, supply, or distribute any video, audio, or channel content of its own.\n\nThis product uses the TMDB API but is not endorsed or certified by TMDB. Metadata and artwork in Discover and recommendations are provided by The Movie Database (themoviedb.org)."
           }
         }
       }
     },
-    "Reference Player needs %@ Server %lld.%lld.%lld or newer." : {
+    "Reference Video Player needs %@ Server %lld.%lld.%lld or newer." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reference Player benötigt %1$@-Server %2$lld.%3$lld.%4$lld oder neuer."
+            "value" : "Reference Video Player benötigt %1$@-Server %2$lld.%3$lld.%4$lld oder neuer."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Reference Player needs %1$@ Server %2$lld.%3$lld.%4$lld or newer."
+            "value" : "Reference Video Player needs %1$@ Server %2$lld.%3$lld.%4$lld or newer."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reference Player nécessite %1$@ Server %2$lld.%3$lld.%4$lld ou ultérieur."
+            "value" : "Reference Video Player nécessite %1$@ Server %2$lld.%3$lld.%4$lld ou ultérieur."
           }
         }
       }
     },
-    "Reference Player's license and the open-source software it uses, including FFmpeg (LGPL), libdovi, and Sentry." : {
+    "Reference Video Player's license and the open-source software it uses, including FFmpeg (LGPL), libdovi, and Sentry." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Lizenz von Reference Player und die verwendete Open-Source-Software, darunter FFmpeg (LGPL), libdovi und Sentry."
+            "value" : "Die Lizenz von Reference Video Player und die verwendete Open-Source-Software, darunter FFmpeg (LGPL), libdovi und Sentry."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Η άδεια του Reference Player και το λογισμικό ανοιχτού κώδικα που χρησιμοποιεί, όπως FFmpeg (LGPL), libdovi και Sentry."
+            "value" : "Η άδεια του Reference Video Player και το λογισμικό ανοιχτού κώδικα που χρησιμοποιεί, όπως FFmpeg (LGPL), libdovi και Sentry."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Licence de Reference Player et logiciels libres utilisés, dont FFmpeg (LGPL), libdovi et Sentry."
+            "value" : "Licence de Reference Video Player et logiciels libres utilisés, dont FFmpeg (LGPL), libdovi et Sentry."
           }
         }
       }
@@ -515,208 +515,208 @@
     "Report Not Sent" : {},
     "Report Playback" : {},
     "Report Sent" : {},
-    "Search for movies and TV shows on Reference Player" : {
+    "Search for movies and TV shows on Reference Video Player" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Filme und TV-Sendungen in Reference Player suchen"
+            "value" : "Filme und TV-Sendungen in Reference Video Player suchen"
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Αναζήτηση ταινιών και σειρών στο Reference Player"
+            "value" : "Αναζήτηση ταινιών και σειρών στο Reference Video Player"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rechercher des films et séries sur Reference Player"
+            "value" : "Rechercher des films et séries sur Reference Video Player"
           }
         }
       }
     },
-    "See how much Reference Player has cached, and clear it." : {
+    "See how much Reference Video Player has cached, and clear it." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sieh, wie viel Reference Player zwischengespeichert hat, und leere den Speicher."
+            "value" : "Sieh, wie viel Reference Video Player zwischengespeichert hat, und leere den Speicher."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voir le cache de Reference Player et le vider."
+            "value" : "Voir le cache de Reference Video Player et le vider."
           }
         }
       }
     },
     "Send Test Report" : {},
-    "Sends a snapshot of Reference Player's setup and recent logs, and gives you a code to quote in a report. No titles, servers, addresses or passwords." : {
+    "Sends a snapshot of Reference Video Player's setup and recent logs, and gives you a code to quote in a report. No titles, servers, addresses or passwords." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sendet eine Momentaufnahme der Einrichtung von Reference Player und der letzten Protokolle und gibt dir einen Code, den du in einer Meldung angeben kannst. Keine Titel, Server, Adressen oder Passwörter."
+            "value" : "Sendet eine Momentaufnahme der Einrichtung von Reference Video Player und der letzten Protokolle und gibt dir einen Code, den du in einer Meldung angeben kannst. Keine Titel, Server, Adressen oder Passwörter."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Στέλνει στιγμιότυπο των ρυθμίσεων και πρόσφατων αρχείων καταγραφής του Reference Player, με κωδικό αναφοράς. Δεν περιλαμβάνει τίτλους, διακομιστές, διευθύνσεις ή κωδικούς."
+            "value" : "Στέλνει στιγμιότυπο των ρυθμίσεων και πρόσφατων αρχείων καταγραφής του Reference Video Player, με κωδικό αναφοράς. Δεν περιλαμβάνει τίτλους, διακομιστές, διευθύνσεις ή κωδικούς."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Envoie un aperçu de la configuration de Reference Player et des journaux récents, avec un code à citer. Ni titres, ni serveurs, ni adresses, ni mots de passe."
+            "value" : "Envoie un aperçu de la configuration de Reference Video Player et des journaux récents, avec un code à citer. Ni titres, ni serveurs, ni adresses, ni mots de passe."
           }
         }
       }
     },
     "Sends one test report now and says whether Home Assistant accepted it." : {},
-    "Shows the profile picker each time Reference Player opens, and when you come back after more than 30 seconds away: on the Home Screen, in another app or on the screensaver." : {
+    "Shows the profile picker each time Reference Video Player opens, and when you come back after more than 30 seconds away: on the Home Screen, in another app or on the screensaver." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zeigt die Profilauswahl bei jedem Start von Reference Player und wenn du nach über 30 Sekunden zurückkehrst: vom Home-Bildschirm, aus einer anderen App oder vom Bildschirmschoner."
+            "value" : "Zeigt die Profilauswahl bei jedem Start von Reference Video Player und wenn du nach über 30 Sekunden zurückkehrst: vom Home-Bildschirm, aus einer anderen App oder vom Bildschirmschoner."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Affiche le sélecteur de profil à chaque ouverture de Reference Player et après plus de 30 secondes d’absence : écran d’accueil, autre app ou économiseur d’écran."
+            "value" : "Affiche le sélecteur de profil à chaque ouverture de Reference Video Player et après plus de 30 secondes d’absence : écran d’accueil, autre app ou économiseur d’écran."
           }
         }
       }
     },
-    "Sign in with the server, username and password from your IPTV provider (an Xtream Codes login). Reference Player loads the channels and guide." : {
+    "Sign in with the server, username and password from your IPTV provider (an Xtream Codes login). Reference Video Player loads the channels and guide." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Melde dich mit Server, Benutzername und Passwort deines IPTV-Anbieters an (ein Login für Xtream Codes). Reference Player lädt die Sender und das Programm."
+            "value" : "Melde dich mit Server, Benutzername und Passwort deines IPTV-Anbieters an (ein Login für Xtream Codes). Reference Video Player lädt die Sender und das Programm."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Συνδέσου με διακομιστή, όνομα χρήστη και κωδικό του παρόχου IPTV (Xtream Codes). Το Reference Player φορτώνει κανάλια και οδηγό."
+            "value" : "Συνδέσου με διακομιστή, όνομα χρήστη και κωδικό του παρόχου IPTV (Xtream Codes). Το Reference Video Player φορτώνει κανάλια και οδηγό."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Connectez-vous avec le serveur, l’identifiant et le mot de passe de votre fournisseur IPTV (compte Xtream Codes). Reference Player charge chaînes et guide."
+            "value" : "Connectez-vous avec le serveur, l’identifiant et le mot de passe de votre fournisseur IPTV (compte Xtream Codes). Reference Video Player charge chaînes et guide."
           }
         }
       }
     },
-    "Sign in without typing a password: Reference Player shows a code to approve from a device already signed in to Jellyfin. Quick Connect has to be on in the server's dashboard." : {
+    "Sign in without typing a password: Reference Video Player shows a code to approve from a device already signed in to Jellyfin. Quick Connect has to be on in the server's dashboard." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Anmelden ohne Passwort: Reference Player zeigt einen Code, den du auf einem bei Jellyfin angemeldeten Gerät bestätigst. Quick Connect muss im Server-Dashboard aktiv sein."
+            "value" : "Anmelden ohne Passwort: Reference Video Player zeigt einen Code, den du auf einem bei Jellyfin angemeldeten Gerät bestätigst. Quick Connect muss im Server-Dashboard aktiv sein."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Συνδέσου χωρίς πληκτρολόγηση κωδικού: το Reference Player εμφανίζει έναν κωδικό έγκρισης από ήδη συνδεδεμένη συσκευή Jellyfin. Η «Γρήγορη σύνδεση» πρέπει να είναι ενεργή στον διακομιστή."
+            "value" : "Συνδέσου χωρίς πληκτρολόγηση κωδικού: το Reference Video Player εμφανίζει έναν κωδικό έγκρισης από ήδη συνδεδεμένη συσκευή Jellyfin. Η «Γρήγορη σύνδεση» πρέπει να είναι ενεργή στον διακομιστή."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Connexion sans mot de passe : Reference Player affiche un code à approuver depuis un appareil connecté à Jellyfin. Quick Connect doit être activé sur le serveur."
+            "value" : "Connexion sans mot de passe : Reference Video Player affiche un code à approuver depuis un appareil connecté à Jellyfin. Quick Connect doit être activé sur le serveur."
           }
         }
       }
     },
-    "Sign out of your Plex account. Every Plex server on it leaves Reference Player until you sign in again." : {
+    "Sign out of your Plex account. Every Plex server on it leaves Reference Video Player until you sign in again." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Meldet dich von deinem Plex-Account ab. Alle Plex-Server darin verschwinden aus Reference Player, bis du dich wieder anmeldest."
+            "value" : "Meldet dich von deinem Plex-Account ab. Alle Plex-Server darin verschwinden aus Reference Video Player, bis du dich wieder anmeldest."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Αποσύνδεση από τον λογαριασμό Plex. Όλοι οι διακομιστές Plex αφαιρούνται από το Reference Player μέχρι να συνδεθείς ξανά."
+            "value" : "Αποσύνδεση από τον λογαριασμό Plex. Όλοι οι διακομιστές Plex αφαιρούνται από το Reference Video Player μέχρι να συνδεθείς ξανά."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Déconnecte votre compte Plex. Tous ses serveurs quittent Reference Player jusqu’à la prochaine connexion."
+            "value" : "Déconnecte votre compte Plex. Tous ses serveurs quittent Reference Video Player jusqu’à la prochaine connexion."
           }
         }
       }
     },
-    "Suggestions are off. Erase what Reference Player learned from what you watch, or keep it for if you turn them back on." : {
+    "Suggestions are off. Erase what Reference Video Player learned from what you watch, or keep it for if you turn them back on." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vorschläge sind deaktiviert. Lösche, was Reference Player aus deinem Sehverhalten gelernt hat, oder behalte es, falls du sie wieder aktivierst."
+            "value" : "Vorschläge sind deaktiviert. Lösche, was Reference Video Player aus deinem Sehverhalten gelernt hat, oder behalte es, falls du sie wieder aktivierst."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Οι προτάσεις είναι ανενεργές. Διάγραψε όσα έμαθε το Reference Player από τις προβολές σου ή κράτησέ τα για ενδεχόμενη επανενεργοποίηση."
+            "value" : "Οι προτάσεις είναι ανενεργές. Διάγραψε όσα έμαθε το Reference Video Player από τις προβολές σου ή κράτησέ τα για ενδεχόμενη επανενεργοποίηση."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les suggestions sont désactivées. Effacez ce que Reference Player a appris de vos visionnages, ou gardez-le au cas où vous les réactiveriez."
+            "value" : "Les suggestions sont désactivées. Effacez ce que Reference Video Player a appris de vos visionnages, ou gardez-le au cas où vous les réactiveriez."
           }
         }
       }
     },
     "TMDB Key" : {},
     "Tells Home Assistant what is playing and how: codec, resolution, Dolby Vision route, audio format and height rendering. Off sends nothing." : {},
-    "That server refused Reference Player." : {
+    "That server refused Reference Video Player." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Server hat Reference Player abgewiesen."
+            "value" : "Der Server hat Reference Video Player abgewiesen."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ο διακομιστής απέρριψε το Reference Player."
+            "value" : "Ο διακομιστής απέρριψε το Reference Video Player."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ce serveur a refusé Reference Player."
+            "value" : "Ce serveur a refusé Reference Video Player."
           }
         }
       }
     },
-    "That user's password. Reference Player keeps it in the Keychain." : {
+    "That user's password. Reference Video Player keeps it in the Keychain." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Passwort dieses Benutzers. Reference Player speichert es im Schlüsselbund."
+            "value" : "Das Passwort dieses Benutzers. Reference Video Player speichert es im Schlüsselbund."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ο κωδικός αυτού του χρήστη. Το Reference Player τον αποθηκεύει στην Κλειδοθήκη."
+            "value" : "Ο κωδικός αυτού του χρήστη. Το Reference Video Player τον αποθηκεύει στην Κλειδοθήκη."
           }
         },
         "fr" : {
@@ -729,18 +729,18 @@
     },
     "The address of format-index.json, built from your library files with the index tools in PrivateBuild. With no address, nothing is fetched." : {},
     "The index could not be fetched." : {},
-    "The password your provider gave you. Reference Player keeps it in the Keychain." : {
+    "The password your provider gave you. Reference Video Player keeps it in the Keychain." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Passwort, das du von deinem Anbieter erhalten hast. Reference Player speichert es im Schlüsselbund."
+            "value" : "Das Passwort, das du von deinem Anbieter erhalten hast. Reference Video Player speichert es im Schlüsselbund."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ο κωδικός του παρόχου σου. Το Reference Player τον αποθηκεύει στην Κλειδοθήκη."
+            "value" : "Ο κωδικός του παρόχου σου. Το Reference Video Player τον αποθηκεύει στην Κλειδοθήκη."
           }
         },
         "fr" : {
@@ -767,74 +767,74 @@
         }
       }
     },
-    "This server runs Jellyfin %@. Reference Player needs %lld.%lld or newer." : {
+    "This server runs Jellyfin %@. Reference Video Player needs %lld.%lld or newer." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Auf diesem Server läuft Jellyfin %@. Reference Player benötigt %lld.%lld oder neuer."
+            "value" : "Auf diesem Server läuft Jellyfin %@. Reference Video Player benötigt %lld.%lld oder neuer."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "This server runs Jellyfin %1$@. Reference Player needs %2$lld.%3$lld or newer."
+            "value" : "This server runs Jellyfin %1$@. Reference Video Player needs %2$lld.%3$lld or newer."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ce serveur exécute Jellyfin %1$@. Reference Player nécessite %2$lld.%3$lld ou ultérieur."
+            "value" : "Ce serveur exécute Jellyfin %1$@. Reference Video Player nécessite %2$lld.%3$lld ou ultérieur."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ο διακομιστής εκτελεί Jellyfin %1$@. Το Reference Player απαιτεί έκδοση %2$lld.%3$lld ή νεότερη."
+            "value" : "Ο διακομιστής εκτελεί Jellyfin %1$@. Το Reference Video Player απαιτεί έκδοση %2$lld.%3$lld ή νεότερη."
           }
         }
       }
     },
-    "Turn off to remove this server from Reference Player: its libraries, Home rows, Continue Watching and Live TV. Your account stays signed in." : {
+    "Turn off to remove this server from Reference Video Player: its libraries, Home rows, Continue Watching and Live TV. Your account stays signed in." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schalte diese Option aus, um diesen Server aus Reference Player zu entfernen: seine Mediatheken, Reihen der Startseite, „Weiter ansehen“ und Live-TV. Dein Account bleibt angemeldet."
+            "value" : "Schalte diese Option aus, um diesen Server aus Reference Video Player zu entfernen: seine Mediatheken, Reihen der Startseite, „Weiter ansehen“ und Live-TV. Dein Account bleibt angemeldet."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Απενεργοποίησε για αφαίρεση αυτού του διακομιστή από το Reference Player: βιβλιοθήκες, σειρές Αρχικής, Συνέχεια παρακολούθησης και ζωντανή τηλεόραση. Ο λογαριασμός παραμένει συνδεδεμένος."
+            "value" : "Απενεργοποίησε για αφαίρεση αυτού του διακομιστή από το Reference Video Player: βιβλιοθήκες, σειρές Αρχικής, Συνέχεια παρακολούθησης και ζωντανή τηλεόραση. Ο λογαριασμός παραμένει συνδεδεμένος."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Désactivez pour retirer ce serveur de Reference Player : bibliothèques, rangées d’Accueil, Reprendre la lecture et TV en direct. Votre compte reste connecté."
+            "value" : "Désactivez pour retirer ce serveur de Reference Video Player : bibliothèques, rangées d’Accueil, Reprendre la lecture et TV en direct. Votre compte reste connecté."
           }
         }
       }
     },
-    "Tvheadend didn't give Reference Player a stream for this user. Check its streaming rights, or update Tvheadend." : {
+    "Tvheadend didn't give Reference Video Player a stream for this user. Check its streaming rights, or update Tvheadend." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tvheadend hat Reference Player für diesen Benutzer keinen Stream geliefert. Prüfe seine Streaming-Rechte oder aktualisiere Tvheadend."
+            "value" : "Tvheadend hat Reference Video Player für diesen Benutzer keinen Stream geliefert. Prüfe seine Streaming-Rechte oder aktualisiere Tvheadend."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Το Tvheadend δεν έδωσε ροή στο Reference Player για αυτόν τον χρήστη. Έλεγξε τα δικαιώματα μετάδοσης ή ενημέρωσε το Tvheadend."
+            "value" : "Το Tvheadend δεν έδωσε ροή στο Reference Video Player για αυτόν τον χρήστη. Έλεγξε τα δικαιώματα μετάδοσης ή ενημέρωσε το Tvheadend."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tvheadend n’a pas fourni de flux à Reference Player pour cet utilisateur. Vérifiez ses droits de streaming, ou mettez Tvheadend à jour."
+            "value" : "Tvheadend n’a pas fourni de flux à Reference Video Player pour cet utilisateur. Vérifiez ses droits de streaming, ou mettez Tvheadend à jour."
           }
         }
       }
@@ -867,95 +867,95 @@
         }
       }
     },
-    "Used by libass for bidirectional text. FriBidi 1.0.16, statically linked and used under the GNU Lesser General Public License, version 2.1, whose full text is reproduced in the FFmpeg entry above. It is built unmodified from https://github.com/fribidi/fribidi (tag v1.0.16); https://github.com/l984-451/LibassBuild holds the build script, and Reference Player's source is at https://github.com/rohanpandula/reference-player, so the app can be rebuilt against a modified FriBidi." : {
+    "Used by libass for bidirectional text. FriBidi 1.0.16, statically linked and used under the GNU Lesser General Public License, version 2.1, whose full text is reproduced in the FFmpeg entry above. It is built unmodified from https://github.com/fribidi/fribidi (tag v1.0.16); https://github.com/l984-451/LibassBuild holds the build script, and Reference Video Player's source is at https://github.com/rohanpandula/reference-player, so the app can be rebuilt against a modified FriBidi." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Used by libass for bidirectional text. FriBidi 1.0.16, statically linked and used under the GNU Lesser General Public License, version 2.1, whose full text is reproduced in the FFmpeg entry above. It is built unmodified from https://github.com/fribidi/fribidi (tag v1.0.16); https://github.com/l984-451/LibassBuild holds the build script, and Reference Player's source is at https://github.com/rohanpandula/reference-player, so the app can be rebuilt against a modified FriBidi."
+            "value" : "Used by libass for bidirectional text. FriBidi 1.0.16, statically linked and used under the GNU Lesser General Public License, version 2.1, whose full text is reproduced in the FFmpeg entry above. It is built unmodified from https://github.com/fribidi/fribidi (tag v1.0.16); https://github.com/l984-451/LibassBuild holds the build script, and Reference Video Player's source is at https://github.com/rohanpandula/reference-player, so the app can be rebuilt against a modified FriBidi."
           }
         }
       }
     },
-    "Used once, to fetch your Dispatcharr API key. Reference Player keeps the key, not the password." : {
+    "Used once, to fetch your Dispatcharr API key. Reference Video Player keeps the key, not the password." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wird nur einmal verwendet, um deinen Dispatcharr-API-Schlüssel abzurufen. Reference Player speichert den Schlüssel, nicht das Passwort."
+            "value" : "Wird nur einmal verwendet, um deinen Dispatcharr-API-Schlüssel abzurufen. Reference Video Player speichert den Schlüssel, nicht das Passwort."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Χρησιμοποιείται μία φορά για λήψη του κλειδιού API Dispatcharr. Το Reference Player αποθηκεύει το κλειδί και όχι τον κωδικό."
+            "value" : "Χρησιμοποιείται μία φορά για λήψη του κλειδιού API Dispatcharr. Το Reference Video Player αποθηκεύει το κλειδί και όχι τον κωδικό."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Utilisé une fois, pour obtenir votre clé API Dispatcharr. Reference Player garde la clé, pas le mot de passe."
+            "value" : "Utilisé une fois, pour obtenir votre clé API Dispatcharr. Reference Video Player garde la clé, pas le mot de passe."
           }
         }
       }
     },
-    "Used once, to sign in. Reference Player keeps the access token %@ returns, not the password. Leave it empty if your user has none." : {
+    "Used once, to sign in. Reference Video Player keeps the access token %@ returns, not the password. Leave it empty if your user has none." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wird nur einmal zum Anmelden verwendet. Reference Player speichert das Zugriffstoken von %@, nicht das Passwort. Lass das Feld leer, wenn dein Benutzer keins hat."
+            "value" : "Wird nur einmal zum Anmelden verwendet. Reference Video Player speichert das Zugriffstoken von %@, nicht das Passwort. Lass das Feld leer, wenn dein Benutzer keins hat."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Utilisé une fois, pour se connecter. Reference Player garde le jeton d’accès renvoyé par %@, pas le mot de passe. Laissez vide si l’utilisateur n’en a pas."
+            "value" : "Utilisé une fois, pour se connecter. Reference Video Player garde le jeton d’accès renvoyé par %@, pas le mot de passe. Laissez vide si l’utilisateur n’en a pas."
           }
         }
       }
     },
-    "Used once, to sign in. Reference Player keeps the access token Jellyfin returns, not the password." : {
+    "Used once, to sign in. Reference Video Player keeps the access token Jellyfin returns, not the password." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wird nur einmal zum Anmelden verwendet. Reference Player speichert das Zugriffstoken von Jellyfin, nicht das Passwort."
+            "value" : "Wird nur einmal zum Anmelden verwendet. Reference Video Player speichert das Zugriffstoken von Jellyfin, nicht das Passwort."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Χρησιμοποιείται μία φορά για σύνδεση. Το Reference Player αποθηκεύει το token πρόσβασης του Jellyfin και όχι τον κωδικό."
+            "value" : "Χρησιμοποιείται μία φορά για σύνδεση. Το Reference Video Player αποθηκεύει το token πρόσβασης του Jellyfin και όχι τον κωδικό."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Utilisé une fois, pour se connecter. Reference Player garde le jeton d’accès renvoyé par Jellyfin, pas le mot de passe."
+            "value" : "Utilisé une fois, pour se connecter. Reference Video Player garde le jeton d’accès renvoyé par Jellyfin, pas le mot de passe."
           }
         }
       }
     },
     "Webhook ID" : {},
-    "Welcome to Reference Player" : {
+    "Welcome to Reference Video Player" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Willkommen bei Reference Player"
+            "value" : "Willkommen bei Reference Video Player"
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Καλώς ήρθες στο Reference Player"
+            "value" : "Καλώς ήρθες στο Reference Video Player"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bienvenue dans Reference Player"
+            "value" : "Bienvenue dans Reference Video Player"
           }
         }
       }
@@ -963,24 +963,24 @@
     "Where Home Assistant answers on your network, with its port." : {},
     "Where Home Assistant answers on your network, with its port. With no address, nothing is sent." : {},
     "Where the Apple TV fetches format-index.json, built from your library." : {},
-    "Your Dispatcharr server. Reference Player loads its channels and guide, and records through it if you sign in." : {
+    "Your Dispatcharr server. Reference Video Player loads its channels and guide, and records through it if you sign in." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Dispatcharr-Server. Reference Player lädt seine Sender und sein Programm und nimmt darüber auf, wenn du dich anmeldest."
+            "value" : "Dein Dispatcharr-Server. Reference Video Player lädt seine Sender und sein Programm und nimmt darüber auf, wenn du dich anmeldest."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ο διακομιστής Dispatcharr. Το Reference Player φορτώνει κανάλια και οδηγό και, αν συνδεθείς, πραγματοποιεί εγγραφές."
+            "value" : "Ο διακομιστής Dispatcharr. Το Reference Video Player φορτώνει κανάλια και οδηγό και, αν συνδεθείς, πραγματοποιεί εγγραφές."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre serveur Dispatcharr. Reference Player charge ses chaînes et son guide, et enregistre via lui si vous vous connectez."
+            "value" : "Votre serveur Dispatcharr. Reference Video Player charge ses chaînes et son guide, et enregistre via lui si vous vous connectez."
           }
         }
       }
@@ -989,46 +989,46 @@
     "Your MDBList key, from mdblist.com under Preferences. It adds Metacritic and Letterboxd scores to a title's details. The free plan allows 1,000 lookups a day." : {},
     "Your TMDB API Key or API Read Access Token." : {},
     "Your TMDB API Key or Read Access Token (themoviedb.org, Settings, API). It turns on Discover, recommendations and actor biographies. Reopen the app after." : {},
-    "Your Threadfin server. Reference Player loads its playlist and guide from the address." : {
+    "Your Threadfin server. Reference Video Player loads its playlist and guide from the address." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Threadfin-Server. Reference Player lädt Playlist und Programm von dieser Adresse."
+            "value" : "Dein Threadfin-Server. Reference Video Player lädt Playlist und Programm von dieser Adresse."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ο διακομιστής Threadfin. Το Reference Player φορτώνει τη λίστα και τον οδηγό από τη διεύθυνση."
+            "value" : "Ο διακομιστής Threadfin. Το Reference Video Player φορτώνει τη λίστα και τον οδηγό από τη διεύθυνση."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre serveur Threadfin. Reference Player charge sa playlist et son guide depuis l’adresse."
+            "value" : "Votre serveur Threadfin. Reference Video Player charge sa playlist et son guide depuis l’adresse."
           }
         }
       }
     },
-    "Your Tvheadend server. Reference Player loads its channels and guide, and records through it if you sign in." : {
+    "Your Tvheadend server. Reference Video Player loads its channels and guide, and records through it if you sign in." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Tvheadend-Server. Reference Player lädt seine Sender und sein Programm und nimmt darüber auf, wenn du dich anmeldest."
+            "value" : "Dein Tvheadend-Server. Reference Video Player lädt seine Sender und sein Programm und nimmt darüber auf, wenn du dich anmeldest."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ο διακομιστής Tvheadend. Το Reference Player φορτώνει τα κανάλια και τον οδηγό και, αν συνδεθείς, πραγματοποιεί εγγραφές."
+            "value" : "Ο διακομιστής Tvheadend. Το Reference Video Player φορτώνει τα κανάλια και τον οδηγό και, αν συνδεθείς, πραγματοποιεί εγγραφές."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre serveur Tvheadend. Reference Player charge ses chaînes et son guide, et enregistre via lui si vous vous connectez."
+            "value" : "Votre serveur Tvheadend. Reference Video Player charge ses chaînes et son guide, et enregistre via lui si vous vous connectez."
           }
         }
       }

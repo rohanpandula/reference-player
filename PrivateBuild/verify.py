@@ -2,7 +2,7 @@
 """Fail-closed source/configuration guard for this fork's reviewed baseline.
 
 Contract: upstream Rivulet plus the restored FEL/Height Speakers code on the engine upstream
-pins, AetherEngine 7.66.1 with its bed-regression audio.
+pins, AetherEngine 7.69.0 with its bed-regression audio.
 
 This is deliberately not a Swift compiler, a licence opinion, or an HDMI test.
 Keep these expectations independent of UPSTREAM.json: changing a manifest must
@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-BASELINE = "220c3b56121fe4252f2c2b46afbecb17b4a435db"  # upstream v1.3.1-129, the last upstream release merged into this fork
+BASELINE = "0e40b943ec7e61c9e7257f0f3c6a957e6c0d842b"  # upstream main@0e40b943, the last upstream release merged into this fork
 LOCK = Path("Rivulet.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved")
 # Reviewed source, pinned byte for byte (sha256). These two files decide what may reach upstream's
 # Workers and where the user's own TMDB and MDBList keys may be sent. Any edit to either, a comment
@@ -36,7 +36,7 @@ REVIEWED_SOURCES = {
 TRAITS = {"DualLayerDolbyVision", "DolbyVisionFelCurves", "DolbyVisionStillReshaping", "TrueHDObjectAudio", "DTSXObjectAudio"}
 # identity: (source URL, semantic version or None, immutable Git revision)
 PINS = {
-    "aetherengine": ("https://github.com/superuser404notfound/AetherEngine", "7.66.1", "d46c27028db88457a86c04b2c8c4aa7ab41a5f32"),
+    "aetherengine": ("https://github.com/superuser404notfound/AetherEngine", "7.69.0", "a7aaa8d1f1e47c1bb171b376cdd336ccc136f44e"),
     "ffmpegbuild": ("https://github.com/superuser404notfound/FFmpegBuild", "3.15.0", "d445e6daa180db73f12d47606a00c914f682e278"),
     "fluidaudio": ("https://github.com/FluidInference/FluidAudio", None, "1b0ed50d686873128a4129b3510ce3914c849bab"),
     "libassbuild": ("https://github.com/l984-451/LibassBuild", "0.17.5-2", "434a18a439ece78631d671cce0ee7bab1622f725"),

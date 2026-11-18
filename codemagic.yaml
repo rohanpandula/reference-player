@@ -130,7 +130,7 @@ workflows:
             --config Release \
             --archive-flags="-destination 'generic/platform=tvOS' -onlyUsePackageVersionsFromResolvedFile"
 
-      - name: Upload dSYMs to GlitchTip
+      - name: Upload dSYMs to Sentry
         ignore_failure: true
         script: |
           if [ -z "${SENTRY_AUTH_TOKEN:-}" ]; then
@@ -138,7 +138,7 @@ workflows:
             exit 0
           fi
           which sentry-cli >/dev/null 2>&1 || brew install getsentry/tools/sentry-cli
-          sentry-cli --url "${SENTRY_URL:-https://errors.gurleystudios.com}" debug-files upload \
+          sentry-cli debug-files upload \
             --auth-token "$SENTRY_AUTH_TOKEN" \
             --org "$SENTRY_ORG" \
             --project "$SENTRY_PROJECT" \
@@ -296,7 +296,7 @@ workflows:
 
       # Without this the in-app frames on iOS crash and app-hang events resolve
       # as <unknown>, which is what made RIVULET-41 unreadable on tvOS.
-      - name: Upload dSYMs to GlitchTip
+      - name: Upload dSYMs to Sentry
         ignore_failure: true
         script: |
           if [ -z "${SENTRY_AUTH_TOKEN:-}" ]; then
@@ -304,7 +304,7 @@ workflows:
             exit 0
           fi
           which sentry-cli >/dev/null 2>&1 || brew install getsentry/tools/sentry-cli
-          sentry-cli --url "${SENTRY_URL:-https://errors.gurleystudios.com}" debug-files upload \
+          sentry-cli debug-files upload \
             --auth-token "$SENTRY_AUTH_TOKEN" \
             --org "$SENTRY_ORG" \
             --project "$SENTRY_PROJECT" \
@@ -400,9 +400,7 @@ workflows:
 
       - name: Add certificates to keychain
         script: |
-          # The default ACL allows only codesign and productsign; exportArchive
-          # signs the .pkg with productbuild, which would need a keychain prompt.
-          keychain add-certificates --allow-all-applications
+          keychain add-certificates
           rm -f "$CM_BUILD_DIR/cert_key.pem"
 
       - name: Apply fetched signing profiles to Xcode project
@@ -474,20 +472,13 @@ workflows:
           /usr/libexec/PlistBuddy -c "Add :method string app-store-connect" "$OPTIONS"
           /usr/libexec/PlistBuddy -c "Delete :installerSigningCertificate" "$OPTIONS" 2>/dev/null || true
           /usr/libexec/PlistBuddy -c "Add :installerSigningCertificate string $INSTALLER" "$OPTIONS"
-          echo "Export options:"; plutil -p "$OPTIONS"
-          if ! xcodebuild -exportArchive \
+          xcodebuild -exportArchive \
             -archivePath "$CM_BUILD_DIR/$ARCHIVE_PATH" \
             -exportOptionsPlist "$OPTIONS" \
-            -exportPath "$CM_BUILD_DIR/build/macos/pkg"; then
-            # The real productbuild error is only in the distribution logs.
-            for log in "${TMPDIR:-/tmp}"/*.xcdistributionlogs/IDEDistribution*.log; do
-              echo "=== $log"; tail -n 80 "$log"
-            done
-            exit 70
-          fi
+            -exportPath "$CM_BUILD_DIR/build/macos/pkg"
           ls "$CM_BUILD_DIR"/build/macos/pkg/*.pkg
 
-      - name: Upload dSYMs to GlitchTip
+      - name: Upload dSYMs to Sentry
         ignore_failure: true
         script: |
           if [ -z "${SENTRY_AUTH_TOKEN:-}" ]; then
@@ -495,7 +486,7 @@ workflows:
             exit 0
           fi
           which sentry-cli >/dev/null 2>&1 || brew install getsentry/tools/sentry-cli
-          sentry-cli --url "${SENTRY_URL:-https://errors.gurleystudios.com}" debug-files upload \
+          sentry-cli debug-files upload \
             --auth-token "$SENTRY_AUTH_TOKEN" \
             --org "$SENTRY_ORG" \
             --project "$SENTRY_PROJECT" \

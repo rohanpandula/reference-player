@@ -50,15 +50,15 @@ final class PrivateStringTableTests: XCTestCase {
     }
 
     func test_brandingKeepsTheExistingTranslations() throws {
-        let keys = ["Welcome to Reference Player",
-                    "This server runs Jellyfin %@. Reference Player needs %lld.%lld or newer."]
+        let keys = ["Welcome to Reference Video Player",
+                    "This server runs Jellyfin %@. Reference Video Player needs %lld.%lld or newer."]
         for language in ["de", "el", "fr"] {
             let path = try XCTUnwrap(Bundle.main.path(forResource: language, ofType: "lproj"))
             let bundle = try XCTUnwrap(Bundle(path: path))
             for key in keys {
                 let translated = bundle.localizedString(forKey: key, value: nil, table: "Private")
                 XCTAssertNotEqual(translated, key, "Missing translation for \(language): \(key)")
-                XCTAssertTrue(translated.contains("Reference Player"), language)
+                XCTAssertTrue(translated.contains("Reference Video Player"), language)
                 XCTAssertFalse(translated.contains("Rivulet"), language)
             }
         }
@@ -69,6 +69,6 @@ final class PrivateStringTableTests: XCTestCase {
         for (id, descriptor) in SettingsDescriptorStore.descriptors {
             XCTAssertFalse(descriptor.description.contains("Rivulet"), id)
         }
-        XCTAssertTrue(SettingsDescriptorStore.descriptor(for: "appIcon")?.description.contains("Reference Player") == true)
+        XCTAssertTrue(SettingsDescriptorStore.descriptor(for: "appIcon")?.description.contains("Reference Video Player") == true)
     }
 }

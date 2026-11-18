@@ -83,14 +83,14 @@ Limits:
 ### Height speakers for TrueHD Atmos and DTS:X
 
 Settings > Playback > Height Speakers selects a layout: 5.1.2, 5.1.4, 7.1.2, 7.1.4 or 9.1.6. With a
-layout set, an object soundtrack keeps its height channels. The playback engine renders them into
-that layout, and the app sends lossless PCM over HDMI. The default is Off.
+layout set, the playback engine renders supported height channels and sends lossless PCM over HDMI.
+The default is Off.
 
 Limits:
 
 - You need tvOS 26 or later and a 48 kHz track: TrueHD, or DTS-HD Master Audio for DTS:X.
-- DTS:X heights render only into 7.1.4 or 9.1.6. With a smaller layout, a DTS:X track plays its
-  ordinary channels.
+- The engine renders DTS:X into 7.1.4 or 9.1.6. With a smaller setting, the engine renders a 7.1.4
+  bed for the receiver to map. TrueHD follows the selected layout.
 - The app sends fixed channels. It does not send the original bitstream or movable objects. As a
   result, your receiver does not use its own Atmos or DTS:X decoder.
 - No test has shown that the rendering matches a receiver's.
@@ -101,6 +101,8 @@ Limits:
 
 ### Other additions
 
+- **Watch Together** supports a self-hosted Open Watch Party relay. To enable it in your own build,
+  set `WatchTogetherRelayURL` in the app's Info.plist. The TestFlight build leaves it off.
 - **Format badges** on detail pages and folder lists: DV FEL, DV MEL and TrueHD Atmos. The app reads
   them from an optional index of your own library (Settings > Playback > Format Tags). The tools
   that build the index are in `PrivateBuild/tools/format-index/`. The default is no index address,

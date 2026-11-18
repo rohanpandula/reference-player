@@ -6,7 +6,7 @@ say lives here. Where this file and `CLAUDE.md` (or `README.md`) disagree, this 
 fork. The folder and symbol names (`PrivateBuild/`, `PrivateSettings`, `Private.xcstrings`) are the
 overlay's historical names; they mean "this fork's", not "secret".
 
-This tree is upstream Rivulet `v1.3.1-129` (`220c3b56121fe4252f2c2b46afbecb17b4a435db`), merged 2026-11-18, plus this fork's overlay.
+This tree is upstream Rivulet `main@0e40b943` (`0e40b943ec7e61c9e7257f0f3c6a957e6c0d842b`), merged 2026-11-18, plus this fork's overlay.
 
 ## What Reference means for changes
 

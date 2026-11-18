@@ -197,7 +197,7 @@ extension SettingsContent {
                       placeholder: "Required", keyboard: .URL, contentType: .URL,
                       value: { draft.m3uURL }, set: { draft.m3uURL = $0; draft.status = .idle }),
             EntryStep(id: "epgURLField", title: "Guide URL",
-                      message: LocalizedStringResource("If your provider gave you a guide link (XMLTV), enter it. Otherwise leave this empty: Reference Player uses the guide the playlist names, if it has one.", table: "Private"),
+                      message: LocalizedStringResource("If your provider gave you a guide link (XMLTV), enter it. Otherwise leave this empty: Reference Video Player uses the guide the playlist names, if it has one.", table: "Private"),
                       keyboard: .URL, contentType: .URL,
                       value: { draft.epgURL }, set: { draft.epgURL = $0; draft.status = .idle }),
             nameStep(draft, fallback: LiveTVSourceConnector.defaultPlaylistName)

@@ -219,7 +219,7 @@ final class HomeAssistantReporter {
     /// not "accepted".
     func sendTest() async -> Bool {
         var report = HomeAssistantPlaybackReport(state: "test")
-        report.title = "Reference Player test report"
+        report.title = "Reference Video Player test report"
         return await deliver(report)
     }
 

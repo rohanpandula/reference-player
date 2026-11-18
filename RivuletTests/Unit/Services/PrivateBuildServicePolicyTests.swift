@@ -34,7 +34,7 @@ final class PrivateBuildServicePolicyTests: XCTestCase {
     /// Emby client name read `PlexAPI.productName`; a User-Agent's product token cannot hold a space,
     /// so the Live TV and Plex direct-play user agents read `PrivateBuildPolicy.userAgentProduct`.
     func testServersAreToldTheForksName() {
-        XCTAssertEqual(PlexAPI.productName, "Reference Player")
+        XCTAssertEqual(PlexAPI.productName, "Reference Video Player")
         XCTAssertEqual(PrivateBuildPolicy.userAgentProduct, "ReferencePlayer")
         XCTAssertTrue(LiveTVClientIdentity.userAgent.hasPrefix("ReferencePlayer/"), LiveTVClientIdentity.userAgent)
         XCTAssertFalse(LiveTVClientIdentity.userAgent.contains(" "), LiveTVClientIdentity.userAgent)
@@ -46,7 +46,7 @@ final class PrivateBuildServicePolicyTests: XCTestCase {
     @MainActor
     func testTheNameWithASpaceIsCarriedIntact() throws {
         let headers = PlexProvider.directPlayHeaders(token: "tok")
-        XCTAssertEqual(headers["X-Plex-Product"], "Reference Player")
+        XCTAssertEqual(headers["X-Plex-Product"], "Reference Video Player")
         let agent = try XCTUnwrap(headers["User-Agent"])
         XCTAssertEqual(agent, "ReferencePlayer/\(PlexAPI.platform)")
 
@@ -54,13 +54,13 @@ final class PrivateBuildServicePolicyTests: XCTestCase {
             serverURL: "http://plex.local:32400", authToken: "tok", partKey: "/library/parts/1/0/file.mkv"))
         XCTAssertTrue(url.absoluteString.contains("X-Plex-Product=Reference%20Player"), url.absoluteString)
         let query = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems)
-        XCTAssertEqual(query.first { $0.name == "X-Plex-Product" }?.value, "Reference Player")
+        XCTAssertEqual(query.first { $0.name == "X-Plex-Product" }?.value, "Reference Video Player")
 
         for header in [JellyfinClient.authorizationHeader(token: "tok"), EmbyClient.authorizationHeader(token: "tok")] {
-            XCTAssertTrue(header.hasPrefix(#"MediaBrowser Client="Reference Player", "#), header)
+            XCTAssertTrue(header.hasPrefix(#"MediaBrowser Client="Reference Video Player", "#), header)
             let fields = header.dropFirst("MediaBrowser ".count).components(separatedBy: ", ")
             let client = try XCTUnwrap(fields.first { $0.hasPrefix("Client=") })
-            XCTAssertEqual(client, #"Client="Reference Player""#, header)
+            XCTAssertEqual(client, #"Client="Reference Video Player""#, header)
         }
     }
 }

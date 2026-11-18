@@ -48,7 +48,7 @@ struct RivuletMacApp: App {
     }
 
     var body: some Scene {
-        Window(String(localized: "Reference Player", table: "Private"), id: "main") {
+        Window(String(localized: "Reference Video Player", table: "Private"), id: "main") {
             MacRootView()
                 .environmentObject(plex)
                 .environmentObject(plex.browse)

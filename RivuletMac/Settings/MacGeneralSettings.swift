@@ -102,7 +102,7 @@ private struct MacLicensesSheet: View {
     var body: some View {
         NavigationStack {
             List {
-                Section(String(localized: "Reference Player", table: "Private")) {
+                Section(String(localized: "Reference Video Player", table: "Private")) {
                     Text(OpenSourceLicenses.appLicense).font(.footnote).foregroundStyle(.secondary)
                 }
                 Section("Open Source Software") {

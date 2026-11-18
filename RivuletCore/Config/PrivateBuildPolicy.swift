@@ -14,7 +14,7 @@ nonisolated enum PrivateBuildPolicy {
     static let allowsUpstreamHostedServices = false
     /// The name media servers are told (`PlexAPI.productName`: X-Plex-Product, the Jellyfin and Emby
     /// client name), so a server's dashboard does not credit upstream's app with this one.
-    static let productName = "Reference Player"
+    static let productName = "Reference Video Player"
     /// The product token of a User-Agent (`name/version`). A token cannot hold a space (RFC 9110), so it
     /// is the display name without one; headers that carry a name, not a token, use `productName`.
     static let userAgentProduct = "ReferencePlayer"
