@@ -1,15 +1,15 @@
-# Reference Player
+# Reference Video Player
 
-Reference Player is a noncommercial fork of [Rivulet](https://github.com/l984-451/Rivulet) by Bain
-Gurley. Rivulet is a media client for Plex, Jellyfin, Emby and IPTV on Apple TV, iPhone, iPad and
-Mac.
+Reference Video Player is a noncommercial Apple TV app for Plex, Jellyfin, Emby and IPTV.
+It is an independent fork of [Rivulet](https://github.com/l984-451/Rivulet) by Bain Gurley.
+Put questions about Reference Video Player in this repository.
 
-This is not the original app. This fork has no affiliation with Rivulet's author, and Rivulet's
-author does not endorse it. The App Store and TestFlight builds of Rivulet come from upstream, not
-from this fork. Upstream's support channels are for upstream's app. Put questions about this fork in
-this repository.
+## TestFlight
 
-![Reference Player's first-run screen on Apple TV: sign in to Plex, Jellyfin or Emby, or add a Live TV source](images/welcome.jpg)
+The beta requires an Apple TV running tvOS 26 or later. Public TestFlight invitations will open
+after Apple approves the beta.
+
+![First-run screen on Apple TV with Plex, Jellyfin, Emby and Live TV setup options](images/welcome.jpg)
 
 ## The idea
 
@@ -46,8 +46,7 @@ This is a goal for the fork. It is not a claim that the fork has reached the goa
 
 ## What it adds
 
-The settings below are in the Apple TV app only. The iPhone, iPad and Mac apps build from the same
-tree. They also refuse upstream's hosted services, but they have none of these settings.
+The settings below are available on Apple TV.
 
 ![Settings > Playback on Apple TV, with Dolby Vision FEL and Height Speakers under Home Theater](images/playback-settings.jpg)
 
@@ -185,8 +184,7 @@ then reports that the log has no FEL timing.
 - On a physical Apple TV, the author ran and timed the FEL route on two models
   ([FEL on real hardware](#fel-on-real-hardware)). The author has not yet checked the picture on the
   TV, the height speakers or the other playback features there.
-- This repository provides no binaries. You build the app yourself and sign it with your own Apple
-  developer account.
+- To build from source, sign the app with your own Apple developer account.
 
 ## Build
 
